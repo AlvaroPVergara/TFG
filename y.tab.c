@@ -80,7 +80,7 @@ int yyerror (char* mensaje) ;
 typedef struct s_attr {
      int valor ;       //  - valor numerico entero 
      int indice ;      //  - indice para identificar una variable 
-     struct nodoAST nodo;     //  - nodo del arbol sintactico abstracto
+     struct nodoAST* nodo;     //  - nodo del arbol sintactico abstracto
 } t_attr ;
 
 #define YYSTYPE t_attr
@@ -465,11 +465,11 @@ union yyalloc
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  13
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  5
+#define YYNNTS  7
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  10
+#define YYNRULES  13
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  19
+#define YYNSTATES  22
 
 #define YYUNDEFTOK  2
 #define YYMAXUTOK   259
@@ -516,8 +516,8 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    33,    33,    50,    51,    62,    68,    74,    82,    88,
-      91
+       0,    33,    33,    33,    47,    48,    51,    52,    67,    77,
+      87,    99,   105,   108
 };
 #endif
 
@@ -527,8 +527,8 @@ static const yytype_int8 yyrline[] =
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "NUMERO", "VARIABLE", "'='", "'+'",
-  "'-'", "'*'", "'/'", "'\\n'", "'('", "')'", "$accept", "axioma",
-  "expresion", "termino", "operando", YY_NULLPTR
+  "'-'", "'*'", "'/'", "'\\n'", "'('", "')'", "$accept", "axioma", "$@1",
+  "r_expr", "expresion", "termino", "operando", YY_NULLPTR
 };
 #endif
 
@@ -542,7 +542,7 @@ static const yytype_int16 yytoknum[] =
 };
 # endif
 
-#define YYPACT_NINF (-8)
+#define YYPACT_NINF (-15)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -556,8 +556,9 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-       0,    -8,     0,     4,    13,    -8,    -8,     6,    -8,     0,
-       0,     0,     0,    -8,    -8,    -7,    -7,    -8,    -8
+       0,   -15,     0,     4,    13,   -15,   -15,     6,   -15,     0,
+       0,     0,     0,   -15,   -15,    -7,    -7,   -15,   -15,     0,
+     -15,   -15
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -565,20 +566,21 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     9,     0,     0,     0,     3,     8,     0,     1,     0,
-       0,     0,     0,     2,    10,     4,     5,     6,     7
+       0,    12,     0,     0,     0,     6,    11,     0,     1,     0,
+       0,     0,     0,     2,    13,     7,     8,     9,    10,     4,
+       5,     3
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -8,    -8,    -2,    -8,    -8
+     -15,   -14,   -15,   -15,    -2,   -15,   -15
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     3,     4,     5,     6
+      -1,     3,    19,    21,     4,     5,     6
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -586,14 +588,14 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       7,    11,    12,     1,     8,     0,     0,    15,    16,    17,
+       7,    11,    12,     1,     8,    20,     0,    15,    16,    17,
       18,     2,     9,    10,    11,    12,     0,     0,    14,     9,
       10,    11,    12,    13
 };
 
 static const yytype_int8 yycheck[] =
 {
-       2,     8,     9,     3,     0,    -1,    -1,     9,    10,    11,
+       2,     8,     9,     3,     0,    19,    -1,     9,    10,    11,
       12,    11,     6,     7,     8,     9,    -1,    -1,    12,     6,
        7,     8,     9,    10
 };
@@ -602,22 +604,23 @@ static const yytype_int8 yycheck[] =
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,    11,    14,    15,    16,    17,    15,     0,     6,
-       7,     8,     9,    10,    12,    15,    15,    15,    15
+       0,     3,    11,    14,    17,    18,    19,    17,     0,     6,
+       7,     8,     9,    10,    12,    17,    17,    17,    17,    15,
+      14,    16
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    13,    14,    15,    15,    15,    15,    15,    16,    17,
-      17
+       0,    13,    15,    14,    16,    16,    17,    17,    17,    17,
+      17,    18,    19,    19
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     2,     1,     3,     3,     3,     3,     1,     1,
-       3
+       0,     2,     0,     4,     0,     1,     1,     3,     3,     3,
+       3,     1,     1,     3
 };
 
 
@@ -1315,91 +1318,108 @@ yyreduce:
   case 2:
 #line 33 "basicCalc.y"
                                           { printf ("Expresion=%d\n", yyvsp[-1].valor) ;
-                                             printf("Nombre del nodo raiz: %s\n", yyvsp[-1].nodo.nombre);
-                                             printf("Valor del primer hijo: %d\n", yyvsp[-1].nodo.primer_nodo->valor);
-                                             printf("Valor del segundo hijo: %d\n", yyvsp[-1].nodo.primer_nodo->siguiente_hermano->valor);
-                                             imprimirAST(&yyvsp[-1].nodo);
+                                             /*printf("Nombre del nodo raiz: %s\n", $1.nodo->nombre);
+                                             printf("Valor del primer hijo: %d\n", $1.nodo->primer_nodo->valor);
+                                             printf("Valor del segundo hijo: %d\n", $1.nodo->primer_nodo->siguiente_hermano->valor);*/
+                                             imprimirAST(yyvsp[-1].nodo);
+                                             liberarAST(yyvsp[-1].nodo);
                                               }
-#line 1324 "y.tab.c"
-    break;
-
-  case 3:
-#line 50 "basicCalc.y"
-                                         { yyval = yyvsp[0] ; }
-#line 1330 "y.tab.c"
-    break;
-
-  case 4:
-#line 51 "basicCalc.y"
-                                         { yyval.valor = yyvsp[-2].valor + yyvsp[0].valor ;  
-                                             struct nodoAST nuevoNodo = crearNodoIntermedio("suma");
-                                             printf("Agregando a nuevo nodo: %s\n", nuevoNodo.nombre);
-                                             printf("Agregando nodo1: %d\n", yyvsp[-2].nodo.valor);
-                                             printf("Agregando nodo2: %d\n", yyvsp[0].nodo.valor);
-                                             agregarHijo(&nuevoNodo, &yyvsp[-2].nodo);
-                                             printf("Primer hijo de suma: %d\n", nuevoNodo.primer_nodo->valor);
-                                             agregarHijo(&nuevoNodo, &yyvsp[0].nodo);
-                                             printf("Segundo hijo de suma: %d\n", nuevoNodo.primer_nodo->siguiente_hermano->valor);
-                                             yyval.nodo = nuevoNodo;
-                                         }
-#line 1346 "y.tab.c"
-    break;
-
-  case 5:
-#line 62 "basicCalc.y"
-                                         { yyval.valor = yyvsp[-2].valor - yyvsp[0].valor ;  
-                                             struct nodoAST nuevoNodo = crearNodoIntermedio("resta");
-                                             agregarHijo(&nuevoNodo, &yyvsp[-2].nodo);
-                                             agregarHijo(&nuevoNodo, &yyvsp[0].nodo);
-                                             yyval.nodo = nuevoNodo;
-                                             }
-#line 1357 "y.tab.c"
+#line 1328 "y.tab.c"
     break;
 
   case 6:
-#line 68 "basicCalc.y"
-                                         {   yyval.valor = yyvsp[-2].valor * yyvsp[0].valor ;  
-                                             struct nodoAST nuevoNodo = crearNodoIntermedio("multiplicacion");
-                                             agregarHijo(&nuevoNodo, &yyvsp[-2].nodo);
-                                             agregarHijo(&nuevoNodo, &yyvsp[0].nodo);
-                                             yyval.nodo = nuevoNodo;
-                                        }
-#line 1368 "y.tab.c"
+#line 51 "basicCalc.y"
+                                         { yyval = yyvsp[0] ; }
+#line 1334 "y.tab.c"
     break;
 
   case 7:
-#line 74 "basicCalc.y"
-                                         { yyval.valor = yyvsp[-2].valor / yyvsp[0].valor ;  
-                                             struct nodoAST nuevoNodo = crearNodoIntermedio("división");
-                                             agregarHijo(&nuevoNodo, &yyvsp[-2].nodo);
-                                             agregarHijo(&nuevoNodo, &yyvsp[0].nodo);
+#line 52 "basicCalc.y"
+                                         { yyval.valor = yyvsp[-2].valor + yyvsp[0].valor ;  
+                                             struct nodoAST* nuevoNodo = crearNodoIntermedio("suma");
+                                             /*printf("Agregando a nuevo nodo: %s\n", nuevoNodo->nombre);
+                                             printf("Agregando nodo1: %d\n", $1.nodo->valor);
+                                             printf("Agregando nodo2: %d\n", $3.nodo->valor);*/
+                                             if (yyvsp[-2].nodo != NULL) {
+                                                 agregarHijo(nuevoNodo, yyvsp[-2].nodo);
+                                             }
+                                             //printf("Primer hijo de suma: %d\n", nuevoNodo->primer_nodo->valor);
+                                             if (yyvsp[0].nodo != NULL) {
+                                                 agregarHijo(nuevoNodo, yyvsp[0].nodo);
+                                             }
+                                             //printf("Segundo hijo de suma: %d\n", nuevoNodo->primer_nodo->siguiente_hermano->valor);
                                              yyval.nodo = nuevoNodo;
-                                        }
-#line 1379 "y.tab.c"
+                                         }
+#line 1354 "y.tab.c"
     break;
 
   case 8:
-#line 82 "basicCalc.y"
-                                                 { yyval = yyvsp[0] ; }
-#line 1385 "y.tab.c"
+#line 67 "basicCalc.y"
+                                         { yyval.valor = yyvsp[-2].valor - yyvsp[0].valor ;  
+                                             struct nodoAST* nuevoNodo = crearNodoIntermedio("resta");
+                                             if (yyvsp[-2].nodo != NULL) {
+                                                 agregarHijo(nuevoNodo, yyvsp[-2].nodo);
+                                             }
+                                             if (yyvsp[0].nodo != NULL) {
+                                                 agregarHijo(nuevoNodo, yyvsp[0].nodo);
+                                             }
+                                             yyval.nodo = nuevoNodo;
+                                             }
+#line 1369 "y.tab.c"
     break;
 
   case 9:
-#line 88 "basicCalc.y"
-                                           {   yyval.valor = yyvsp[0].valor ;
-                                             yyval.nodo = crearNodoNumero(yyvsp[0].valor);
-                                         }
-#line 1393 "y.tab.c"
+#line 77 "basicCalc.y"
+                                         {   yyval.valor = yyvsp[-2].valor * yyvsp[0].valor ;  
+                                             struct nodoAST* nuevoNodo = crearNodoIntermedio("multiplicacion");
+                                             if (yyvsp[-2].nodo != NULL) {
+                                                 agregarHijo(nuevoNodo, yyvsp[-2].nodo);
+                                             }
+                                             if (yyvsp[0].nodo != NULL) {
+                                                 agregarHijo(nuevoNodo, yyvsp[0].nodo);
+                                             }
+                                             yyval.nodo = nuevoNodo;
+                                        }
+#line 1384 "y.tab.c"
     break;
 
   case 10:
-#line 91 "basicCalc.y"
-                                         { yyval = yyvsp[-1] ; }
+#line 87 "basicCalc.y"
+                                         { yyval.valor = yyvsp[-2].valor / yyvsp[0].valor ;  
+                                             struct nodoAST* nuevoNodo = crearNodoIntermedio("división");
+                                             if (yyvsp[-2].nodo != NULL) {
+                                                 agregarHijo(nuevoNodo, yyvsp[-2].nodo);
+                                             }
+                                             if (yyvsp[0].nodo != NULL) {
+                                                 agregarHijo(nuevoNodo, yyvsp[0].nodo);
+                                             }
+                                             yyval.nodo = nuevoNodo;
+                                        }
 #line 1399 "y.tab.c"
     break;
 
+  case 11:
+#line 99 "basicCalc.y"
+                                                 { yyval = yyvsp[0] ; }
+#line 1405 "y.tab.c"
+    break;
 
-#line 1403 "y.tab.c"
+  case 12:
+#line 105 "basicCalc.y"
+                                           {   yyval.valor = yyvsp[0].valor ;
+                                             yyval.nodo = crearNodoNumero(yyvsp[0].valor);
+                                         }
+#line 1413 "y.tab.c"
+    break;
+
+  case 13:
+#line 108 "basicCalc.y"
+                                         { yyval = yyvsp[-1] ; }
+#line 1419 "y.tab.c"
+    break;
+
+
+#line 1423 "y.tab.c"
 
       default: break;
     }
@@ -1631,7 +1651,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 94 "basicCalc.y"
+#line 111 "basicCalc.y"
 
 
                         /* SECCION 4  Codigo en C */

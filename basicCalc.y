@@ -11,7 +11,7 @@ int yyerror (char* mensaje) ;
 typedef struct s_attr {
      int valor ;       //  - valor numerico entero 
      int indice ;      //  - indice para identificar una variable 
-     struct nodoAST nodo;     //  - nodo del arbol sintactico abstracto
+     struct nodoAST* nodo;     //  - nodo del arbol sintactico abstracto
 } t_attr ;
 
 #define YYSTYPE t_attr
@@ -31,50 +31,67 @@ typedef struct s_attr {
 %%
                         // SECCION 3: Gramatica - Semantico 
 axioma:       expresion '\n'              { printf ("Expresion=%d\n", $1.valor) ;
-                                             printf("Nombre del nodo raiz: %s\n", $1.nodo.nombre);
-                                             printf("Valor del primer hijo: %d\n", $1.nodo.primer_nodo->valor);
-                                             printf("Valor del segundo hijo: %d\n", $1.nodo.primer_nodo->siguiente_hermano->valor);
-                                             imprimirAST(&$1.nodo);
+                                             /*printf("Nombre del nodo raiz: %s\n", $1.nodo->nombre);
+                                             printf("Valor del primer hijo: %d\n", $1.nodo->primer_nodo->valor);
+                                             printf("Valor del segundo hijo: %d\n", $1.nodo->primer_nodo->siguiente_hermano->valor);*/
+                                             imprimirAST($1.nodo);
+                                             liberarAST($1.nodo);
                                               } 
-/*                       r_expr
+                      r_expr/* 
             | VARIABLE '=' expresion '\n' { memoria [$1] = $3;
                                             printf ("%c=%d\n", $1+'A', $3);
                                           }
                        r_expr */
             ; 
 
- // r_expr:                      /* lambda */
- /*           | axioma
-            ; */
+  r_expr:                      /* lambda */
+            | axioma
+            ; 
 
 expresion:    termino                    { $$ = $1 ; }
             | expresion '+' expresion    { $$.valor = $1.valor + $3.valor ;  
-                                             struct nodoAST nuevoNodo = crearNodoIntermedio("suma");
-                                             printf("Agregando a nuevo nodo: %s\n", nuevoNodo.nombre);
-                                             printf("Agregando nodo1: %d\n", $1.nodo.valor);
-                                             printf("Agregando nodo2: %d\n", $3.nodo.valor);
-                                             agregarHijo(&nuevoNodo, &$1.nodo);
-                                             printf("Primer hijo de suma: %d\n", nuevoNodo.primer_nodo->valor);
-                                             agregarHijo(&nuevoNodo, &$3.nodo);
-                                             printf("Segundo hijo de suma: %d\n", nuevoNodo.primer_nodo->siguiente_hermano->valor);
+                                             struct nodoAST* nuevoNodo = crearNodoIntermedio("suma");
+                                             /*printf("Agregando a nuevo nodo: %s\n", nuevoNodo->nombre);
+                                             printf("Agregando nodo1: %d\n", $1.nodo->valor);
+                                             printf("Agregando nodo2: %d\n", $3.nodo->valor);*/
+                                             if ($1.nodo != NULL) {
+                                                 agregarHijo(nuevoNodo, $1.nodo);
+                                             }
+                                             //printf("Primer hijo de suma: %d\n", nuevoNodo->primer_nodo->valor);
+                                             if ($3.nodo != NULL) {
+                                                 agregarHijo(nuevoNodo, $3.nodo);
+                                             }
+                                             //printf("Segundo hijo de suma: %d\n", nuevoNodo->primer_nodo->siguiente_hermano->valor);
                                              $$.nodo = nuevoNodo;
                                          }    
             | expresion '-' expresion    { $$.valor = $1.valor - $3.valor ;  
-                                             struct nodoAST nuevoNodo = crearNodoIntermedio("resta");
-                                             agregarHijo(&nuevoNodo, &$1.nodo);
-                                             agregarHijo(&nuevoNodo, &$3.nodo);
+                                             struct nodoAST* nuevoNodo = crearNodoIntermedio("resta");
+                                             if ($1.nodo != NULL) {
+                                                 agregarHijo(nuevoNodo, $1.nodo);
+                                             }
+                                             if ($3.nodo != NULL) {
+                                                 agregarHijo(nuevoNodo, $3.nodo);
+                                             }
                                              $$.nodo = nuevoNodo;
                                              }
             | expresion '*' expresion    {   $$.valor = $1.valor * $3.valor ;  
-                                             struct nodoAST nuevoNodo = crearNodoIntermedio("multiplicacion");
-                                             agregarHijo(&nuevoNodo, &$1.nodo);
-                                             agregarHijo(&nuevoNodo, &$3.nodo);
+                                             struct nodoAST* nuevoNodo = crearNodoIntermedio("multiplicacion");
+                                             if ($1.nodo != NULL) {
+                                                 agregarHijo(nuevoNodo, $1.nodo);
+                                             }
+                                             if ($3.nodo != NULL) {
+                                                 agregarHijo(nuevoNodo, $3.nodo);
+                                             }
                                              $$.nodo = nuevoNodo;
                                         }
             | expresion '/' expresion    { $$.valor = $1.valor / $3.valor ;  
-                                             struct nodoAST nuevoNodo = crearNodoIntermedio("división");
-                                             agregarHijo(&nuevoNodo, &$1.nodo);
-                                             agregarHijo(&nuevoNodo, &$3.nodo);
+                                             struct nodoAST* nuevoNodo = crearNodoIntermedio("división");
+                                             if ($1.nodo != NULL) {
+                                                 agregarHijo(nuevoNodo, $1.nodo);
+                                             }
+                                             if ($3.nodo != NULL) {
+                                                 agregarHijo(nuevoNodo, $3.nodo);
+                                             }
                                              $$.nodo = nuevoNodo;
                                         }
             ;
