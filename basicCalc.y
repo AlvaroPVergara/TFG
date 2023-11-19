@@ -1,16 +1,22 @@
 %{                      // SECCION 1 
 #include <stdio.h>
+#include <ctype.h>            // declaraciones para tolower
+#include <string.h>           // declaraciones para code
+#include <stdlib.h>           // declaraciones para exit ()
 #include "./AST.h"
 //int memoria [26] ;   	// Se define una zona de memoria para las variables 
 
 int yylex () ;
 int yyerror (char* mensaje) ; 
+char *gen_code (char *) ;
+char *my_malloc (int nbytes) ;
 
-
+char temp [2048] ;
 
 typedef struct s_attr {
      int valor ;       //  - valor numerico entero 
      int indice ;      //  - indice para identificar una variable 
+     char* postfija;   //  - expresion postfija
      struct nodoAST* nodo;     //  - nodo del arbol sintactico abstracto
 } t_attr ;
 
@@ -30,10 +36,9 @@ typedef struct s_attr {
 // %left   SIGNO_UNARIO    //  mayor orden de precedencia 
 %%
                         // SECCION 3: Gramatica - Semantico 
-axioma:       expresion '\n'              { printf ("Expresion=%d\n", $1.valor) ;
-                                             /*printf("Nombre del nodo raiz: %s\n", $1.nodo->nombre);
-                                             printf("Valor del primer hijo: %d\n", $1.nodo->primer_nodo->valor);
-                                             printf("Valor del segundo hijo: %d\n", $1.nodo->primer_nodo->siguiente_hermano->valor);*/
+axioma:       expresion '\n'              { printf ("Resultado=%d\n\n", $1.valor) ;
+                                             printf ("Expresion postfija:\n %s\n\n", $1.postfija) ;
+                                             printf ("Arbol sintactico abstracto:\n");
                                              imprimirAST($1.nodo);
                                              liberarAST($1.nodo);
                                               } 
@@ -49,22 +54,25 @@ axioma:       expresion '\n'              { printf ("Expresion=%d\n", $1.valor) 
             ; 
 
 expresion:    termino                    { $$ = $1 ; }
-            | expresion '+' expresion    { $$.valor = $1.valor + $3.valor ;  
+            | expresion '+' expresion    {   // Para calculadora
+                                             $$.valor = $1.valor + $3.valor ;  
+                                             // Para AST
                                              struct nodoAST* nuevoNodo = crearNodoIntermedio("suma");
-                                             /*printf("Agregando a nuevo nodo: %s\n", nuevoNodo->nombre);
-                                             printf("Agregando nodo1: %d\n", $1.nodo->valor);
-                                             printf("Agregando nodo2: %d\n", $3.nodo->valor);*/
                                              if ($1.nodo != NULL) {
                                                  agregarHijo(nuevoNodo, $1.nodo);
                                              }
-                                             //printf("Primer hijo de suma: %d\n", nuevoNodo->primer_nodo->valor);
                                              if ($3.nodo != NULL) {
                                                  agregarHijo(nuevoNodo, $3.nodo);
                                              }
-                                             //printf("Segundo hijo de suma: %d\n", nuevoNodo->primer_nodo->siguiente_hermano->valor);
                                              $$.nodo = nuevoNodo;
-                                         }    
-            | expresion '-' expresion    { $$.valor = $1.valor - $3.valor ;  
+                                             // Notacion postfija
+                                             sprintf(temp, "(+ %s %s)", $1.postfija, $3.postfija); 
+                                             $$.postfija =  gen_code(temp);
+                                        }    
+
+            | expresion '-' expresion    {   // Para calculadora
+                                             $$.valor = $1.valor - $3.valor ;  
+                                             // Para AST
                                              struct nodoAST* nuevoNodo = crearNodoIntermedio("resta");
                                              if ($1.nodo != NULL) {
                                                  agregarHijo(nuevoNodo, $1.nodo);
@@ -73,8 +81,14 @@ expresion:    termino                    { $$ = $1 ; }
                                                  agregarHijo(nuevoNodo, $3.nodo);
                                              }
                                              $$.nodo = nuevoNodo;
-                                             }
-            | expresion '*' expresion    {   $$.valor = $1.valor * $3.valor ;  
+                                             // Notacion postfija
+                                             sprintf(temp, "(- %s %s)", $1.postfija, $3.postfija);
+                                             $$.postfija =  gen_code(temp);
+                                        }
+                                             
+            | expresion '*' expresion    {   // Para calculadora
+                                             $$.valor = $1.valor * $3.valor ;  
+                                             // Para AST
                                              struct nodoAST* nuevoNodo = crearNodoIntermedio("multiplicacion");
                                              if ($1.nodo != NULL) {
                                                  agregarHijo(nuevoNodo, $1.nodo);
@@ -83,8 +97,14 @@ expresion:    termino                    { $$ = $1 ; }
                                                  agregarHijo(nuevoNodo, $3.nodo);
                                              }
                                              $$.nodo = nuevoNodo;
+                                             // Notacion postfija
+                                             sprintf(temp, "(* %s %s)", $1.postfija, $3.postfija);
+                                             $$.postfija =  gen_code(temp);
                                         }
-            | expresion '/' expresion    { $$.valor = $1.valor / $3.valor ;  
+
+            | expresion '/' expresion    {   // Para calculadora
+                                             $$.valor = $1.valor / $3.valor ;  
+                                             // Para AST
                                              struct nodoAST* nuevoNodo = crearNodoIntermedio("división");
                                              if ($1.nodo != NULL) {
                                                  agregarHijo(nuevoNodo, $1.nodo);
@@ -93,6 +113,9 @@ expresion:    termino                    { $$ = $1 ; }
                                                  agregarHijo(nuevoNodo, $3.nodo);
                                              }
                                              $$.nodo = nuevoNodo;
+                                             // Notacion postfija
+                                             sprintf(temp, "(/ %s %s)", $1.postfija, $3.postfija);
+                                             $$.postfija =  gen_code(temp);
                                         }
             ;
 
@@ -102,8 +125,14 @@ termino:      operando                           { $$ = $1 ; }
             ; 
 
 operando:     /*VARIABLE                   { $$ = memoria [$1] ; }
-            | */NUMERO                     {   $$.valor = $1.valor ;
+            | */NUMERO                     { // Para calculadora
+                                             $$.valor = $1.valor ;
+                                             // Para AST
                                              $$.nodo = crearNodoNumero($1.valor);
+                                             // Para notacion postfija
+                                             sprintf (temp, "%d", $1.valor);
+                                             $$.postfija = gen_code(temp);
+
                                          }
             | '(' expresion ')'          { $$ = $2 ; }
             ;
@@ -115,7 +144,38 @@ int n_linea = 1 ;
 
 int yyerror(char *mensaje) {
     fprintf(stderr, "%s en la linea %d\n", mensaje, n_linea);
-    return 0; // Asegúrate de que yyerror devuelva un valor, en este caso, 0.
+    return 0; 
+}
+
+
+char *my_malloc (int nbytes)       // reserva n bytes de memoria dinamica
+{
+    char *p ;
+    static long int nb = 0;        // sirven para contabilizar la memoria
+    static int nv = 0 ;            // solicitada en total
+
+    p = malloc (nbytes) ;
+    if (p == NULL) {
+        fprintf (stderr, "No memoria left for additional %d bytes\n", nbytes) ;
+        fprintf (stderr, "%ld bytes reserved in %d calls\n", nb, nv) ;
+        exit (0) ;
+    }
+    nb += (long) nbytes ;
+    nv++ ;
+
+    return p ;
+}
+
+char *gen_code (char *name)     // copia el argumento a un
+{                                      // string en memoria dinamica
+    char *p ;
+    int l ;
+	
+    l = strlen (name)+1 ;
+    p = (char *) my_malloc (l) ;
+    strcpy (p, name) ;
+	
+    return p ;
 }
 
 int yylex ()

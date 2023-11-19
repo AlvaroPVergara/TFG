@@ -69,24 +69,30 @@
 #line 1 "basicCalc.y"
                       // SECCION 1 
 #include <stdio.h>
+#include <ctype.h>            // declaraciones para tolower
+#include <string.h>           // declaraciones para code
+#include <stdlib.h>           // declaraciones para exit ()
 #include "./AST.h"
 //int memoria [26] ;   	// Se define una zona de memoria para las variables 
 
 int yylex () ;
 int yyerror (char* mensaje) ; 
+char *gen_code (char *) ;
+char *my_malloc (int nbytes) ;
 
-
+char temp [2048] ;
 
 typedef struct s_attr {
      int valor ;       //  - valor numerico entero 
      int indice ;      //  - indice para identificar una variable 
+     char* postfija;   //  - expresion postfija
      struct nodoAST* nodo;     //  - nodo del arbol sintactico abstracto
 } t_attr ;
 
 #define YYSTYPE t_attr
 
 
-#line 90 "y.tab.c"
+#line 96 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -514,10 +520,10 @@ static const yytype_int8 yytranslate[] =
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_int8 yyrline[] =
+static const yytype_uint8 yyrline[] =
 {
-       0,    33,    33,    33,    47,    48,    51,    52,    67,    77,
-      87,    99,   105,   108
+       0,    39,    39,    39,    52,    53,    56,    57,    73,    89,
+     105,   122,   128,   137
 };
 #endif
 
@@ -1316,46 +1322,47 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 33 "basicCalc.y"
-                                          { printf ("Expresion=%d\n", yyvsp[-1].valor) ;
-                                             /*printf("Nombre del nodo raiz: %s\n", $1.nodo->nombre);
-                                             printf("Valor del primer hijo: %d\n", $1.nodo->primer_nodo->valor);
-                                             printf("Valor del segundo hijo: %d\n", $1.nodo->primer_nodo->siguiente_hermano->valor);*/
+#line 39 "basicCalc.y"
+                                          { printf ("Resultado=%d\n\n", yyvsp[-1].valor) ;
+                                             printf ("Expresion postfija:\n %s\n\n", yyvsp[-1].postfija) ;
+                                             printf ("Arbol sintactico abstracto:\n");
                                              imprimirAST(yyvsp[-1].nodo);
                                              liberarAST(yyvsp[-1].nodo);
                                               }
-#line 1328 "y.tab.c"
+#line 1333 "y.tab.c"
     break;
 
   case 6:
-#line 51 "basicCalc.y"
+#line 56 "basicCalc.y"
                                          { yyval = yyvsp[0] ; }
-#line 1334 "y.tab.c"
+#line 1339 "y.tab.c"
     break;
 
   case 7:
-#line 52 "basicCalc.y"
-                                         { yyval.valor = yyvsp[-2].valor + yyvsp[0].valor ;  
+#line 57 "basicCalc.y"
+                                         {   // Para calculadora
+                                             yyval.valor = yyvsp[-2].valor + yyvsp[0].valor ;  
+                                             // Para AST
                                              struct nodoAST* nuevoNodo = crearNodoIntermedio("suma");
-                                             /*printf("Agregando a nuevo nodo: %s\n", nuevoNodo->nombre);
-                                             printf("Agregando nodo1: %d\n", $1.nodo->valor);
-                                             printf("Agregando nodo2: %d\n", $3.nodo->valor);*/
                                              if (yyvsp[-2].nodo != NULL) {
                                                  agregarHijo(nuevoNodo, yyvsp[-2].nodo);
                                              }
-                                             //printf("Primer hijo de suma: %d\n", nuevoNodo->primer_nodo->valor);
                                              if (yyvsp[0].nodo != NULL) {
                                                  agregarHijo(nuevoNodo, yyvsp[0].nodo);
                                              }
-                                             //printf("Segundo hijo de suma: %d\n", nuevoNodo->primer_nodo->siguiente_hermano->valor);
                                              yyval.nodo = nuevoNodo;
-                                         }
-#line 1354 "y.tab.c"
+                                             // Notacion postfija
+                                             sprintf(temp, "(+ %s %s)", yyvsp[-2].postfija, yyvsp[0].postfija); 
+                                             yyval.postfija =  gen_code(temp);
+                                        }
+#line 1359 "y.tab.c"
     break;
 
   case 8:
-#line 67 "basicCalc.y"
-                                         { yyval.valor = yyvsp[-2].valor - yyvsp[0].valor ;  
+#line 73 "basicCalc.y"
+                                         {   // Para calculadora
+                                             yyval.valor = yyvsp[-2].valor - yyvsp[0].valor ;  
+                                             // Para AST
                                              struct nodoAST* nuevoNodo = crearNodoIntermedio("resta");
                                              if (yyvsp[-2].nodo != NULL) {
                                                  agregarHijo(nuevoNodo, yyvsp[-2].nodo);
@@ -1364,13 +1371,18 @@ yyreduce:
                                                  agregarHijo(nuevoNodo, yyvsp[0].nodo);
                                              }
                                              yyval.nodo = nuevoNodo;
-                                             }
-#line 1369 "y.tab.c"
+                                             // Notacion postfija
+                                             sprintf(temp, "(- %s %s)", yyvsp[-2].postfija, yyvsp[0].postfija);
+                                             yyval.postfija =  gen_code(temp);
+                                        }
+#line 1379 "y.tab.c"
     break;
 
   case 9:
-#line 77 "basicCalc.y"
-                                         {   yyval.valor = yyvsp[-2].valor * yyvsp[0].valor ;  
+#line 89 "basicCalc.y"
+                                         {   // Para calculadora
+                                             yyval.valor = yyvsp[-2].valor * yyvsp[0].valor ;  
+                                             // Para AST
                                              struct nodoAST* nuevoNodo = crearNodoIntermedio("multiplicacion");
                                              if (yyvsp[-2].nodo != NULL) {
                                                  agregarHijo(nuevoNodo, yyvsp[-2].nodo);
@@ -1379,13 +1391,18 @@ yyreduce:
                                                  agregarHijo(nuevoNodo, yyvsp[0].nodo);
                                              }
                                              yyval.nodo = nuevoNodo;
+                                             // Notacion postfija
+                                             sprintf(temp, "(* %s %s)", yyvsp[-2].postfija, yyvsp[0].postfija);
+                                             yyval.postfija =  gen_code(temp);
                                         }
-#line 1384 "y.tab.c"
+#line 1399 "y.tab.c"
     break;
 
   case 10:
-#line 87 "basicCalc.y"
-                                         { yyval.valor = yyvsp[-2].valor / yyvsp[0].valor ;  
+#line 105 "basicCalc.y"
+                                         {   // Para calculadora
+                                             yyval.valor = yyvsp[-2].valor / yyvsp[0].valor ;  
+                                             // Para AST
                                              struct nodoAST* nuevoNodo = crearNodoIntermedio("división");
                                              if (yyvsp[-2].nodo != NULL) {
                                                  agregarHijo(nuevoNodo, yyvsp[-2].nodo);
@@ -1394,32 +1411,41 @@ yyreduce:
                                                  agregarHijo(nuevoNodo, yyvsp[0].nodo);
                                              }
                                              yyval.nodo = nuevoNodo;
+                                             // Notacion postfija
+                                             sprintf(temp, "(/ %s %s)", yyvsp[-2].postfija, yyvsp[0].postfija);
+                                             yyval.postfija =  gen_code(temp);
                                         }
-#line 1399 "y.tab.c"
-    break;
-
-  case 11:
-#line 99 "basicCalc.y"
-                                                 { yyval = yyvsp[0] ; }
-#line 1405 "y.tab.c"
-    break;
-
-  case 12:
-#line 105 "basicCalc.y"
-                                           {   yyval.valor = yyvsp[0].valor ;
-                                             yyval.nodo = crearNodoNumero(yyvsp[0].valor);
-                                         }
-#line 1413 "y.tab.c"
-    break;
-
-  case 13:
-#line 108 "basicCalc.y"
-                                         { yyval = yyvsp[-1] ; }
 #line 1419 "y.tab.c"
     break;
 
+  case 11:
+#line 122 "basicCalc.y"
+                                                 { yyval = yyvsp[0] ; }
+#line 1425 "y.tab.c"
+    break;
 
-#line 1423 "y.tab.c"
+  case 12:
+#line 128 "basicCalc.y"
+                                           { // Para calculadora
+                                             yyval.valor = yyvsp[0].valor ;
+                                             // Para AST
+                                             yyval.nodo = crearNodoNumero(yyvsp[0].valor);
+                                             // Para notacion postfija
+                                             sprintf (temp, "%d", yyvsp[0].valor);
+                                             yyval.postfija = gen_code(temp);
+
+                                         }
+#line 1439 "y.tab.c"
+    break;
+
+  case 13:
+#line 137 "basicCalc.y"
+                                         { yyval = yyvsp[-1] ; }
+#line 1445 "y.tab.c"
+    break;
+
+
+#line 1449 "y.tab.c"
 
       default: break;
     }
@@ -1651,7 +1677,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 111 "basicCalc.y"
+#line 140 "basicCalc.y"
 
 
                         /* SECCION 4  Codigo en C */
@@ -1659,7 +1685,38 @@ int n_linea = 1 ;
 
 int yyerror(char *mensaje) {
     fprintf(stderr, "%s en la linea %d\n", mensaje, n_linea);
-    return 0; // Asegúrate de que yyerror devuelva un valor, en este caso, 0.
+    return 0; 
+}
+
+
+char *my_malloc (int nbytes)       // reserva n bytes de memoria dinamica
+{
+    char *p ;
+    static long int nb = 0;        // sirven para contabilizar la memoria
+    static int nv = 0 ;            // solicitada en total
+
+    p = malloc (nbytes) ;
+    if (p == NULL) {
+        fprintf (stderr, "No memoria left for additional %d bytes\n", nbytes) ;
+        fprintf (stderr, "%ld bytes reserved in %d calls\n", nb, nv) ;
+        exit (0) ;
+    }
+    nb += (long) nbytes ;
+    nv++ ;
+
+    return p ;
+}
+
+char *gen_code (char *name)     // copia el argumento a un
+{                                      // string en memoria dinamica
+    char *p ;
+    int l ;
+	
+    l = strlen (name)+1 ;
+    p = (char *) my_malloc (l) ;
+    strcpy (p, name) ;
+	
+    return p ;
 }
 
 int yylex ()
