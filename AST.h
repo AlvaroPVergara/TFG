@@ -20,6 +20,7 @@ struct nodoAST* crearNodoNumero(int valor);
 struct nodoAST* crearNodoVariable(char* nombre, int valor);
 struct nodoAST* crearNodoIntermedio(char* nombre);
 void agregarHijo(struct nodoAST* padre, struct nodoAST* hijo);
+struct nodoAST* crearNodoIntermedioGenerico(char* nombre, int numHijos, ...);
 void liberarAST(struct nodoAST* raiz);
 void imprimirAST(struct nodoAST* raiz);
 

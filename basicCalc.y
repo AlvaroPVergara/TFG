@@ -16,7 +16,7 @@ char temp [2048] ;
 typedef struct s_attr {
      int valor ;       //  - valor numerico entero 
      int indice ;      //  - indice para identificar una variable 
-     char* postfija;   //  - expresion postfija
+     char* prefija;   //  - expresion prefija
      struct nodoAST* nodo;     //  - nodo del arbol sintactico abstracto
 } t_attr ;
 
@@ -37,7 +37,7 @@ typedef struct s_attr {
 %%
                         // SECCION 3: Gramatica - Semantico 
 axioma:       expresion '\n'              { printf ("Resultado=%d\n\n", $1.valor) ;
-                                             printf ("Expresion postfija:\n %s\n\n", $1.postfija) ;
+                                             printf ("Expresion prefija:\n %s\n\n", $1.prefija) ;
                                              printf ("Arbol sintactico abstracto:\n");
                                              imprimirAST($1.nodo);
                                              liberarAST($1.nodo);
@@ -56,66 +56,50 @@ axioma:       expresion '\n'              { printf ("Resultado=%d\n\n", $1.valor
 expresion:    termino                    { $$ = $1 ; }
             | expresion '+' expresion    {   // Para calculadora
                                              $$.valor = $1.valor + $3.valor ;  
+
                                              // Para AST
-                                             struct nodoAST* nuevoNodo = crearNodoIntermedio("suma");
-                                             if ($1.nodo != NULL) {
-                                                 agregarHijo(nuevoNodo, $1.nodo);
-                                             }
-                                             if ($3.nodo != NULL) {
-                                                 agregarHijo(nuevoNodo, $3.nodo);
-                                             }
+                                             struct nodoAST* nuevoNodo = crearNodoIntermedioGenerico("suma", 2, $1.nodo, $3.nodo);
                                              $$.nodo = nuevoNodo;
-                                             // Notacion postfija
-                                             sprintf(temp, "(+ %s %s)", $1.postfija, $3.postfija); 
-                                             $$.postfija =  gen_code(temp);
+
+                                             // Notacion prefija
+                                             sprintf(temp, "(+ %s %s)", $1.prefija, $3.prefija); 
+                                             $$.prefija =  gen_code(temp);
                                         }    
 
             | expresion '-' expresion    {   // Para calculadora
                                              $$.valor = $1.valor - $3.valor ;  
+
                                              // Para AST
-                                             struct nodoAST* nuevoNodo = crearNodoIntermedio("resta");
-                                             if ($1.nodo != NULL) {
-                                                 agregarHijo(nuevoNodo, $1.nodo);
-                                             }
-                                             if ($3.nodo != NULL) {
-                                                 agregarHijo(nuevoNodo, $3.nodo);
-                                             }
+                                             struct nodoAST* nuevoNodo = crearNodoIntermedioGenerico("resta", 2, $1.nodo, $3.nodo);
                                              $$.nodo = nuevoNodo;
-                                             // Notacion postfija
-                                             sprintf(temp, "(- %s %s)", $1.postfija, $3.postfija);
-                                             $$.postfija =  gen_code(temp);
+
+                                             // Notacion prefija
+                                             sprintf(temp, "(- %s %s)", $1.prefija, $3.prefija);
+                                             $$.prefija =  gen_code(temp);
                                         }
                                              
             | expresion '*' expresion    {   // Para calculadora
                                              $$.valor = $1.valor * $3.valor ;  
+
                                              // Para AST
-                                             struct nodoAST* nuevoNodo = crearNodoIntermedio("multiplicacion");
-                                             if ($1.nodo != NULL) {
-                                                 agregarHijo(nuevoNodo, $1.nodo);
-                                             }
-                                             if ($3.nodo != NULL) {
-                                                 agregarHijo(nuevoNodo, $3.nodo);
-                                             }
+                                             struct nodoAST* nuevoNodo = crearNodoIntermedioGenerico("multiplicacion", 2, $1.nodo, $3.nodo);
                                              $$.nodo = nuevoNodo;
-                                             // Notacion postfija
-                                             sprintf(temp, "(* %s %s)", $1.postfija, $3.postfija);
-                                             $$.postfija =  gen_code(temp);
+
+                                             // Notacion prefija
+                                             sprintf(temp, "(* %s %s)", $1.prefija, $3.prefija);
+                                             $$.prefija =  gen_code(temp);
                                         }
 
             | expresion '/' expresion    {   // Para calculadora
                                              $$.valor = $1.valor / $3.valor ;  
+
                                              // Para AST
-                                             struct nodoAST* nuevoNodo = crearNodoIntermedio("división");
-                                             if ($1.nodo != NULL) {
-                                                 agregarHijo(nuevoNodo, $1.nodo);
-                                             }
-                                             if ($3.nodo != NULL) {
-                                                 agregarHijo(nuevoNodo, $3.nodo);
-                                             }
+                                             struct nodoAST* nuevoNodo = crearNodoIntermedioGenerico("división", 2, $1.nodo, $3.nodo);
                                              $$.nodo = nuevoNodo;
-                                             // Notacion postfija
-                                             sprintf(temp, "(/ %s %s)", $1.postfija, $3.postfija);
-                                             $$.postfija =  gen_code(temp);
+
+                                             // Notacion prefija
+                                             sprintf(temp, "(/ %s %s)", $1.prefija, $3.prefija);
+                                             $$.prefija =  gen_code(temp);
                                         }
             ;
 
@@ -129,9 +113,9 @@ operando:     /*VARIABLE                   { $$ = memoria [$1] ; }
                                              $$.valor = $1.valor ;
                                              // Para AST
                                              $$.nodo = crearNodoNumero($1.valor);
-                                             // Para notacion postfija
+                                             // Para notacion prefija
                                              sprintf (temp, "%d", $1.valor);
-                                             $$.postfija = gen_code(temp);
+                                             $$.prefija = gen_code(temp);
 
                                          }
             | '(' expresion ')'          { $$ = $2 ; }
