@@ -78,7 +78,7 @@ asignacion: IDENTIF '=' expresion    {    // Para calculadora
                                              $$.nodo = nuevoNodo;
 
                                              // Para notacion prefija
-                                             sprintf (temp, "(= %s %s)", $1.code, $3.prefija);
+                                             sprintf (temp, "(setq %s %s)", $1.code, $3.prefija);
                                              $$.prefija = gen_code(temp);
                                         }
             ;
