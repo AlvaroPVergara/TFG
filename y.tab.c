@@ -83,8 +83,8 @@ char *my_malloc (int nbytes) ;
 char temp [2048] ;
 
 typedef struct s_attr {
-     int valor ;       //  - valor numerico entero 
-     int indice ;      //  - indice para identificar una variable 
+     int value ;       //  - valor numerico entero 
+     char* code ;    
      char* prefija;   //  - expresion prefija
      struct nodoAST* nodo;     //  - nodo del arbol sintactico abstracto
 } t_attr ;
@@ -140,13 +140,45 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    NUMERO = 258,
-    VARIABLE = 259
+    NUMBER = 258,
+    IDENTIF = 259,
+    INTEGER = 260,
+    STRING = 261,
+    MAIN = 262,
+    WHILE = 263,
+    FOR = 264,
+    IF = 265,
+    ELSE = 266,
+    PUTS = 267,
+    PRINTF = 268,
+    AND = 269,
+    OR = 270,
+    LEQ = 271,
+    GEQ = 272,
+    EQ = 273,
+    NEQ = 274,
+    RETURN = 275
   };
 #endif
 /* Tokens.  */
-#define NUMERO 258
-#define VARIABLE 259
+#define NUMBER 258
+#define IDENTIF 259
+#define INTEGER 260
+#define STRING 261
+#define MAIN 262
+#define WHILE 263
+#define FOR 264
+#define IF 265
+#define ELSE 266
+#define PUTS 267
+#define PRINTF 268
+#define AND 269
+#define OR 270
+#define LEQ 271
+#define GEQ 272
+#define EQ 273
+#define NEQ 274
+#define RETURN 275
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -464,21 +496,21 @@ union yyalloc
 #endif /* !YYCOPY_NEEDED */
 
 /* YYFINAL -- State number of the termination state.  */
-#define YYFINAL  8
+#define YYFINAL  12
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   23
+#define YYLAST   28
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  13
+#define YYNTOKENS  29
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  7
+#define YYNNTS  9
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  13
+#define YYNRULES  16
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  22
+#define YYNSTATES  27
 
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   259
+#define YYMAXUTOK   275
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -491,15 +523,12 @@ union yyalloc
 static const yytype_int8 yytranslate[] =
 {
        0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      10,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      11,    12,     8,     6,     2,     7,     2,     9,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     5,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+      27,    28,    24,    22,     2,    23,     2,    25,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,    26,
+       2,    21,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -515,15 +544,20 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     1,     2,     3,     4
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
+       5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
+      15,    16,    17,    18,    19,    20
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_int8 yyrline[] =
+static const yytype_uint8 yyrline[] =
 {
-       0,    39,    39,    39,    52,    53,    56,    57,    69,    81,
-      93,   106,   112,   121
+       0,    54,    54,    54,    63,    64,    67,    69,    72,    87,
+      88,   100,   112,   124,   137,   143,   152
 };
 #endif
 
@@ -532,9 +566,11 @@ static const yytype_int8 yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "NUMERO", "VARIABLE", "'='", "'+'",
-  "'-'", "'*'", "'/'", "'\\n'", "'('", "')'", "$accept", "axioma", "$@1",
-  "r_expr", "expresion", "termino", "operando", YY_NULLPTR
+  "$end", "error", "$undefined", "NUMBER", "IDENTIF", "INTEGER", "STRING",
+  "MAIN", "WHILE", "FOR", "IF", "ELSE", "PUTS", "PRINTF", "AND", "OR",
+  "LEQ", "GEQ", "EQ", "NEQ", "RETURN", "'='", "'+'", "'-'", "'*'", "'/'",
+  "';'", "'('", "')'", "$accept", "axioma", "$@1", "r_sentencia",
+  "sentencia", "asignacion", "expresion", "termino", "operando", YY_NULLPTR
 };
 #endif
 
@@ -543,12 +579,13 @@ static const char *const yytname[] =
    (internal) symbol number NUM (which must be that of a token).  */
 static const yytype_int16 yytoknum[] =
 {
-       0,   256,   257,   258,   259,    61,    43,    45,    42,    47,
-      10,    40,    41
+       0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
+     265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
+     275,    61,    43,    45,    42,    47,    59,    40,    41
 };
 # endif
 
-#define YYPACT_NINF (-15)
+#define YYPACT_NINF (-18)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -562,9 +599,9 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-       0,   -15,     0,     4,    13,   -15,   -15,     6,   -15,     0,
-       0,     0,     0,   -15,   -15,    -7,    -7,   -15,   -15,     0,
-     -15,   -15
+      -3,   -18,     1,    -1,     4,     2,   -18,    -4,   -18,   -18,
+      -1,   -17,   -18,   -18,    -1,    -1,    -1,    -1,    -4,   -18,
+      -3,   -12,   -12,   -18,   -18,   -18,   -18
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -572,21 +609,21 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,    12,     0,     0,     0,     6,    11,     0,     1,     0,
-       0,     0,     0,     2,    13,     7,     8,     9,    10,     4,
-       5,     3
+       0,    15,     0,     0,     0,     0,     7,     6,     9,    14,
+       0,     0,     1,     2,     0,     0,     0,     0,     8,    16,
+       4,    10,    11,    12,    13,     5,     3
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -15,   -14,   -15,   -15,    -2,   -15,   -15
+     -18,   -11,   -18,   -18,   -18,   -18,     0,   -18,   -18
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     3,    19,    21,     4,     5,     6
+      -1,     4,    20,    26,     5,     6,     7,     8,     9
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -594,39 +631,39 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       7,    11,    12,     1,     8,    20,     0,    15,    16,    17,
-      18,     2,     9,    10,    11,    12,     0,     0,    14,     9,
-      10,    11,    12,    13
+       1,     2,     1,    11,    12,    14,    15,    16,    17,    25,
+      18,    19,    16,    17,    21,    22,    23,    24,    14,    15,
+      16,    17,    10,     0,     3,     0,     3,     0,    13
 };
 
 static const yytype_int8 yycheck[] =
 {
-       2,     8,     9,     3,     0,    19,    -1,     9,    10,    11,
-      12,    11,     6,     7,     8,     9,    -1,    -1,    12,     6,
-       7,     8,     9,    10
+       3,     4,     3,     3,     0,    22,    23,    24,    25,    20,
+      10,    28,    24,    25,    14,    15,    16,    17,    22,    23,
+      24,    25,    21,    -1,    27,    -1,    27,    -1,    26
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,     3,    11,    14,    17,    18,    19,    17,     0,     6,
-       7,     8,     9,    10,    12,    17,    17,    17,    17,    15,
-      14,    16
+       0,     3,     4,    27,    30,    33,    34,    35,    36,    37,
+      21,    35,     0,    26,    22,    23,    24,    25,    35,    28,
+      31,    35,    35,    35,    35,    30,    32
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    13,    15,    14,    16,    16,    17,    17,    17,    17,
-      17,    18,    19,    19
+       0,    29,    31,    30,    32,    32,    33,    33,    34,    35,
+      35,    35,    35,    35,    36,    37,    37
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     0,     4,     0,     1,     1,     3,     3,     3,
-       3,     1,     1,     3
+       0,     2,     0,     4,     0,     1,     1,     1,     3,     1,
+       3,     3,     3,     3,     1,     1,     3
 };
 
 
@@ -1322,26 +1359,55 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 39 "basicCalc.y"
-                                          { printf ("Resultado=%d\n\n", yyvsp[-1].valor) ;
+#line 54 "basicCalc.y"
+                                            {  printf ("Resultado=%d\n\n", yyvsp[-1].value) ;
                                              printf ("Expresion prefija:\n %s\n\n", yyvsp[-1].prefija) ;
                                              printf ("Arbol sintactico abstracto:\n");
                                              imprimirAST(yyvsp[-1].nodo);
                                              liberarAST(yyvsp[-1].nodo);
                                               }
-#line 1333 "y.tab.c"
+#line 1370 "y.tab.c"
     break;
 
   case 6:
-#line 56 "basicCalc.y"
-                                         { yyval = yyvsp[0] ; }
-#line 1339 "y.tab.c"
+#line 67 "basicCalc.y"
+                                    { yyval = yyvsp[0] ; }
+#line 1376 "y.tab.c"
     break;
 
   case 7:
-#line 57 "basicCalc.y"
+#line 69 "basicCalc.y"
+                                    { yyval = yyvsp[0] ; }
+#line 1382 "y.tab.c"
+    break;
+
+  case 8:
+#line 72 "basicCalc.y"
+                                     {    // Para calculadora
+                                             yyval.value = yyvsp[0].value ;
+
+                                             // Para AST
+                                             struct nodoAST* nodoVar = crearNodoVariable(yyvsp[-2].code, yyvsp[0].value);
+                                             struct nodoAST* nuevoNodo = crearNodoIntermedioGenerico("asignacion", 2, nodoVar, yyvsp[0].nodo);
+                                             yyval.nodo = nuevoNodo;
+
+                                             // Para notacion prefija
+                                             sprintf (temp, "(= %s %s)", yyvsp[-2].code, yyvsp[0].prefija);
+                                             yyval.prefija = gen_code(temp);
+                                        }
+#line 1399 "y.tab.c"
+    break;
+
+  case 9:
+#line 87 "basicCalc.y"
+                                         { yyval = yyvsp[0] ; }
+#line 1405 "y.tab.c"
+    break;
+
+  case 10:
+#line 88 "basicCalc.y"
                                          {   // Para calculadora
-                                             yyval.valor = yyvsp[-2].valor + yyvsp[0].valor ;  
+                                             yyval.value = yyvsp[-2].value + yyvsp[0].value ;  
 
                                              // Para AST
                                              struct nodoAST* nuevoNodo = crearNodoIntermedioGenerico("suma", 2, yyvsp[-2].nodo, yyvsp[0].nodo);
@@ -1351,13 +1417,13 @@ yyreduce:
                                              sprintf(temp, "(+ %s %s)", yyvsp[-2].prefija, yyvsp[0].prefija); 
                                              yyval.prefija =  gen_code(temp);
                                         }
-#line 1355 "y.tab.c"
+#line 1421 "y.tab.c"
     break;
 
-  case 8:
-#line 69 "basicCalc.y"
+  case 11:
+#line 100 "basicCalc.y"
                                          {   // Para calculadora
-                                             yyval.valor = yyvsp[-2].valor - yyvsp[0].valor ;  
+                                             yyval.value = yyvsp[-2].value - yyvsp[0].value ;  
 
                                              // Para AST
                                              struct nodoAST* nuevoNodo = crearNodoIntermedioGenerico("resta", 2, yyvsp[-2].nodo, yyvsp[0].nodo);
@@ -1367,13 +1433,13 @@ yyreduce:
                                              sprintf(temp, "(- %s %s)", yyvsp[-2].prefija, yyvsp[0].prefija);
                                              yyval.prefija =  gen_code(temp);
                                         }
-#line 1371 "y.tab.c"
+#line 1437 "y.tab.c"
     break;
 
-  case 9:
-#line 81 "basicCalc.y"
+  case 12:
+#line 112 "basicCalc.y"
                                          {   // Para calculadora
-                                             yyval.valor = yyvsp[-2].valor * yyvsp[0].valor ;  
+                                             yyval.value = yyvsp[-2].value * yyvsp[0].value ;  
 
                                              // Para AST
                                              struct nodoAST* nuevoNodo = crearNodoIntermedioGenerico("multiplicacion", 2, yyvsp[-2].nodo, yyvsp[0].nodo);
@@ -1383,13 +1449,13 @@ yyreduce:
                                              sprintf(temp, "(* %s %s)", yyvsp[-2].prefija, yyvsp[0].prefija);
                                              yyval.prefija =  gen_code(temp);
                                         }
-#line 1387 "y.tab.c"
+#line 1453 "y.tab.c"
     break;
 
-  case 10:
-#line 93 "basicCalc.y"
+  case 13:
+#line 124 "basicCalc.y"
                                          {   // Para calculadora
-                                             yyval.valor = yyvsp[-2].valor / yyvsp[0].valor ;  
+                                             yyval.value = yyvsp[-2].value / yyvsp[0].value ;  
 
                                              // Para AST
                                              struct nodoAST* nuevoNodo = crearNodoIntermedioGenerico("división", 2, yyvsp[-2].nodo, yyvsp[0].nodo);
@@ -1399,37 +1465,37 @@ yyreduce:
                                              sprintf(temp, "(/ %s %s)", yyvsp[-2].prefija, yyvsp[0].prefija);
                                              yyval.prefija =  gen_code(temp);
                                         }
-#line 1403 "y.tab.c"
+#line 1469 "y.tab.c"
     break;
 
-  case 11:
-#line 106 "basicCalc.y"
+  case 14:
+#line 137 "basicCalc.y"
                                                  { yyval = yyvsp[0] ; }
-#line 1409 "y.tab.c"
+#line 1475 "y.tab.c"
     break;
 
-  case 12:
-#line 112 "basicCalc.y"
+  case 15:
+#line 143 "basicCalc.y"
                                            { // Para calculadora
-                                             yyval.valor = yyvsp[0].valor ;
+                                             yyval.value = yyvsp[0].value ;
                                              // Para AST
-                                             yyval.nodo = crearNodoNumero(yyvsp[0].valor);
+                                             yyval.nodo = crearNodoNumero(yyvsp[0].value);
                                              // Para notacion prefija
-                                             sprintf (temp, "%d", yyvsp[0].valor);
+                                             sprintf (temp, "%d", yyvsp[0].value);
                                              yyval.prefija = gen_code(temp);
 
                                          }
-#line 1423 "y.tab.c"
+#line 1489 "y.tab.c"
     break;
 
-  case 13:
-#line 121 "basicCalc.y"
+  case 16:
+#line 152 "basicCalc.y"
                                          { yyval = yyvsp[-1] ; }
-#line 1429 "y.tab.c"
+#line 1495 "y.tab.c"
     break;
 
 
-#line 1433 "y.tab.c"
+#line 1499 "y.tab.c"
 
       default: break;
     }
@@ -1661,14 +1727,14 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 124 "basicCalc.y"
+#line 155 "basicCalc.y"
 
 
                         /* SECCION 4  Codigo en C */
-int n_linea = 1 ;
+int n_line = 1 ;
 
 int yyerror(char *mensaje) {
-    fprintf(stderr, "%s en la linea %d\n", mensaje, n_linea);
+    fprintf(stderr, "%s en la linea %d\n", mensaje, n_line);
     return 0; 
 }
 
@@ -1691,6 +1757,48 @@ char *my_malloc (int nbytes)       // reserva n bytes de memoria dinamica
     return p ;
 }
 
+/***************************************************************************/
+/********************** Seccion de Palabras Reservadas *********************/
+/***************************************************************************/
+
+typedef struct s_keyword { // para las palabras reservadas de C
+    char *name ;
+    int token ;
+} t_keyword ;
+
+t_keyword keywords[] = {
+    {"main", MAIN}, {"int", INTEGER}, {"puts", PUTS}, {"printf", PRINTF},
+    {"while", WHILE}, {"for", FOR}, {"if", IF}, {"else", ELSE},
+    {"&&", AND}, {"||", OR}, {"<=", LEQ}, {">=", GEQ}, {"==", EQ},
+    {"!=", NEQ}, {"return", RETURN},
+    {NULL, 0} // Marca el fin de la tabla
+};
+
+
+t_keyword *search_keyword (char *symbol_name)
+{                                  // Busca n_s en la tabla de pal. res.
+                                   // y devuelve puntero a registro (simbolo)
+    int i ;
+    t_keyword *sim ;
+
+    i = 0 ;
+    sim = keywords ;
+    while (sim [i].name != NULL) {
+	    if (strcmp (sim [i].name, symbol_name) == 0) {
+		                             // strcmp(a, b) devuelve == 0 si a==b
+            return &(sim [i]) ;
+        }
+        i++ ;
+    }
+
+    return NULL ;
+}
+
+/***************************************************************************/
+/******************* Seccion del Analizador Lexicografico ******************/
+/***************************************************************************/
+
+
 char *gen_code (char *name)     // copia el argumento a un
 {                                      // string en memoria dinamica
     char *p ;
@@ -1705,30 +1813,108 @@ char *gen_code (char *name)     // copia el argumento a un
 
 int yylex ()
 {
+    int i ;
     unsigned char c ;
+    unsigned char cc ;
+    char expandable_ops [] = "!<=>|%/&+-*" ;
+    char temp_str [256] ;
+    t_keyword *symbol ;
 
     do {
-         c = getchar () ;
-    } while (c == ' ') ;
+        c = getchar () ;
+
+        if (c == '#') {	// Ignora las lineas que empiezan por #  (#define, #include)
+            do {		//	OJO que puede funcionar mal si una linea contiene #
+                c = getchar () ;
+            } while (c != '\n') ;
+        }
+
+        if (c == '/') {	// Si la linea contiene un / puede ser inicio de comentario
+            cc = getchar () ;
+            if (cc != '/') {   // Si el siguiente char es /  es un comentario, pero...
+                ungetc (cc, stdin) ;
+            } else {
+                c = getchar () ;	// ...
+                if (c == '@') {	// Si es la secuencia //@  ==> transcribimos la linea
+                    do {		// Se trata de codigo inline (Codigo embebido en C)
+                        c = getchar () ;
+                        putchar (c) ;
+                    } while (c != '\n') ;
+                } else {		// ==> comentario, ignorar la linea
+                    while (c != '\n') {
+                        c = getchar () ;
+                    }
+                }
+            }
+        } else if (c == '\\') c = getchar () ;
+		
+        if (c == '\n')
+            n_line++ ;
+
+    } while (c == ' ' || c == '\n' || c == '\r' || c == 10 || c == 13 || c == '\t') ;
+
+    if (c == '\"') {
+        i = 0 ;
+        do {
+            c = getchar () ;
+            temp_str [i++] = c ;
+        } while (c != '\"' && i < 255) ;
+        if (i == 256) {
+            //printf ("WARNING: string with more than 255 characters in line %d\n", n_line) ;
+        }		 	// habria que leer hasta el siguiente " , pero, y si falta?
+        temp_str [--i] = '\0' ;
+        yylval.code = gen_code (temp_str) ;
+        return (STRING) ;
+    }
 
     if (c == '.' || (c >= '0' && c <= '9')) {
-         ungetc (c, stdin) ;
-         scanf ("%d", &yylval.valor) ;
-         return NUMERO ;
+        ungetc (c, stdin) ;
+        scanf ("%d", &yylval.value) ;
+         //printf ("\nDEV: NUMBER %d\n", yylval.value) ;        // PARA DEPURAR
+        return NUMBER ;
     }
 
-    if (c >= 'A' && c <= 'Z') {
-         yylval.indice = c - 'A' ;  // resta a c el valor ascii de A
-         return VARIABLE ;
+    if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
+        i = 0 ;
+        while (((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
+            (c >= '0' && c <= '9') || c == '_') && i < 255) {
+            temp_str [i++] = tolower (c) ;
+            c = getchar () ;
+        }
+        temp_str [i] = '\0' ;
+        ungetc (c, stdin) ;
+
+        yylval.code = gen_code (temp_str) ;
+        symbol = search_keyword (yylval.code) ;
+        if (symbol == NULL) {    // no es palabra reservada -> identificador antes vrariabre
+               //printf ("\nDEV: IDENTIF %s\n", yylval.code) ;    // PARA DEPURAR
+            return (IDENTIF) ;
+        } else {
+               //printf ("\nDEV: OTRO %s\n", yylval.code) ;       // PARA DEPURAR
+            return (symbol->token) ;
+        }
     }
 
-    if (c >= 'a' && c <= 'z') {
-         yylval.indice = c - 'a' ;  // resta a c el valor ascii de a 
-         return VARIABLE ;
+    if (strchr (expandable_ops, c) != NULL) { // busca c en operadores expandibles
+        cc = getchar () ;
+        sprintf (temp_str, "%c%c", (char) c, (char) cc) ;
+        symbol = search_keyword (temp_str) ;
+        if (symbol == NULL) {
+            ungetc (cc, stdin) ;
+            yylval.code = NULL ;
+            return (c) ;
+        } else {
+            yylval.code = gen_code (temp_str) ; // aunque no se use
+            return (symbol->token) ;
+        }
     }
 
-    if (c == '\n')
-          n_linea++ ;
+    //printf ("\nDEV: LITERAL %d #%c#\n", (int) c, c) ;      // PARA DEPURAR
+    if (c == EOF || c == 255 || c == 26) {
+        //printf ("tEOF ") ;                                // PARA DEPURAR
+        return (0) ;
+    }
+
     return c ;
 }
 

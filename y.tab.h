@@ -49,13 +49,45 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    NUMERO = 258,
-    VARIABLE = 259
+    NUMBER = 258,
+    IDENTIF = 259,
+    INTEGER = 260,
+    STRING = 261,
+    MAIN = 262,
+    WHILE = 263,
+    FOR = 264,
+    IF = 265,
+    ELSE = 266,
+    PUTS = 267,
+    PRINTF = 268,
+    AND = 269,
+    OR = 270,
+    LEQ = 271,
+    GEQ = 272,
+    EQ = 273,
+    NEQ = 274,
+    RETURN = 275
   };
 #endif
 /* Tokens.  */
-#define NUMERO 258
-#define VARIABLE 259
+#define NUMBER 258
+#define IDENTIF 259
+#define INTEGER 260
+#define STRING 261
+#define MAIN 262
+#define WHILE 263
+#define FOR 264
+#define IF 265
+#define ELSE 266
+#define PUTS 267
+#define PRINTF 268
+#define AND 269
+#define OR 270
+#define LEQ 271
+#define GEQ 272
+#define EQ 273
+#define NEQ 274
+#define RETURN 275
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
