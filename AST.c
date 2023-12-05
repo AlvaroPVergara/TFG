@@ -9,7 +9,7 @@
 // Crea un nodo hoja con el nombre "NUMERO" y el valor especificado
 struct nodoAST* crearNodoNumero(int valor) {
     struct nodoAST* nuevoNodo = (struct nodoAST*)malloc(sizeof(struct nodoAST));
-    nuevoNodo->tipo = NODO_HOJA;
+    nuevoNodo->tipo = NODO_HOJA_NUMERO;
     nuevoNodo->valor = valor;
     nuevoNodo->nombre = strdup("NUMERO"); 
     nuevoNodo->primer_nodo = NULL;
@@ -21,13 +21,27 @@ struct nodoAST* crearNodoNumero(int valor) {
 // Crea un nodo hoja con el nombre y el valor especificado
 struct nodoAST* crearNodoVariable(char* nombre, int valor) {
     struct nodoAST* nuevoNodo = (struct nodoAST*)malloc(sizeof(struct nodoAST));
-    nuevoNodo->tipo = NODO_HOJA;
+    nuevoNodo->tipo = NODO_HOJA_VARIABLE;
     nuevoNodo->valor = valor;
     nuevoNodo->nombre = strdup(nombre); 
     nuevoNodo->primer_nodo = NULL;
     nuevoNodo->siguiente_hermano = NULL;
     return nuevoNodo;
 }
+
+// Crea un nodo hoja con el nombre y el valor especificado
+struct nodoAST* crearNodoSigno(char* nombre, int valor)
+{
+    struct nodoAST* nuevoNodo = (struct nodoAST*)malloc(sizeof(struct nodoAST));;
+    nuevoNodo->tipo = NODO_HOJA_SIGNO;
+    nuevoNodo->valor = valor;
+    nuevoNodo->nombre = strdup(nombre); 
+    nuevoNodo->primer_nodo = NULL;
+    nuevoNodo->siguiente_hermano = NULL;
+    return nuevoNodo;
+};
+
+
 
 // Crea un nodo intermedio con el nombre especificado
 struct nodoAST* crearNodoIntermedio(char* nombre) {
@@ -103,12 +117,30 @@ void imprimirASTRecursivo(struct nodoAST* nodo, int nivel) {
     for (int i = 0; i < nivel; ++i) {
         printf("    ");
     }
-    printf("%s", nodo->nombre);
 
-    // Imprime el valor si es un nodo hoja
-    if (nodo->tipo == NODO_HOJA) {
+    // Imprime el nombre del nodo, solo en caso de que este sea intermedio.
+    if (nodo->tipo == NODO_INTERMEDIO){
+        printf("%s", nodo->nombre);
+    }
+
+    // Imprime el valor si es un nodo hoja numérico
+    if (nodo->tipo == NODO_HOJA_NUMERO) {
+        printf("%s", nodo->nombre);
         printf(" %d", nodo->valor);
     }
+
+    // Imprime el valor si es un nodo hoja variable
+    if (nodo->tipo == NODO_HOJA_VARIABLE) {
+        printf("VAR");
+        printf(" %s", nodo->nombre);
+    }
+
+    // Imprime el valor si es un nodo hoja signo
+    if (nodo->tipo == NODO_HOJA_SIGNO) {
+        printf("SIGNO");
+        printf(" %s", nodo->nombre);
+    }
+
 
     printf("\n");
 

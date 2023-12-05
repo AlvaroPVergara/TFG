@@ -48,7 +48,7 @@ typedef struct s_attr {
 %right  '='             //  es la ultima operacion que se debe realizar
 %left   '+' '-'         //  menor orden de precedencia 
 %left   '*' '/'         //  orden de precedencia intermedio 
-// %left   SIGNO_UNARIO    //  mayor orden de precedencia 
+%left   UNARY_SIGN      //  mayor orden de precedencia 
 %%
                         // SECCION 3: Gramatica - Semantico 
 axioma:       sentencia ';'                 {  printf ("Resultado=%d\n\n", $1.value) ;
@@ -56,6 +56,7 @@ axioma:       sentencia ';'                 {  printf ("Resultado=%d\n\n", $1.va
                                              printf ("Arbol sintactico abstracto:\n");
                                              imprimirAST($1.nodo);
                                              liberarAST($1.nodo);
+                                             printf ("\n\n");
                                               } 
                       r_sentencia
             ; 
@@ -135,12 +136,37 @@ expresion:    termino                    { $$ = $1 ; }
             ;
 
 termino:      operando                           { $$ = $1 ; }
-/*            | '+' operando %prec SIGNO_UNARIO    { $$ = $2 ; }
-            | '-' operando %prec SIGNO_UNARIO    { $$ = -$2 ; } */
+            | '+' operando %prec UNARY_SIGN    {  // Para calculadora
+                                                    $$.value = $2.value ; 
+                                                    // Para AST
+                                                    struct nodoAST* nodoSigno = crearNodoSigno("+", $2.value);
+                                                    struct nodoAST* nuevoNodo = crearNodoIntermedioGenerico("signo-unario", 2, nodoSigno, $2.nodo);
+                                                    $$.nodo = nuevoNodo;
+                                                    // Para notacion prefija
+                                                    sprintf (temp, "(+ %s)", $2.prefija);
+                                                    $$.prefija = gen_code(temp);
+                                                }
+            | '-' operando %prec UNARY_SIGN    { // Para calculadora
+                                                    $$.value = -$2.value ; 
+                                                    // Para AST
+                                                    struct nodoAST* nodoSigno = crearNodoSigno("-", - $2.value);
+                                                    struct nodoAST* nuevoNodo = crearNodoIntermedioGenerico("signo unario", 2, nodoSigno, $2.nodo);
+                                                    $$.nodo = nuevoNodo;
+                                                    // Para notacion prefija
+                                                    sprintf (temp, "(- %s)", $2.prefija);
+                                                    $$.prefija = gen_code(temp);
+                                                } 
             ; 
 
-operando:     /*VARIABLE                   { $$ = memoria [$1] ; }
-            | */NUMBER                     { // Para calculadora
+operando:    IDENTIF                    { // Para calculadora
+                                             $$.value = $1.value ;
+                                             // Para AST
+                                             $$.nodo = crearNodoVariable($1.code, $1.value);
+                                             // Para notacion prefija
+                                             sprintf (temp, "%s", $1.code);
+                                             $$.prefija = gen_code(temp);
+                                        }
+            | NUMBER                     { // Para calculadora
                                              $$.value = $1.value ;
                                              // Para AST
                                              $$.nodo = crearNodoNumero($1.value);
