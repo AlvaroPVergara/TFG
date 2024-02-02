@@ -1,9 +1,5 @@
 %{                      // SECCION 1 
-#include <stdio.h>
-#include <ctype.h>            // declaraciones para tolower
-#include <string.h>           // declaraciones para code
-#include <stdlib.h>           // declaraciones para exit ()
-#include "./AST.h"
+#include "basicCalc.h"
 //int memoria [26] ;   	// Se define una zona de memoria para las variables 
 
 int yylex () ;
@@ -51,10 +47,14 @@ typedef struct s_attr {
 %left   UNARY_SIGN      //  mayor orden de precedencia 
 %%
                         // SECCION 3: Gramatica - Semantico 
-axioma:       sentencia ';'                 {  printf ("Resultado=%d\n\n", $1.value) ;
-                                             printf ("Expresion prefija:\n %s\n\n", $1.prefija) ;
+
+                        
+axioma:       sentencia ';'                 {  //printf ("Resultado=%d\n\n", $1.value) ;
+                                             //printf ("Expresion prefija:\n %s\n\n", $1.prefija) ;
                                              printf ("Arbol sintactico abstracto:\n");
                                              imprimirAST($1.nodo);
+                                             printf ("\n\n-------------------------------\nAnalisis semantico:\n");
+                                             semanticAnalysis($1.nodo);
                                              liberarAST($1.nodo);
                                              printf ("\n\n");
                                               } 
@@ -65,16 +65,28 @@ r_sentencia:                      /* lambda */
             | axioma
             ; 
 
-sentencia:  expresion               { $$ = $1 ; }
-                                              
+sentencia:  
+            declaracion              { $$ = $1 ; }                 
             | asignacion            { $$ = $1 ; }
+            | expresion               { $$ = $1 ; }
             ;
+
+declaracion: INTEGER IDENTIF                { // Para calculadora
+                                             $$.value = 0 ; 
+                                             // Para AST
+                                             $$.nodo = crearNodoVariableInit($2.code, 0, "int");
+                                             // Para notacion prefija
+                                             sprintf (temp, "(setq %s 0)", $2.code);
+                                             $$.prefija = gen_code(temp);
+                                        }
+            ;
+
 
 asignacion: IDENTIF '=' expresion    {    // Para calculadora
                                              $$.value = $3.value ;
 
                                              // Para AST
-                                             struct nodoAST* nodoVar = crearNodoVariable($1.code, $3.value);
+                                             struct nodoAST* nodoVar = crearNodoVariable($1.code, $3.value, "int");
                                              struct nodoAST* nuevoNodo = crearNodoIntermedioGenerico("asignacion", 2, nodoVar, $3.nodo);
                                              $$.nodo = nuevoNodo;
 
@@ -161,7 +173,7 @@ termino:      operando                           { $$ = $1 ; }
 operando:    IDENTIF                    { // Para calculadora
                                              $$.value = $1.value ;
                                              // Para AST
-                                             $$.nodo = crearNodoVariable($1.code, $1.value);
+                                             $$.nodo = crearNodoVariable($1.code, $1.value, "int");
                                              // Para notacion prefija
                                              sprintf (temp, "%s", $1.code);
                                              $$.prefija = gen_code(temp);

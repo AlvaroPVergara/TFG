@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h> 
 #include <stdarg.h> // Para usar va_list, va_start, va_arg, va_end
 #include "AST.h"
 
@@ -12,6 +9,7 @@ struct nodoAST* crearNodoNumero(int valor) {
     nuevoNodo->tipo = NODO_HOJA_NUMERO;
     nuevoNodo->valor = valor;
     nuevoNodo->nombre = strdup("NUMERO"); 
+    nuevoNodo->tipo_variable = NULL;
     nuevoNodo->primer_nodo = NULL;
     nuevoNodo->siguiente_hermano = NULL;
     return nuevoNodo;
@@ -19,11 +17,24 @@ struct nodoAST* crearNodoNumero(int valor) {
 
 
 // Crea un nodo hoja con el nombre y el valor especificado
-struct nodoAST* crearNodoVariable(char* nombre, int valor) {
+struct nodoAST* crearNodoVariable(char* nombre, int valor, char* tipo) {
     struct nodoAST* nuevoNodo = (struct nodoAST*)malloc(sizeof(struct nodoAST));
     nuevoNodo->tipo = NODO_HOJA_VARIABLE;
     nuevoNodo->valor = valor;
+    nuevoNodo->nombre = strdup(nombre);
+    nuevoNodo->tipo_variable = tipo;
+    nuevoNodo->primer_nodo = NULL;
+    nuevoNodo->siguiente_hermano = NULL;
+    return nuevoNodo;
+}
+
+// Crea un nodo hoja con el nombre y el valor especificado
+struct nodoAST* crearNodoVariableInit(char* nombre, int valor, char* tipo) {
+    struct nodoAST* nuevoNodo = (struct nodoAST*)malloc(sizeof(struct nodoAST));
+    nuevoNodo->tipo = NODO_HOJA_VARIABLE_INIT;
+    nuevoNodo->valor = valor;
     nuevoNodo->nombre = strdup(nombre); 
+    nuevoNodo->tipo_variable = tipo;
     nuevoNodo->primer_nodo = NULL;
     nuevoNodo->siguiente_hermano = NULL;
     return nuevoNodo;
@@ -35,7 +46,8 @@ struct nodoAST* crearNodoSigno(char* nombre, int valor)
     struct nodoAST* nuevoNodo = (struct nodoAST*)malloc(sizeof(struct nodoAST));;
     nuevoNodo->tipo = NODO_HOJA_SIGNO;
     nuevoNodo->valor = valor;
-    nuevoNodo->nombre = strdup(nombre); 
+    nuevoNodo->nombre = strdup(nombre);
+    nuevoNodo->tipo_variable = NULL; 
     nuevoNodo->primer_nodo = NULL;
     nuevoNodo->siguiente_hermano = NULL;
     return nuevoNodo;
@@ -49,6 +61,7 @@ struct nodoAST* crearNodoIntermedio(char* nombre) {
     nuevoNodo->tipo = NODO_INTERMEDIO;
     nuevoNodo->valor = 0;
     nuevoNodo->nombre = strdup(nombre); 
+    nuevoNodo->tipo_variable = NULL;
     nuevoNodo->primer_nodo = NULL;
     nuevoNodo->siguiente_hermano = NULL;
     return nuevoNodo;
@@ -130,7 +143,7 @@ void imprimirASTRecursivo(struct nodoAST* nodo, int nivel) {
     }
 
     // Imprime el valor si es un nodo hoja variable
-    if (nodo->tipo == NODO_HOJA_VARIABLE) {
+    if (nodo->tipo == NODO_HOJA_VARIABLE || nodo->tipo == NODO_HOJA_VARIABLE_INIT) {
         printf("VAR");
         printf(" %s", nodo->nombre);
     }

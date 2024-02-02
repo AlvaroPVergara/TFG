@@ -10,25 +10,23 @@ unsigned int hash(const char *str) {
 }
 
 // Inicializa la tabla de símbolos
-Symbol* createSymbol(const char *name, const char *type, void *memory_address, int size, int size_array, int offset) {
+Symbol* createSymbol(const char *name, const char *type, int size_array, int array_pos) {
     Symbol *newSymbol = (Symbol*)malloc(sizeof(Symbol));
     newSymbol->name = strdup(name);
     newSymbol->type = strdup(type);
-    newSymbol->memory_address = memory_address;
-    newSymbol->size = size;
     newSymbol->size_array = size_array;
-    newSymbol->offset = offset;
+    newSymbol->array_pos = array_pos;
     return newSymbol;
 }
 
 // Inserta un símbolo en la tabla
-void insertSymbol(Symbol **symTable, const char *name, const char *type, void *memory_address, int size, int size_array, int offset) {
+void insertSymbol(Symbol **symTable, const char *name, const char *type, int size_array, int array_pos) {
     unsigned int index = hash(name);
     
     // Verifica si el índice está ocupado
     if (symTable[index] == NULL) {
         // Espacio libre, crea un nuevo símbolo
-        symTable[index] = createSymbol(name, type, memory_address, size, size_array, offset);
+        symTable[index] = createSymbol(name, type, size_array, array_pos);
     } else {
         // Maneja colisiones (puedes usar estrategias más avanzadas)
         printf("Colisión al insertar el símbolo '%s'.\n", name);
@@ -66,35 +64,42 @@ void destroySymbolTable(Symbol **symTable) {
     free(symTable);
 }
 
-int inizializeTS() {
-    Symbol **symTable = (Symbol**)calloc(TABLE_SIZE * sizeof(Symbol*));
 
-    /*
-    // Direcciones de memoria de las variables
-    void *var1_address = malloc(sizeof(int));
-    void *var2_address = malloc(sizeof(double));
 
-    // Inser    ta algunos símbolos de ejemplo con direcciones de memoria
-    insertSymbol(symTable, "variable1", "int", var1_address, sizeof(int), 0, 0);
-    insertSymbol(symTable, "variable2", "double", var2_address, sizeof(double), 0, 0);
-    insertSymbol(symTable, "array1", "int", NULL, sizeof(int), 5, 0);  // Ejemplo de un array
+// Función para realizar el análisis semántico
+void semanticAnalysis(struct nodoAST* raiz) {
+    // Inicializa la tabla de símbolos
+    Symbol **symTable = (Symbol**)calloc(TABLE_SIZE, sizeof(Symbol*));
 
-    // Busca un símbolo
-    const char *searchName = "variable1";
-    Symbol *foundSymbol = searchSymbol(symTable, searchName);
+    // Recorre el árbol AST para realizar el análisis semántico
+    if (raiz != NULL) {
+        // Verifica si el nodo actual es una hoja
+        if (raiz->tipo == NODO_HOJA_VARIABLE_INIT) {
+            // Inserta el símbolo en la tabla de símbolos
+            insertSymbol(symTable, raiz->nombre, raiz->tipo_variable, 0, 0);
+            printf("Símbolo '%s' insertado en la tabla.\n", raiz->nombre);
+        } 
 
-    if (foundSymbol != NULL) {
-        printf("Símbolo '%s' encontrado en la tabla. Tipo: %s, Tamaño: %d, Offset: %d\n", searchName, foundSymbol->type, foundSymbol->size, foundSymbol->offset);
-    } else {
-        printf("Símbolo '%s' no encontrado en la tabla.\n", searchName);
+        else if (raiz->tipo == NODO_HOJA_VARIABLE) {
+            // Busca el símbolo en la tabla de símbolos
+            Symbol *foundSymbol = searchSymbol(symTable, raiz->nombre);
+            if (foundSymbol != NULL) {
+                printf("Símbolo '%s' encontrado en la tabla. Tipo: %s, Tamaño: %d, Offset: %d\n", raiz->nombre, foundSymbol->type, foundSymbol->size_array, foundSymbol->array_pos);
+            } else {
+                printf("Símbolo '%s' no encontrado en la tabla.\n", raiz->nombre);
+                // TODO: RAISE ERROR
+            }
+        }
+
+        // Recorre los nodos hijos
+        struct nodoAST* temp = raiz->primer_nodo;
+        while (temp != NULL) {
+            semanticAnalysis(temp);
+            temp = temp->siguiente_hermano;
+        }
     }
-
-    // Libera la memoria de las variables
-    free(var1_address);
-    free(var2_address);
 
     // Libera la memoria de la tabla de símbolos
     destroySymbolTable(symTable);
-    */
-    return 0;
+    return;
 }

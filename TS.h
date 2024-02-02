@@ -1,21 +1,17 @@
 #ifndef TS_H
 #define TS_H
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #define TABLE_SIZE 255
+
+#include "AST.h"
+
+
 
 // Estructura para representar un símbolo
 typedef struct Symbol {
     char *name;
     char *type;
-    void *memory_address;
-    int size;
     int size_array; // 0 if not array
-    int offset;
-
+    int array_pos; // 0 if not array
     
 } Symbol;
 
@@ -23,5 +19,8 @@ typedef struct Symbol {
 typedef struct SymbolTable {
     Symbol *table[TABLE_SIZE];
 } SymbolTable;
+
+void semanticAnalysis(struct nodoAST* raiz);
+
 
 #endif // TS_H
