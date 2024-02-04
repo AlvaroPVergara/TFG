@@ -80,6 +80,18 @@ void agregarHijo(struct nodoAST* padre, struct nodoAST* hijo) {
     }
 }
 
+void agregarHermano(struct nodoAST* hermano, struct nodoAST* nuevo) {
+    if (hermano->siguiente_hermano == NULL) {
+        hermano->siguiente_hermano = nuevo;
+    } else {
+        struct nodoAST* temp = hermano->siguiente_hermano;
+        while (temp->siguiente_hermano != NULL) {
+            temp = temp->siguiente_hermano;
+        }
+        temp->siguiente_hermano = nuevo;
+    }
+}
+
 
 /* Crea un nodo intermedio con el nombre especificado
 * y le agrega los nodos hijos pasados por parámetro
