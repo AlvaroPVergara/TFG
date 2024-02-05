@@ -52,6 +52,11 @@ typedef struct s_attr {
                         
 axioma:      /*declaracionesGlob  funcionesDef*/  mainDef 	{   printf ("Arbol sintactico abstracto:\n");
                                                                 imprimirAST($1.nodo); 
+                                                                printf("\n\n");
+                                                                printf ("Tabla de símbolos:\n");
+                                                                Symbol **tabla = initSymbolTable();
+                                                                semanticAnalysis($1.nodo, tabla);
+                                                                destroySymbolTable(tabla);
                                                                 liberarAST($1.nodo);
                                                                 printf ("\n\n");
                                                             }

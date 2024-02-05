@@ -20,7 +20,7 @@ typedef struct SymbolTable {
     Symbol *table[TABLE_SIZE];
 } SymbolTable;
 
-void semanticAnalysis(struct nodoAST* raiz);
-
-
+void semanticAnalysis(struct nodoAST* raiz, Symbol **symTable);
+Symbol** initSymbolTable();
+void destroySymbolTable(Symbol **symTable);
 #endif // TS_H

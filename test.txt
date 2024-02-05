@@ -4,4 +4,7 @@ int main (){
     int b; 
     int c;
     a = 5+1;
+    int variable;
+    variable = 3;
+    var2 = 5;
 }

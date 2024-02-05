@@ -28,7 +28,7 @@ void insertSymbol(Symbol **symTable, const char *name, const char *type, int siz
         // Espacio libre, crea un nuevo símbolo
         symTable[index] = createSymbol(name, type, size_array, array_pos);
     } else {
-        // Maneja colisiones (puedes usar estrategias más avanzadas)
+        // TODO: Manejar colisiones
         printf("Colisión al insertar el símbolo '%s'.\n", name);
     }
 }
@@ -64,12 +64,15 @@ void destroySymbolTable(Symbol **symTable) {
     free(symTable);
 }
 
+Symbol** initSymbolTable() {
+    Symbol **symTable = (Symbol**)calloc(TABLE_SIZE, sizeof(Symbol*));
+    return symTable;
+}
+
 
 
 // Función para realizar el análisis semántico
-void semanticAnalysis(struct nodoAST* raiz) {
-    // Inicializa la tabla de símbolos
-    Symbol **symTable = (Symbol**)calloc(TABLE_SIZE, sizeof(Symbol*));
+void semanticAnalysis(struct nodoAST* raiz, Symbol **symTable) {
 
     // Recorre el árbol AST para realizar el análisis semántico
     if (raiz != NULL) {
@@ -84,7 +87,7 @@ void semanticAnalysis(struct nodoAST* raiz) {
             // Busca el símbolo en la tabla de símbolos
             Symbol *foundSymbol = searchSymbol(symTable, raiz->nombre);
             if (foundSymbol != NULL) {
-                printf("Símbolo '%s' encontrado en la tabla. Tipo: %s, Tamaño: %d, Offset: %d\n", raiz->nombre, foundSymbol->type, foundSymbol->size_array, foundSymbol->array_pos);
+                printf("Símbolo '%s' encontrado en la tabla. Tipo: %s, Tamaño del vecctor: %d, Offset: %d\n", raiz->nombre, foundSymbol->type, foundSymbol->size_array, foundSymbol->array_pos);
             } else {
                 printf("Símbolo '%s' no encontrado en la tabla.\n", raiz->nombre);
                 // TODO: RAISE ERROR
@@ -94,12 +97,9 @@ void semanticAnalysis(struct nodoAST* raiz) {
         // Recorre los nodos hijos
         struct nodoAST* temp = raiz->primer_nodo;
         while (temp != NULL) {
-            semanticAnalysis(temp);
+            semanticAnalysis(temp, symTable);
             temp = temp->siguiente_hermano;
         }
-    }
-
-    // Libera la memoria de la tabla de símbolos
-    destroySymbolTable(symTable);
+    }    
     return;
 }
