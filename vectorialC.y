@@ -50,14 +50,15 @@ typedef struct s_attr {
                         // SECCION 3: Gramatica - Semantico 
 
                         
-axioma:      /*declaracionesGlob  funcionesDef*/  mainDef 	{   printf ("Arbol sintactico abstracto:\n");
-                                                                imprimirAST($1.nodo); 
+axioma:      /*declaracionesGlob*/  funcionesDef /* mainDef */	{   printf ("Arbol sintactico abstracto:\n");
+                                                                struct nodoAST* nodoAxioma = crearNodoIntermedioGenerico("axioma", 1, $1.nodo);
+                                                                imprimirAST(nodoAxioma); 
                                                                 printf("\n\n");
                                                                 printf ("Tabla de símbolos:\n");
                                                                 Symbol **tabla = initSymbolTable();
-                                                                semanticAnalysis($1.nodo, tabla);
+                                                                semanticAnalysis(nodoAxioma, tabla);
                                                                 destroySymbolTable(tabla);
-                                                                liberarAST($1.nodo);
+                                                                liberarAST(nodoAxioma);
                                                                 printf ("\n\n");
                                                             }
             ;
@@ -98,40 +99,47 @@ restGlobVar:                    { $$.value = 0;
 
 */
 /*------------ FUNCTIONS DECLARATION MANAGEMENT ------------*/
-/*
+
 funcionesDef:                                       { ; }
-            |   IDENTIF '(' funcionArgs ')'  '{'    { printf("(defun %s (%s)\n", $1.code, $3.code); 
-                                                        act_function = $1.code;
+            |   INTEGER IDENTIF '(' funcionArgs ')'  '{'    { printf("(defun %s (%s)\n", $2.code, $4.prefija); 
+                                                            act_function = $2.code;
                                                     }
-                recSentenciaFin                     { ; }
-                                                    { act_function = NULL; }
-                funcionesDef                        { ; }
+                recSentenciaFin                     {
+                                                        act_function = NULL;  
+                                                    }
+                funcionesDef                        { 
+                                                        struct nodoAST* nodoFunc = crearNodoIntermedioGenerico($2.code, 1, lastNode); 
+                                                        if ($8.nodo){
+                                                            printf("GAFGESYGHAFIUAAF,F,IOAKMFA");
+                                                            agregarHermano(nodoFunc, $8.nodo);
+                                                        }
+                                                        $$.nodo = nodoFunc;
+                                                        
+                                                    }
             ;
 
-funcionArgs:                                { $$.code = ""; }
-            |  INTEGER /*varIdentf*/ /*IDENTIF recArgFunct {    if( $3.code == NULL)    {
+funcionArgs:                                { $$.prefija = ""; }
+            |  INTEGER /*varIdentf*/ IDENTIF recArgFunct {    if( $3.prefija == NULL)    {
                                                     sprintf(temp, "%s",  $2.code);
                                                 } else{
-                                                    sprintf(temp, "%s %s", $2.code, $3.code);
+                                                    sprintf(temp, "%s %s", $2.code, $3.prefija);
                                                 }
-                                                $$.code = gen_code(temp);
+                                                $$.prefija = gen_code(temp);
                                             }
             ;
 
-recArgFunct:                        { $$.code = NULL; }
-			 | ',' funcionArgs		{ $$.code = $2.code; }
+recArgFunct:                        { $$.prefija = NULL; }
+			 | ',' funcionArgs		{ $$.prefija = $2.prefija; }
              ;
 
 
-*/
+
 /*------------ MAIN FUNCTION DECLARATION MANAGEMENT ------------*/
                                                     
 mainDef: INTEGER MAIN '(' ')' '{'   { printf("(defun main ()\n");
                                         act_function = "main"; 
                                     }
                     recSentenciaFin { 
-                                        if (lastNode->siguiente_hermano != NULL){
-                                        printf("HERMANOS LASTNODE: %s\n", lastNode->siguiente_hermano->nombre);}
                                         struct nodoAST* nodoMain = crearNodoIntermedioGenerico("main", 1, lastNode);
                                         $$.nodo = nodoMain;
                                     }
