@@ -1,9 +1,12 @@
-int mwadyuayfwain (){
-    int a;
-    int b; 
-    int c;
-    a = 5+1;
-    int variable;
-    variable = 3;
-    var2 = 5;
+int fun1 (){
+    int zanahoria;
+    zanahoria = 5+1;
 }
+int fun2(){
+    int patata;
+}
+
+int fun3(){
+    int calabaza;
+}
+

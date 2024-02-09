@@ -8,6 +8,7 @@ char *gen_code (char *) ;
 char *my_malloc (int nbytes) ;
 char *act_function;
 struct nodoAST* lastNode = NULL;
+struct nodoAST* functionNode = NULL;
 char temp [2048] ;
 
 typedef struct s_attr {
@@ -100,21 +101,25 @@ restGlobVar:                    { $$.value = 0;
 */
 /*------------ FUNCTIONS DECLARATION MANAGEMENT ------------*/
 
-funcionesDef:                                       { ; }
+funcionesDef:                                       { $$.nodo = functionNode;}
             |   INTEGER IDENTIF '(' funcionArgs ')'  '{'    { printf("(defun %s (%s)\n", $2.code, $4.prefija); 
                                                             act_function = $2.code;
+                                                            if (functionNode == NULL) { 
+                                                                functionNode = crearNodoIntermedioGenerico("Funciones", 0);
+                                                            }
+                                                          
                                                     }
-                recSentenciaFin                     {
-                                                        act_function = NULL;  
+                recSentenciaFin                     {   
+                                                        struct nodoAST* nodoFunc = crearNodoIntermedioGenerico($2.code, 0);
+                                                        if ( $8.nodo){
+                                                            agregarHijo(nodoFunc, $8.nodo);
+                                                        }
+                                                        agregarHijo(functionNode, nodoFunc);
+                                                        act_function = NULL;
+                                                        lastNode = NULL;
                                                     }
                 funcionesDef                        { 
-                                                        struct nodoAST* nodoFunc = crearNodoIntermedioGenerico($2.code, 1, lastNode); 
-                                                        if ($8.nodo){
-                                                            printf("GAFGESYGHAFIUAAF,F,IOAKMFA");
-                                                            agregarHermano(nodoFunc, $8.nodo);
-                                                        }
-                                                        $$.nodo = nodoFunc;
-                                                        
+                                                        $$.nodo = functionNode;
                                                     }
             ;
 
@@ -138,6 +143,7 @@ recArgFunct:                        { $$.prefija = NULL; }
                                                     
 mainDef: INTEGER MAIN '(' ')' '{'   { printf("(defun main ()\n");
                                         act_function = "main"; 
+                                        lastNode = NULL;
                                     }
                     recSentenciaFin { 
                                         struct nodoAST* nodoMain = crearNodoIntermedioGenerico("main", 1, lastNode);
