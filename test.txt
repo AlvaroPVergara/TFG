@@ -10,3 +10,6 @@ int fun3(){
     int calabaza;
 }
 
+int main(){
+    zanahoria = 3;
+}

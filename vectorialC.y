@@ -51,8 +51,8 @@ typedef struct s_attr {
                         // SECCION 3: Gramatica - Semantico 
 
                         
-axioma:      /*declaracionesGlob*/  funcionesDef /* mainDef */	{   printf ("Arbol sintactico abstracto:\n");
-                                                                struct nodoAST* nodoAxioma = crearNodoIntermedioGenerico("axioma", 1, $1.nodo);
+axioma:      /*declaracionesGlob*/  INTEGER funcionesDef  mainDef 	{   printf ("Arbol sintactico abstracto:\n");
+                                                                struct nodoAST* nodoAxioma = crearNodoIntermedioGenerico("axioma", 2, $2.nodo, $3.nodo);
                                                                 imprimirAST(nodoAxioma); 
                                                                 printf("\n\n");
                                                                 printf ("Tabla de símbolos:\n");
@@ -102,23 +102,23 @@ restGlobVar:                    { $$.value = 0;
 /*------------ FUNCTIONS DECLARATION MANAGEMENT ------------*/
 
 funcionesDef:                                       { $$.nodo = functionNode;}
-            |   INTEGER IDENTIF '(' funcionArgs ')'  '{'    { printf("(defun %s (%s)\n", $2.code, $4.prefija); 
-                                                            act_function = $2.code;
+            |    IDENTIF '(' funcionArgs ')'  '{'    { printf("(defun %s (%s)\n", $1.code, $3.prefija); 
+                                                            act_function = $1.code;
                                                             if (functionNode == NULL) { 
                                                                 functionNode = crearNodoIntermedioGenerico("Funciones", 0);
                                                             }
                                                           
                                                     }
                 recSentenciaFin                     {   
-                                                        struct nodoAST* nodoFunc = crearNodoIntermedioGenerico($2.code, 0);
-                                                        if ( $8.nodo){
-                                                            agregarHijo(nodoFunc, $8.nodo);
+                                                        struct nodoAST* nodoFunc = crearNodoIntermedioGenerico($1.code, 0);
+                                                        if ( $7.nodo){
+                                                            agregarHijo(nodoFunc, $7.nodo);
                                                         }
                                                         agregarHijo(functionNode, nodoFunc);
                                                         act_function = NULL;
                                                         lastNode = NULL;
                                                     }
-                funcionesDef                        { 
+                INTEGER funcionesDef                        { 
                                                         $$.nodo = functionNode;
                                                     }
             ;
@@ -141,7 +141,7 @@ recArgFunct:                        { $$.prefija = NULL; }
 
 /*------------ MAIN FUNCTION DECLARATION MANAGEMENT ------------*/
                                                     
-mainDef: INTEGER MAIN '(' ')' '{'   { printf("(defun main ()\n");
+mainDef:  MAIN '(' ')' '{'   { printf("(defun main ()\n");
                                         act_function = "main"; 
                                         lastNode = NULL;
                                     }
