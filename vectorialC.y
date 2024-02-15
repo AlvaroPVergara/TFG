@@ -51,8 +51,8 @@ typedef struct s_attr {
                         // SECCION 3: Gramatica - Semantico 
 
                         
-axioma:      /*declaracionesGlob*/  INTEGER funcionesDef  mainDef 	{   printf ("Arbol sintactico abstracto:\n");
-                                                                struct nodoAST* nodoAxioma = crearNodoIntermedioGenerico("axioma", 2, $2.nodo, $3.nodo);
+axioma:     INTEGER declaracionesGlob funcionesDef  mainDef 	{   printf ("Arbol sintactico abstracto:\n");
+                                                                struct nodoAST* nodoAxioma = crearNodoIntermedioGenerico("axioma", 3, $2.nodo, $3.nodo, $4.nodo);
                                                                 imprimirAST(nodoAxioma); 
                                                                 printf("\n\n");
                                                                 printf ("Tabla de símbolos:\n");
@@ -66,27 +66,52 @@ axioma:      /*declaracionesGlob*/  INTEGER funcionesDef  mainDef 	{   printf ("
             
 
 /*------------ GLOBAL DECLARATION VARIABLE MANAGEMENT ------------*/
-/*
+
 declaracionesGlob:                                                              { ; }
-                        | declaracionesGlobRec ';' declaracionesGlob            { ; }
+                        | declaracionesGlobRec ';' INTEGER declaracionesGlob            { 
+                                                                                if ($3.nodo){
+                                                                                    agregarHermano($1.nodo, $3.nodo);
+                                                                                }
+                                                                                $$.nodo = $1.nodo;
+                                                                                }
+                                                                             
                         ;
 
-declaracionesGlobRec:   INTEGER IDENTIF restGlobVar restDeclaracionesGlob   { if ($3.code==NULL){
-                                                                                    printf("(setq %s %d)%s\n", $2.code, $3.value, $4.code);
+declaracionesGlobRec:   IDENTIF restGlobVar restDeclaracionesGlob   {   struct nodoAST *nodoVar = NULL;
+                                                                                if ($2.code==NULL){
+                                                                                    printf("(setq %s %d)%s\n", $1.code, $2.value, $3.code);
+                                                                                    nodoVar = crearNodoVariableInit($2.code, $3.value, "int");
+                                                                                    
                                                                                 } else{
-                                                                                    printf("(setq %s %s)%s\n", $2.code, $3.code, $4.code);
+                                                                                    printf("(setq %s %s)%s\n", $1.code, $2.code, $3.code); 
+                                                                                    nodoVar = crearNodoVariableInit($1.code, 0, "vector");
                                                                                 }
+                                                                                if ($3.nodo){
+                                                                                    // A la hora de generar el AST, es indiferente si las variables se declaran juntas o separadas
+                                                                                    // Tomo la decisión de que se genere el AST como si se declararan separadas
+                                                                                    agregarHermano(nodoVar, $3.nodo);
+                                                                                }
+                                                                                $$.nodo = nodoVar;
                                                                             }
                         ;
 
-restDeclaracionesGlob:                                                      { $$.code = ""; }
-                        | ',' IDENTIF restGlobVar restDeclaracionesGlob     { if ($3.code==NULL){
+restDeclaracionesGlob:                                                      { $$.code = ""; 
+                                                                                $$.nodo = NULL;
+                                                                            }
+                        | ',' IDENTIF restGlobVar restDeclaracionesGlob     {   struct nodoAST *nodoVar = NULL;
+                                                                                if ($3.code==NULL){
                                                                                     sprintf(temp, " (setq %s %d)%s", $2.code, $3.value, $4.code);
                                                                                     $$.code = gen_code(temp);
+                                                                                    nodoVar = crearNodoVariableInit($2.code, $3.value, "int");
                                                                                 } else {
                                                                                     sprintf(temp, " (setq %s %s)%s", $2.code, $3.code, $4.code);
                                                                                     $$.code = gen_code(temp);
+                                                                                    nodoVar = crearNodoVariableInit($2.code, 0, "vector");
                                                                                 }
+                                                                                if ($4.nodo){
+                                                                                    agregarHermano(nodoVar, $4.nodo);
+                                                                                }
+                                                                                $$.nodo = nodoVar;
                                                                             }
                         ;
 
@@ -94,11 +119,12 @@ restGlobVar:                    { $$.value = 0;
                                     $$.code = NULL;}
             | '=' NUMBER        { $$.value = $2.value; 
                                     $$.code = NULL;}
-            | '[' NUMBER ']'    { sprintf(temp, "(make-array %d)", $2.value);
+            | '[' NUMBER ']'    { 
+                                    sprintf(temp, "(make-array %d)", $2.value);
 								    $$.code = gen_code(temp); }
             ;
 
-*/
+
 /*------------ FUNCTIONS DECLARATION MANAGEMENT ------------*/
 
 funcionesDef:                                       { $$.nodo = functionNode;}
