@@ -51,7 +51,8 @@ typedef struct s_attr {
                         // SECCION 3: Gramatica - Semantico 
 
                         
-axioma:     INTEGER declaraciones mainDef 	{   printf ("Arbol sintactico abstracto:\n");
+axioma:     INTEGER declaraciones mainDef 	{   printf("%s%s", $2.prefija, $3.prefija);
+                                                printf ("Arbol sintactico abstracto:\n");
                                                 imprimirAST(nodoAxioma); 
                                                 printf("\n\n");
                                                 printf ("Tabla de símbolos:\n");
@@ -64,7 +65,7 @@ axioma:     INTEGER declaraciones mainDef 	{   printf ("Arbol sintactico abstrac
             ;
             
 
-declaraciones:  //Lambda
+declaraciones:  //Lambda                   { $$.prefija = ""; }
                 | IDENTIF nuevaDeclaracion { act_function = $1.code; 
                                             if (! nodoAxioma){
                                                 nodoAxioma = crearNodoIntermedioGenerico("axioma", 0);
@@ -77,13 +78,15 @@ declaraciones:  //Lambda
                                                     agregarHermano(nodoVar, $2.nodo);
                                                 }
                                                 agregarHijo(nodoAxioma, nodoVar);
-                                                // Impresión de la notación prefija
-                                                printf("(setq %s %s\n",$1.code ,$2.prefija); 
+                                                // notación prefija
+                                                sprintf(temp,"(setq %s %s",$1.code ,$2.prefija); 
+                                                $$.prefija = gen_code(temp);
                                             } else{ // Functions
                                                 changeName($2.nodo, $1.code);
                                                 agregarHijo(nodoAxioma, $2.nodo);
-                                                //impresión de la notación prefija
-                                                printf("(defun %s %s", $1.code, $2.prefija);
+                                                // notación prefija
+                                                sprintf(temp,"(defun %s %s", $1.code, $2.prefija);
+                                                $$.prefija = gen_code(temp);
                                             } 
                                             }
                 ;
@@ -111,7 +114,7 @@ nuevaDeclaracion:  '(' funcionesDef         {
 varGlob:    restoVar varRecGlob ';' INTEGER declaraciones                       { 
                                                                                  $$.value = $1.value;
                                                                                  $$.nodo = $2.nodo;
-                                                                                 sprintf(temp, "%s)%s", $1.code, $2.code);
+                                                                                 sprintf(temp, "%s)%s\n%s", $1.code, $2.code, $5.prefija);
                                                                                  $$.prefija = gen_code(temp);
                                                                                  $$.code = $1.code;
                                                                                  act_function = NULL;
@@ -163,14 +166,20 @@ funcionesDef:   funcionArgs ')' '{' recSentenciaFin
                                                         }
                                                         $$.nodo = nodoFunc;
                                                         //Notacion prefija
-                                                        sprintf(temp," (%s)\n%s", $1.prefija, $4.prefija);
+                                                        
+                                                        sprintf(temp," (%s)\n%s%s", $1.prefija, $4.prefija, $6.prefija);
                                                         $$.prefija = gen_code(temp); 
                                                         act_function = NULL;
                                                     }
             ;
 
-funcionesDefRec:  //Lambda
-                | IDENTIF '(' funcionesDef          { act_function = $1.code; }
+funcionesDefRec:                                    { $$.prefija = ""; //Lambda  
+                                                    }    
+                | IDENTIF '(' funcionesDef          { act_function = $1.code;
+                                                     sprintf(temp, "(defun %s %s", $1.code, $3.prefija);
+                                                     $$.prefija = gen_code(temp);
+                                                     printf("Funcion: %s\n", $1.code);
+                                                    }
                 ;
 
 funcionArgs:                                { $$.prefija = ""; }
@@ -202,7 +211,8 @@ mainDef:  MAIN '(' ')' '{'          {
                                         struct nodoAST* nodoMain = crearNodoIntermedioGenerico("main", 1, lastNode);
                                         agregarHijo(nodoAxioma, nodoMain);
                                         //Notacion prefija
-                                        printf("(defun main ()\n%s", $6.prefija);
+                                        sprintf(temp,"(defun main ()\n%s", $6.prefija);
+                                        $$.prefija = gen_code(temp);
                                     }
                     ;
 
