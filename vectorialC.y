@@ -8,7 +8,7 @@ char *gen_code (char *) ;
 char *my_malloc (int nbytes) ;
 char *act_function;
 struct nodoAST* lastNode = NULL;
-struct nodoAST* nodoAxioma = NULL;
+struct nodoAST* lastNodeGlobal = NULL;
 char temp [2048] ;
 
 typedef struct s_attr {
@@ -53,6 +53,13 @@ typedef struct s_attr {
                         
 axioma:     INTEGER declaraciones mainDef 	{   printf("%s%s", $2.prefija, $3.prefija);
                                                 printf ("Arbol sintactico abstracto:\n");
+                                                struct nodoAST* nodoAxioma;
+                                                if (lastNodeGlobal){
+                                                    nodoAxioma = crearNodoIntermedioGenerico("axioma", 2, lastNodeGlobal, $3.nodo);
+                                                } else {
+                                                    nodoAxioma = crearNodoIntermedioGenerico("axioma", 1, $3.nodo);
+                                                }
+                                                
                                                 imprimirAST(nodoAxioma); 
                                                 printf("\n\n");
                                                 printf ("Tabla de símbolos:\n");
@@ -63,27 +70,32 @@ axioma:     INTEGER declaraciones mainDef 	{   printf("%s%s", $2.prefija, $3.pre
                                                 printf ("\n\n");
                                             }
             ;
-            
+        
+
 
 declaraciones:  //Lambda                   { $$.prefija = ""; }
                 | IDENTIF nuevaDeclaracion { act_function = $1.code; 
-                                            if (! nodoAxioma){
-                                                nodoAxioma = crearNodoIntermedioGenerico("axioma", 0);
-                                            }
                                             if ($2.code){ // Variables
                                                 // Gestion de nodo AST
                                                 struct nodoAST* nodoVar;                                        
                                                 nodoVar = crearNodoVariableInit($1.code, $2.value, $2.code);                                               
-                                                if ($2.nodo){
-                                                    agregarHermano(nodoVar, $2.nodo);
+                                                if (! lastNodeGlobal){
+                                                    lastNodeGlobal = nodoVar;
+                                                } else{
+                                                    agregarHermano(nodoVar, lastNodeGlobal);
+                                                    lastNodeGlobal = nodoVar;
                                                 }
-                                                agregarHijo(nodoAxioma, nodoVar);
                                                 // notación prefija
                                                 sprintf(temp,"(setq %s %s",$1.code ,$2.prefija); 
                                                 $$.prefija = gen_code(temp);
                                             } else{ // Functions
                                                 changeName($2.nodo, $1.code);
-                                                agregarHijo(nodoAxioma, $2.nodo);
+                                                if (! lastNodeGlobal){
+                                                    lastNodeGlobal = $2.nodo;
+                                                } else{
+                                                    agregarHermano($2.nodo, lastNodeGlobal);
+                                                    lastNodeGlobal = $2.nodo;
+                                                }
                                                 // notación prefija
                                                 sprintf(temp,"(defun %s %s", $1.code, $2.prefija);
                                                 $$.prefija = gen_code(temp);
@@ -176,6 +188,10 @@ funcionesDef:   funcionArgs ')' '{' recSentenciaFin
 funcionesDefRec:                                    { $$.prefija = ""; //Lambda  
                                                     }    
                 | IDENTIF '(' funcionesDef          { act_function = $1.code;
+                                                    //Nodo AST
+                                                    struct nodoAST* nodoFunc = crearNodoIntermedioGenerico($1.code, 0);
+                                                    agregarHermano(lastNodeGlobal, nodoFunc);
+                                                    //Notacion prefija
                                                      sprintf(temp, "(defun %s %s", $1.code, $3.prefija);
                                                      $$.prefija = gen_code(temp);
                                                      printf("Funcion: %s\n", $1.code);
@@ -205,11 +221,8 @@ mainDef:  MAIN '(' ')' '{'          {
                                         lastNode = NULL;
                                     }
                     recSentenciaFin {   //Nodo AST
-                                        if (! nodoAxioma){
-                                            nodoAxioma = crearNodoIntermedioGenerico("axioma", 0);
-                                        }
                                         struct nodoAST* nodoMain = crearNodoIntermedioGenerico("main", 1, lastNode);
-                                        agregarHijo(nodoAxioma, nodoMain);
+                                        $$.nodo = nodoMain;
                                         //Notacion prefija
                                         sprintf(temp,"(defun main ()\n%s", $6.prefija);
                                         $$.prefija = gen_code(temp);
