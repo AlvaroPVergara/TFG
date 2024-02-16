@@ -8,7 +8,7 @@ char *gen_code (char *) ;
 char *my_malloc (int nbytes) ;
 char *act_function;
 struct nodoAST* lastNode = NULL;
-struct nodoAST* functionNode = NULL;
+struct nodoAST* nodoAxioma = NULL;
 char temp [2048] ;
 
 typedef struct s_attr {
@@ -51,103 +51,125 @@ typedef struct s_attr {
                         // SECCION 3: Gramatica - Semantico 
 
                         
-axioma:     INTEGER declaracionesGlob funcionesDef  mainDef 	{   printf ("Arbol sintactico abstracto:\n");
-                                                                struct nodoAST* nodoAxioma = crearNodoIntermedioGenerico("axioma", 3, $2.nodo, $3.nodo, $4.nodo);
-                                                                imprimirAST(nodoAxioma); 
-                                                                printf("\n\n");
-                                                                printf ("Tabla de símbolos:\n");
-                                                                Symbol **tabla = initSymbolTable();
-                                                                semanticAnalysis(nodoAxioma, tabla);
-                                                                destroySymbolTable(tabla);
-                                                                liberarAST(nodoAxioma);
-                                                                printf ("\n\n");
-                                                            }
+axioma:     INTEGER                         { nodoAxioma = crearNodoIntermedioGenerico("axioma", 0); } //TODO: FIX THE AXIOM NODE CREATION
+            declaraciones mainDef 	        {   printf ("Arbol sintactico abstracto:\n");
+                                                struct nodoAST* nodoAxioma = crearNodoIntermedioGenerico("axioma", 1, nodoAxioma);
+                                                imprimirAST(nodoAxioma); 
+                                                printf("\n\n");
+                                                printf ("Tabla de símbolos:\n");
+                                                Symbol **tabla = initSymbolTable();
+                                                semanticAnalysis(nodoAxioma, tabla);
+                                                destroySymbolTable(tabla);
+                                                liberarAST(nodoAxioma);
+                                                printf ("\n\n");
+                                            }
             ;
             
 
+declaraciones:  //Lambda
+                | IDENTIF nuevaDeclaracion { act_function = $1.code; 
+                                            if ($2.code){ // Variables
+                                                // Gestion de nodo AST
+                                                struct nodoAST* nodoVar;                                        
+                                                nodoVar = crearNodoVariableInit($1.code, $2.value, $2.code);                                               
+                                                if ($2.nodo){
+                                                    agregarHermano(nodoVar, $2.nodo);
+                                                }
+                                                agregarHijo(nodoAxioma, nodoVar);
+                                                // Impresión de la notación prefija
+                                                printf("(setq %s %s\n",$1.code ,$2.prefija); //TODO: FIX THE PREFIX ANOTATION 
+                                            } else{ // Functions
+                                                //TODO: CAMBIAR EL NOMBRE DE EL NODO $2.nodo->nombre = $1.code;
+                                                agregarHijo(nodoAxioma, $2.nodo);
+                                                //impresión de la notación prefija
+                                                printf("(defun %s %s", $1.code, $2.prefija);//TODO: FIX THE PREFIX ANOTATION 
+                                            } 
+                                            }
+                ;
+
+nuevaDeclaracion:  '(' funcionesDef         { 
+                                            $$.nodo = $2.nodo;
+                                            $$.prefija = $2.prefija;
+                                            $$.code = NULL; // NULL for functions
+                                            }
+                    | varGlob               { $$.value = $1.value;
+                                            $$.nodo = $1.nodo;
+                                            $$.prefija = $1.prefija;
+                                            if ($1.code){
+                                                $$.code = "int"; //NOT NULL FOR VARIABLES
+                                            }
+                                            else {
+                                                $$.code = "vector"; //NOT NULL FOR VARIABLES
+                                            }
+                                            }
+                ;
+
+
 /*------------ GLOBAL DECLARATION VARIABLE MANAGEMENT ------------*/
 
-declaracionesGlob:                                                              { ; }
-                        | declaracionesGlobRec ';' INTEGER declaracionesGlob            { 
-                                                                                if ($3.nodo){
-                                                                                    agregarHermano($1.nodo, $3.nodo);
-                                                                                }
-                                                                                $$.nodo = $1.nodo;
+varGlob:    restoVar varRecGlob ';' INTEGER declaraciones                       { 
+                                                                                 $$.value = $1.value;
+                                                                                 $$.nodo = $2.nodo;
+                                                                                 sprintf(temp, "%s)%s", $1.code, $2.code);
+                                                                                 $$.code = gen_code(temp);
+                                                                                 act_function = NULL;
                                                                                 }
                                                                              
                         ;
 
-declaracionesGlobRec:   IDENTIF restGlobVar restDeclaracionesGlob   {   struct nodoAST *nodoVar = NULL;
-                                                                                if ($2.code==NULL){
-                                                                                    printf("(setq %s %d)%s\n", $1.code, $2.value, $3.code);
-                                                                                    nodoVar = crearNodoVariableInit($2.code, $3.value, "int");
-                                                                                    
-                                                                                } else{
-                                                                                    printf("(setq %s %s)%s\n", $1.code, $2.code, $3.code); 
-                                                                                    nodoVar = crearNodoVariableInit($1.code, 0, "vector");
-                                                                                }
-                                                                                if ($3.nodo){
-                                                                                    // A la hora de generar el AST, es indiferente si las variables se declaran juntas o separadas
-                                                                                    // Tomo la decisión de que se genere el AST como si se declararan separadas
-                                                                                    agregarHermano(nodoVar, $3.nodo);
-                                                                                }
-                                                                                $$.nodo = nodoVar;
-                                                                            }
+
+varRecGlob:                                                     { $$.code = ""; 
+                                                                  $$.nodo = NULL;
+                                                                }
+                        | ',' IDENTIF restoVar varRecGlob     {   struct nodoAST *nodoVar = NULL;
+                                                                  sprintf(temp, " (setq %s %s)%s", $2.code, $3.prefija, $4.prefija);
+                                                                  $$.prefija = gen_code(temp); 
+                                                                  $$.code = $3.code;             
+                                                                if ($3.value){      
+                                                                    nodoVar = crearNodoVariableInit($2.code, 0, "vector");
+                                                                } else {
+                                                                    nodoVar = crearNodoVariableInit($2.code, $3.value, "int");
+                                                                }
+                                                                if ($4.nodo){
+                                                                    agregarHermano(nodoVar, $4.nodo);
+                                                                }
+                                                                $$.nodo = nodoVar;
+                                                                }
                         ;
 
-restDeclaracionesGlob:                                                      { $$.code = ""; 
-                                                                                $$.nodo = NULL;
-                                                                            }
-                        | ',' IDENTIF restGlobVar restDeclaracionesGlob     {   struct nodoAST *nodoVar = NULL;
-                                                                                if ($3.code==NULL){
-                                                                                    sprintf(temp, " (setq %s %d)%s", $2.code, $3.value, $4.code);
-                                                                                    $$.code = gen_code(temp);
-                                                                                    nodoVar = crearNodoVariableInit($2.code, $3.value, "int");
-                                                                                } else {
-                                                                                    sprintf(temp, " (setq %s %s)%s", $2.code, $3.code, $4.code);
-                                                                                    $$.code = gen_code(temp);
-                                                                                    nodoVar = crearNodoVariableInit($2.code, 0, "vector");
-                                                                                }
-                                                                                if ($4.nodo){
-                                                                                    agregarHermano(nodoVar, $4.nodo);
-                                                                                }
-                                                                                $$.nodo = nodoVar;
-                                                                            }
-                        ;
-
-restGlobVar:                    { $$.value = 0; 
-                                    $$.code = NULL;}
+restoVar:                       { $$.value = 0; 
+                                    sprintf(temp, "0");
+                                    $$.prefija = $$.code = gen_code(temp);
+                                    }
             | '=' NUMBER        { $$.value = $2.value; 
-                                    $$.code = NULL;}
-            | '[' NUMBER ']'    { 
+                                    sprintf(temp, "%d", $2.value);
+                                    $$.prefija = $$.code = gen_code(temp);}
+            | '[' NUMBER ']'    { $$.value = 0;
                                     sprintf(temp, "(make-array %d)", $2.value);
-								    $$.code = gen_code(temp); }
+								    $$.prefija = gen_code(temp); 
+                                    $$.code = NULL;}
             ;
 
 
 /*------------ FUNCTIONS DECLARATION MANAGEMENT ------------*/
 
-funcionesDef:                                       { $$.nodo = functionNode;}
-            |    IDENTIF '(' funcionArgs ')'  '{'    { printf("(defun %s (%s)\n", $1.code, $3.prefija); 
-                                                            act_function = $1.code;
-                                                            if (functionNode == NULL) { 
-                                                                functionNode = crearNodoIntermedioGenerico("Funciones", 0);
-                                                            }
-                                                          
-                                                    }
-                recSentenciaFin                     {   
-                                                        struct nodoAST* nodoFunc = crearNodoIntermedioGenerico($1.code, 0);
-                                                        if ( $7.nodo){
-                                                            agregarHijo(nodoFunc, $7.nodo);
+funcionesDef:   funcionArgs ')' '{' recSentenciaFin    
+                INTEGER funcionesDefRec             { //Nodo de la funcion
+                                                        struct nodoAST* nodoFunc = crearNodoIntermedioGenerico("NombreFuncTemp", 0);
+                                                        if ( $4.nodo){
+                                                            agregarHijo(nodoFunc, $4.nodo);
                                                         }
-                                                        agregarHijo(functionNode, nodoFunc);
+                                                        $$.nodo = nodoFunc;
+                                                        //Notacion prefija
+                                                        sprintf(temp," (%s)\n%s", $1.prefija, $4.prefija);
+                                                        $$.prefija = gen_code(temp); 
                                                         act_function = NULL;
-                                                        lastNode = NULL;
-                                                    }
-                INTEGER funcionesDef                        { 
-                                                        $$.nodo = functionNode;
                                                     }
             ;
+
+funcionesDefRec:  //Lambda
+                | IDENTIF '(' funcionesDef          { act_function = $1.code; }
+                ;
 
 funcionArgs:                                { $$.prefija = ""; }
             |  INTEGER /*varIdentf*/ IDENTIF recArgFunct {    if( $3.prefija == NULL)    {
@@ -173,40 +195,58 @@ mainDef:  MAIN '(' ')' '{'   { printf("(defun main ()\n");
                                     }
                     recSentenciaFin { 
                                         struct nodoAST* nodoMain = crearNodoIntermedioGenerico("main", 1, lastNode);
-                                        $$.nodo = nodoMain;
+                                        agregarHijo(nodoAxioma, nodoMain);
                                     }
                     ;
 
 
 /*------------ STATEMENT LEVEL ------------*/
-recSentenciaFin:      '}'                              { printf(")\n"); 
+recSentenciaFin:      '}'                              { sprintf(temp,")\n"); 
+                                                        $$.prefija = gen_code(temp);
                                                         $$.nodo = lastNode;
                                                         }
-                    |   RETURN /*expresionAric*/ expresion ';' '}'       { printf("%s\n)\n", $2.prefija); } 
-                    |   RETURN /*expresionAric*/ expresion ';'           { printf("(return-from %s %s)\n", act_function, $2.prefija); }
-                        recSentenciaNoFin              { ; }
-                    |   sentencia                      { if ($1.prefija) { printf("%s\n", $1.prefija); }}
-                        recSentenciaFin                { 
-                                                        if ($1.nodo && lastNode) {                                                            
-                                                                agregarHermano($1.nodo, lastNode);
-                                                        } 
-                                                        $$.nodo = $1.nodo;
-                                                        lastNode = $1.nodo;
-                                                        }
-//                    |   /*declaraciones*/ declaracion                  { ; }
+                    |   RETURN /*expresionAric*/ expresion ';' '}'              { 
+                                                                                sprintf(temp,"%s\n)\n", $2.prefija);
+                                                                                $$.prefija = gen_code(temp);
+                                                                                } 
+
+                    |   RETURN /*expresionAric*/ expresion ';' recSentenciaNoFin { 
+                                                                                sprintf(temp,"(return-from %s %s)\n%s", act_function, $2.prefija, $3.prefija); 
+                                                                                $$.prefija = gen_code(temp); 
+                                                                                }
+
+                    |   sentencia recSentenciaFin                               { 
+                                                                                // Nodos AST
+                                                                                if ($1.nodo && lastNode) {                                                            
+                                                                                        agregarHermano($1.nodo, lastNode);
+                                                                                } 
+                                                                                $$.nodo = $1.nodo;
+                                                                                lastNode = $1.nodo;
+                                                                                // Notacion prefija
+                                                                                sprintf(temp,"%s\n%s", $1.prefija, $2.prefija);
+                                                                                $$.prefija = gen_code(temp); 
+                                                                                }
                     ;
 
-recSentenciaNoFin:      RETURN /*expresionAric*/ expresion ';' '}'   { printf("%s\n)\n", $2.prefija); }
-                    |   RETURN /*expresionAric*/ expresion ';'       { printf("(return-from %s %s)", act_function, $2.prefija); }
-                        recSentenciaNoFin          { ; }
-                    |   sentencia                  { if ($1.prefija) { printf("%s\n", $1.prefija); }}
-                        recSentenciaFin            { if ($1.nodo && lastNode) {                                                            
-                                                                agregarHermano($1.nodo, lastNode);
-                                                        } 
-                                                        $$.nodo = $1.nodo;
-                                                        lastNode = $1.nodo;
-                        }
-//                    |   /*declaraciones*/ declaracion              { ; }
+recSentenciaNoFin:      RETURN /*expresionAric*/ expresion ';' '}'              { 
+                                                                                sprintf(temp,"%s\n)\n", $2.prefija);
+                                                                                $$.prefija = gen_code(temp);
+                                                                                } 
+                    |   RETURN /*expresionAric*/ expresion ';' recSentenciaNoFin { 
+                                                                                sprintf(temp,"(return-from %s %s)\n%s", act_function, $2.prefija, $3.prefija); 
+                                                                                $$.prefija = gen_code(temp); 
+                                                                                }
+                    |   sentencia recSentenciaFin                               { 
+                                                                                // Nodos AST
+                                                                                if ($1.nodo && lastNode) {                                                            
+                                                                                        agregarHermano($1.nodo, lastNode);
+                                                                                } 
+                                                                                $$.nodo = $1.nodo;
+                                                                                lastNode = $1.nodo;
+                                                                                // Notacion prefija
+                                                                                sprintf(temp,"%s\n%s", $1.prefija, $2.prefija);
+                                                                                $$.prefija = gen_code(temp); 
+                                                                                }
                     ;
 
 /*
