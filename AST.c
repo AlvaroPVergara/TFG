@@ -113,6 +113,9 @@ struct nodoAST* crearNodoIntermedioGenerico(char* nombre, int numHijos, ...) {
     return nuevoNodo;
 }
 
+void changeName(struct nodoAST* nodo, char* nombre) {
+    nodo->nombre = strdup(nombre);
+}
 
 // Libera la memoria del árbol AST
 void liberarAST(struct nodoAST* raiz) {

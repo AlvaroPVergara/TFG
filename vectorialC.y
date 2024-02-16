@@ -80,7 +80,7 @@ declaraciones:  //Lambda
                                                 // Impresión de la notación prefija
                                                 printf("(setq %s %s\n",$1.code ,$2.prefija); 
                                             } else{ // Functions
-                                                //TODO: CAMBIAR EL NOMBRE DE EL NODO $2.nodo->nombre = $1.code;
+                                                changeName($2.nodo, $1.code);
                                                 agregarHijo(nodoAxioma, $2.nodo);
                                                 //impresión de la notación prefija
                                                 printf("(defun %s %s", $1.code, $2.prefija);

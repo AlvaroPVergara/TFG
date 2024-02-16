@@ -32,6 +32,7 @@ struct nodoAST* crearNodoIntermedio(char* nombre);
 void agregarHijo(struct nodoAST* padre, struct nodoAST* hijo);
 void agregarHermano(struct nodoAST* hermano, struct nodoAST* nuevo);
 struct nodoAST* crearNodoIntermedioGenerico(char* nombre, int numHijos, ...);
+void changeName(struct nodoAST* nodo, char* nombre);
 void liberarAST(struct nodoAST* raiz);
 void imprimirAST(struct nodoAST* raiz);
 

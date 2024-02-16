@@ -1440,7 +1440,7 @@ yyreduce:
                                                 // Impresión de la notación prefija
                                                 printf("(setq %s %s\n",yyvsp[-1].code ,yyvsp[0].prefija); 
                                             } else{ // Functions
-                                                //TODO: CAMBIAR EL NOMBRE DE EL NODO $2.nodo->nombre = $1.code;
+                                                changeName(yyvsp[0].nodo, yyvsp[-1].code);
                                                 agregarHijo(nodoAxioma, yyvsp[0].nodo);
                                                 //impresión de la notación prefija
                                                 printf("(defun %s %s", yyvsp[-1].code, yyvsp[0].prefija);
