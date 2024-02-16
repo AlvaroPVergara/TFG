@@ -51,9 +51,7 @@ typedef struct s_attr {
                         // SECCION 3: Gramatica - Semantico 
 
                         
-axioma:     INTEGER                         { nodoAxioma = crearNodoIntermedioGenerico("axioma", 0); } //TODO: FIX THE AXIOM NODE CREATION
-            declaraciones mainDef 	        {   printf ("Arbol sintactico abstracto:\n");
-                                                struct nodoAST* nodoAxioma = crearNodoIntermedioGenerico("axioma", 1, nodoAxioma);
+axioma:     INTEGER declaraciones mainDef 	{   printf ("Arbol sintactico abstracto:\n");
                                                 imprimirAST(nodoAxioma); 
                                                 printf("\n\n");
                                                 printf ("Tabla de símbolos:\n");
@@ -68,6 +66,9 @@ axioma:     INTEGER                         { nodoAxioma = crearNodoIntermedioGe
 
 declaraciones:  //Lambda
                 | IDENTIF nuevaDeclaracion { act_function = $1.code; 
+                                            if (! nodoAxioma){
+                                                nodoAxioma = crearNodoIntermedioGenerico("axioma", 0);
+                                            }
                                             if ($2.code){ // Variables
                                                 // Gestion de nodo AST
                                                 struct nodoAST* nodoVar;                                        
@@ -77,12 +78,12 @@ declaraciones:  //Lambda
                                                 }
                                                 agregarHijo(nodoAxioma, nodoVar);
                                                 // Impresión de la notación prefija
-                                                printf("(setq %s %s\n",$1.code ,$2.prefija); //TODO: FIX THE PREFIX ANOTATION 
+                                                printf("(setq %s %s\n",$1.code ,$2.prefija); 
                                             } else{ // Functions
                                                 //TODO: CAMBIAR EL NOMBRE DE EL NODO $2.nodo->nombre = $1.code;
                                                 agregarHijo(nodoAxioma, $2.nodo);
                                                 //impresión de la notación prefija
-                                                printf("(defun %s %s", $1.code, $2.prefija);//TODO: FIX THE PREFIX ANOTATION 
+                                                printf("(defun %s %s", $1.code, $2.prefija);
                                             } 
                                             }
                 ;
@@ -111,7 +112,8 @@ varGlob:    restoVar varRecGlob ';' INTEGER declaraciones                       
                                                                                  $$.value = $1.value;
                                                                                  $$.nodo = $2.nodo;
                                                                                  sprintf(temp, "%s)%s", $1.code, $2.code);
-                                                                                 $$.code = gen_code(temp);
+                                                                                 $$.prefija = gen_code(temp);
+                                                                                 $$.code = $1.code;
                                                                                  act_function = NULL;
                                                                                 }
                                                                              
@@ -189,13 +191,18 @@ recArgFunct:                        { $$.prefija = NULL; }
 
 /*------------ MAIN FUNCTION DECLARATION MANAGEMENT ------------*/
                                                     
-mainDef:  MAIN '(' ')' '{'   { printf("(defun main ()\n");
+mainDef:  MAIN '(' ')' '{'          { 
                                         act_function = "main"; 
                                         lastNode = NULL;
                                     }
-                    recSentenciaFin { 
+                    recSentenciaFin {   //Nodo AST
+                                        if (! nodoAxioma){
+                                            nodoAxioma = crearNodoIntermedioGenerico("axioma", 0);
+                                        }
                                         struct nodoAST* nodoMain = crearNodoIntermedioGenerico("main", 1, lastNode);
                                         agregarHijo(nodoAxioma, nodoMain);
+                                        //Notacion prefija
+                                        printf("(defun main ()\n%s", $6.prefija);
                                     }
                     ;
 
