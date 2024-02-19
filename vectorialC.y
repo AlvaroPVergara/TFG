@@ -73,7 +73,7 @@ axioma:     INTEGER declaraciones mainDef 	{   printf("%s%s", $2.prefija, $3.pre
         
 
 
-declaraciones:  //Lambda                   { $$.prefija = ""; }
+declaraciones:                              { $$.prefija = ""; } //Lambda 
                 | IDENTIF nuevaDeclaracion { act_function = $1.code; 
                                             if ($2.code){ // Variables
                                                 // Gestion de nodo AST
@@ -170,16 +170,17 @@ restoVar:                       { $$.value = 0;
 
 /*------------ FUNCTIONS DECLARATION MANAGEMENT ------------*/
 
-funcionesDef:   funcionArgs ')' '{' recSentenciaFin    
+funcionesDef:   funcionArgs ')' '{'                 { lastNode = NULL; }
+                recSentenciaFin    
                 INTEGER funcionesDefRec             { //Nodo de la funcion
                                                         struct nodoAST* nodoFunc = crearNodoIntermedioGenerico("NombreFuncTemp", 0);
-                                                        if ( $4.nodo){
-                                                            agregarHijo(nodoFunc, $4.nodo);
+                                                        if ( $5.nodo){
+                                                            agregarHijo(nodoFunc, $5.nodo);
                                                         }
                                                         $$.nodo = nodoFunc;
-                                                        //Notacion prefija
                                                         
-                                                        sprintf(temp," (%s)\n%s%s", $1.prefija, $4.prefija, $6.prefija);
+                                                        //Notacion prefija
+                                                        sprintf(temp," (%s)\n%s%s", $1.prefija, $5.prefija, $7.prefija);
                                                         $$.prefija = gen_code(temp); 
                                                         act_function = NULL;
                                                     }
@@ -189,8 +190,13 @@ funcionesDefRec:                                    { $$.prefija = ""; //Lambda
                                                     }    
                 | IDENTIF '(' funcionesDef          { act_function = $1.code;
                                                     //Nodo AST
-                                                    struct nodoAST* nodoFunc = crearNodoIntermedioGenerico($1.code, 0);
-                                                    agregarHermano(lastNodeGlobal, nodoFunc);
+                                                    changeName($3.nodo, $1.code);
+                                                    if (! lastNodeGlobal){
+                                                        lastNodeGlobal = $3.nodo;
+                                                    } else{
+                                                        agregarHermano($3.nodo, lastNodeGlobal);
+                                                        lastNodeGlobal = $3.nodo;
+                                                    }
                                                     //Notacion prefija
                                                      sprintf(temp, "(defun %s %s", $1.code, $3.prefija);
                                                      $$.prefija = gen_code(temp);
