@@ -79,8 +79,14 @@ void semanticAnalysis(struct nodoAST* raiz, Symbol **symTable) {
         // Verifica si el nodo actual es una hoja
         if (raiz->tipo == NODO_HOJA_VARIABLE_INIT) {
             // Inserta el símbolo en la tabla de símbolos
-            insertSymbol(symTable, raiz->nombre, raiz->tipo_variable, 0, 0);
-            printf("Símbolo '%s' insertado en la tabla.\n", raiz->nombre);
+            Symbol *foundSymbol = searchSymbol(symTable, raiz->nombre);
+            if (foundSymbol != NULL) {
+                printf("Símbolo '%s' ya existe en la tabla.\n", raiz->nombre);
+                //TODO: RAISE ERROR
+            } else {
+                insertSymbol(symTable, raiz->nombre, raiz->tipo_variable, 0, 0);
+                printf("Símbolo '%s' insertado en la tabla.\n", raiz->nombre);
+            }
         } 
 
         else if (raiz->tipo == NODO_HOJA_VARIABLE) {
