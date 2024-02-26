@@ -6,10 +6,14 @@ int yylex () ;
 int yyerror (char* mensaje) ; 
 char *gen_code (char *) ;
 char *my_malloc (int nbytes) ;
+void node_to_bool(struct nodoAST* nodo);
+void node_to_aric(struct nodoAST* nodo);
+
 char *act_function;
 struct nodoAST* lastNode = NULL;
 struct nodoAST* lastNodeGlobal = NULL;
 char temp [2048] ;
+char *concat_ptr;
 
 typedef struct s_attr {
      int value ;       //  - valor numerico entero 
@@ -200,7 +204,6 @@ funcionesDefRec:                                    { $$.prefija = ""; //Lambda
                                                     //Notacion prefija
                                                      sprintf(temp, "(defun %s %s", $1.code, $3.prefija);
                                                      $$.prefija = gen_code(temp);
-                                                     printf("Funcion: %s\n", $1.code);
                                                     }
                 ;
 
@@ -325,8 +328,7 @@ sentencia:   asignacion  ';'                                  { $$ = $1; }
             ;
                                                         
 
-declaracion: INTEGER IDENTIF               { // Para calculadora
-                                             $$.value = 0 ; 
+declaracion: INTEGER IDENTIF               { 
                                              // Para AST
                                              $$.nodo = crearNodoVariableInit($2.code, 0, "int");
                                              // Para notacion prefija
@@ -336,9 +338,7 @@ declaracion: INTEGER IDENTIF               { // Para calculadora
            ;
 
 
-asignacion: IDENTIF '=' expresion    {    // Para calculadora
-                                             $$.value = $3.value ;
-
+asignacion: IDENTIF '=' expresionAric    { 
                                              // Para AST
                                              struct nodoAST* nodoVar = crearNodoVariable($1.code, $3.value, "int");
                                              struct nodoAST* nuevoNodo = crearNodoIntermedioGenerico("asignacion", 2, nodoVar, $3.nodo);
@@ -351,58 +351,338 @@ asignacion: IDENTIF '=' expresion    {    // Para calculadora
             ;
 
 
-expresion:    termino                    { $$ = $1 ; }
-            | expresion '+' expresion    {   // Para calculadora
-                                             $$.value = $1.value + $3.value ;  
+/* ------------------------------------- EXPRESSION LEVEL --------------------------------------- */
 
-                                             // Para AST
-                                             struct nodoAST* nuevoNodo = crearNodoIntermedioGenerico("suma", 2, $1.nodo, $3.nodo);
-                                             $$.nodo = nuevoNodo;
+/*
+expresionBool: expresion        { if ( $1.code == "0"){
+                                    sprintf(temp, "(/= 0 %s)", $1.prefija);
+                                    $$.prefija = gen_code(temp);
+                                    $$nodo = node_to_bool($1.nodo);
+                                  } else{
+                                    $$.prefija = $1.prefija;
+                                    $$nodo = $1.nodo;
+                                  }
+                                }
+            ;*/
 
-                                             // Notacion prefija
-                                             sprintf(temp, "(+ %s %s)", $1.prefija, $3.prefija); 
-                                             $$.prefija =  gen_code(temp);
-                                        }    
+expresionAric: expresion        { if ( $1.value == 1){
+                                    sprintf(temp, "(if %s 1 0)", $1.prefija);
+                                    $$.prefija = gen_code(temp);
+                                    node_to_aric($1.nodo);
+                                    $$.nodo = $1.nodo;
+                                  } else{
+                                    $$.prefija = $1.prefija;
+                                    $$.nodo = $1.nodo;
+                                  }
+                                }
+            ;
 
-            | expresion '-' expresion    {   // Para calculadora
-                                             $$.value = $1.value - $3.value ;  
 
-                                             // Para AST
-                                             struct nodoAST* nuevoNodo = crearNodoIntermedioGenerico("resta", 2, $1.nodo, $3.nodo);
-                                             $$.nodo = nuevoNodo;
-
-                                             // Notacion prefija
-                                             sprintf(temp, "(- %s %s)", $1.prefija, $3.prefija);
-                                             $$.prefija =  gen_code(temp);
+expresion: termino                     { $$.prefija = $1.prefija;
+                                         $$.value = 2 ; // Never translate terms 
+                                         $$.nodo = $1.nodo;
+                                         }
+/*
+           | expresion AND expresion  { concat_ptr = temp; 
+                                        concat_ptr += sprintf(concat_ptr, "(and ");
+                                        struct nodoAST* nodoexp1 = $1.nodo;
+                                        struct nodoAST* nodoexp2 = $3.nodo;
+                                        if ($1.value == 0){
+                                            // Concat $1 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(/= 0 %s) ", $1.prefija);
+                                            node_to_bool(nodoexp1);
+                                        } else {
+                                            // Concat $1 as is
+                                            concat_ptr += sprintf(concat_ptr, "%s ", $1.prefija);
                                         }
-                                             
-            | expresion '*' expresion    {   // Para calculadora
-                                             $$.value = $1.value * $3.value ;  
+                                        if ($3.value == 0){
+                                            // Concat $3 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(/= 0 %s))", $3.prefija);
+                                            node_to_bool(nodoexp2);
+                                        } else {
+                                            concat_ptr += sprintf(concat_ptr, "%s )", $3.prefija);
+                                        }
+                                        $$.value = 1;
+                                        $$.prefija = gen_code (temp) ; 
 
-                                             // Para AST
-                                             struct nodoAST* nuevoNodo = crearNodoIntermedioGenerico("multiplicacion", 2, $1.nodo, $3.nodo);
-                                             $$.nodo = nuevoNodo;
+                                        // Nodo AST
+                                        struct nodoAST* nodoAnd = crearNodoIntermedioGenerico("and", 2, nodoexp1, nodoexp2);
+                                        $$.nodo = nodoAnd;
+                                        }
+ 
+            | expresion OR expresion  { concat_ptr = temp; 
+                                        concat_ptr += sprintf(concat_ptr, "(or ");
+                                        if ($1.code == "0"){
+                                            // Concat $1 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(/= 0 %s) ", $1.prefija);
+                                        } else {
+                                            // Concat $1 as is
+                                            concat_ptr += sprintf(concat_ptr, "%s ", $1.prefija);
+                                        }
+                                        if ($3.code == "0"){
+                                            // Concat $3 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(/= 0 %s))", $3.prefija);
+                                        } else {
+                                            concat_ptr += sprintf(concat_ptr, "%s )", $3.prefija);
+                                        }
+                                        $$.code = "1";
+                                        $$.prefija = gen_code (temp) ; 
 
-                                             // Notacion prefija
-                                             sprintf(temp, "(* %s %s)", $1.prefija, $3.prefija);
-                                             $$.prefija =  gen_code(temp);
+                                        // Nodo AST
+                                        struct nodoAST* nodoOr = crearNodoIntermedioGenerico("or", 2, $1.nodo, $3.nodo);
+                                        $$.nodo = nodoOr;
                                         }
 
-            | expresion '/' expresion    {   // Para calculadora
-                                             $$.value = $1.value / $3.value ;  
+            | expresion NEQ expresion  {concat_ptr = temp;  
+                                        concat_ptr += sprintf(concat_ptr, "(/= ");
+                                        if ($1.code == "0"){
+                                            // Concat $1 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(/= 0 %s) ", $1.prefija);
+                                        } else {
+                                            // Concat $1 as is
+                                            concat_ptr += sprintf(concat_ptr, "%s ", $1.prefija);
+                                        }
+                                        if ($3.code == "0"){
+                                            // Concat $3 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(/= 0 %s))", $3.prefija);
+                                        } else {
+                                            concat_ptr += sprintf(concat_ptr, "%s )", $3.prefija);
+                                        }
+                                        $$.code = "1";
+                                        $$.prefija = gen_code (temp) ; 
 
-                                             // Para AST
-                                             struct nodoAST* nuevoNodo = crearNodoIntermedioGenerico("división", 2, $1.nodo, $3.nodo);
-                                             $$.nodo = nuevoNodo;
+                                        // Nodo AST
+                                        struct nodoAST* nodoNeq = crearNodoIntermedioGenerico("neq", 2, $1.nodo, $3.nodo);
+                                        $$.nodo = nodoNeq;
+                                        }
 
-                                             // Notacion prefija
-                                             sprintf(temp, "(/ %s %s)", $1.prefija, $3.prefija);
-                                             $$.prefija =  gen_code(temp);
+            | expresion EQ expresion   { concat_ptr = temp;  
+                                        concat_ptr += sprintf(concat_ptr, "(== ");
+                                        if ($1.code == "0"){
+                                            // Concat $1 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(/= 0 %s) ", $1.prefija);
+                                        } else {
+                                            // Concat $1 as is
+                                            concat_ptr += sprintf(concat_ptr, "%s ", $1.prefija);
+                                        }
+                                        if ($3.code == "0"){
+                                            // Concat $3 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(/= 0 %s))", $3.prefija);
+                                        } else {
+                                            concat_ptr += sprintf(concat_ptr, "%s )", $3.prefija);
+                                        }
+                                        $$.code = "1";
+                                        $$.prefija = gen_code (temp) ; 
+
+                                        // Nodo AST
+                                        struct nodoAST* nodoEq = crearNodoIntermedioGenerico("eq", 2, $1.nodo, $3.nodo);
+                                        $$.nodo = nodoEq;
+                                        }
+
+            | expresion '<' expresion  {concat_ptr = temp;   
+                                        concat_ptr += sprintf(concat_ptr, "(< ");
+                                        if ($1.code == "0"){
+                                            // Concat $1 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(/= 0 %s) ", $1.prefija);
+                                        } else {
+                                            // Concat $1 as is
+                                            concat_ptr += sprintf(concat_ptr, "%s ", $1.prefija);
+                                        }
+                                        if ($3.code == "0"){
+                                            // Concat $3 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(/= 0 %s))", $3.prefija);
+                                        } else {
+                                            concat_ptr += sprintf(concat_ptr, "%s )", $3.prefija);
+                                        }
+                                        $$.code = "1";
+                                        $$.prefija = gen_code (temp) ; 
+
+                                        // Nodo AST
+                                        struct nodoAST* nodoLt = crearNodoIntermedioGenerico("lt", 2, $1.nodo, $3.nodo);
+                                        $$.nodo = nodoLt;
+                                        }
+
+            | expresion LEQ expresion  { concat_ptr = temp;  
+                                        concat_ptr += sprintf(concat_ptr, "(<= ");
+                                        if ($1.code == "0"){
+                                            // Concat $1 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(/= 0 %s) ", $1.prefija);
+                                        } else {
+                                            // Concat $1 as is
+                                            concat_ptr += sprintf(concat_ptr, "%s ", $1.prefija);
+                                        }
+                                        if ($3.code == "0"){
+                                            // Concat $3 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(/= 0 %s))", $3.prefija);
+                                        } else {
+                                            concat_ptr += sprintf(concat_ptr, "%s )", $3.prefija);
+                                        }
+                                        $$.code = "1";
+                                        $$.prefija = gen_code (temp) ; 
+
+                                        // Nodo AST
+                                        struct nodoAST* nodoLeq = crearNodoIntermedioGenerico("leq", 2, $1.nodo, $3.nodo);
+                                        $$.nodo = nodoLeq;
+                                        }
+
+            | expresion '>' expresion  {concat_ptr = temp;   
+                                        concat_ptr += sprintf(concat_ptr, "(> ");
+                                        if ($1.code == "0"){
+                                            // Concat $1 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(/= 0 %s) ", $1.prefija);
+                                        } else {
+                                            // Concat $1 as is
+                                            concat_ptr += sprintf(concat_ptr, "%s ", $1.prefija);
+                                        }
+                                        if ($3.code == "0"){
+                                            // Concat $3 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(/= 0 %s))", $3.prefija);
+                                        } else {
+                                            concat_ptr += sprintf(concat_ptr, "%s )", $3.prefija);
+                                        }
+                                        $$.code = "1";
+                                        $$.prefija = gen_code (temp) ; 
+
+                                        // Nodo AST
+                                        struct nodoAST* nodoGt = crearNodoIntermedioGenerico("gt", 2, $1.nodo, $3.nodo);
+                                        $$.nodo = nodoGt;
+                                        }
+
+            | expresion GEQ expresion  {concat_ptr = temp;    
+                                        concat_ptr += sprintf(concat_ptr, "(>= ");
+                                        if ($1.code == "0"){
+                                            // Concat $1 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(/= 0 %s) ", $1.prefija);
+                                        } else {
+                                            // Concat $1 as is
+                                            concat_ptr += sprintf(concat_ptr, "%s ", $1.prefija);
+                                        }
+                                        if ($3.code == "0"){
+                                            // Concat $3 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(/= 0 %s))", $3.prefija);
+                                        } else {
+                                            concat_ptr += sprintf(concat_ptr, "%s )", $3.prefija);
+                                        }
+                                        $$.code = "1";
+                                        $$.prefija = gen_code (temp) ; 
+
+                                        // Nodo AST
+                                        struct nodoAST* nodoGeq = crearNodoIntermedioGenerico("geq", 2, $1.nodo, $3.nodo);
+                                        $$.nodo = nodoGeq;
+                                        }
+
+            */            
+            // Arithmetic expressions tranlsated to boolean expressions
+            |   expresion '+' expresion  { concat_ptr = temp;
+                                        concat_ptr += sprintf(concat_ptr, "(+ ");
+                                        struct nodoAST* nodoexp1 = $1.nodo;
+                                        struct nodoAST* nodoexp2 = $3.nodo;
+                                        if ($1.value == 1){
+                                            // Concat $1 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(if %s 1 0) ", $1.prefija);
+                                            node_to_aric(nodoexp1);
+                                        } else {
+                                            // Concat $1 as is
+                                            concat_ptr += sprintf(concat_ptr, "%s ", $1.prefija);
+                                        }
+                                        if ($3.value == 1){
+                                            // Concat $3 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(if %s 1 0))", $3.prefija);
+                                            node_to_aric(nodoexp2);
+                                        } else {
+                                            concat_ptr += sprintf(concat_ptr, "%s )", $3.prefija);
+                                        }
+                                        $$.value = 0;
+                                        $$.prefija = gen_code (temp) ; 
+
+                                        // Nodo AST
+                                        struct nodoAST* nodoSuma = crearNodoIntermedioGenerico("suma", 2, nodoexp1, nodoexp2);
+                                        $$.nodo = nodoSuma;
+                                        }
+
+            |   expresion '-' expresion  { concat_ptr = temp;
+                                        concat_ptr += sprintf(concat_ptr, "(- ");
+                                        struct nodoAST* nodoexp1 = $1.nodo;
+                                        struct nodoAST* nodoexp2 = $3.nodo;
+                                        if ($1.value == 1){
+                                            // Concat $1 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(if %s 1 0) ", $1.prefija);
+                                            node_to_aric(nodoexp1);
+                                        } else {
+                                            // Concat $1 as is
+                                            concat_ptr += sprintf(concat_ptr, "%s ", $1.prefija);
+                                        }
+                                        if ($3.value == 1){
+                                            // Concat $3 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(if %s 1 0))", $3.prefija);
+                                            node_to_aric(nodoexp2);
+                                        } else {
+                                            concat_ptr += sprintf(concat_ptr, "%s )", $3.prefija);
+                                        }
+                                        $$.value = 0;
+                                        $$.prefija = gen_code (temp) ; 
+                                        // Nodo AST
+                                        struct nodoAST* nodoResta = crearNodoIntermedioGenerico("resta", 2, nodoexp1, nodoexp2);
+                                        $$.nodo = nodoResta;
+                                        }
+
+            |   expresion '*' expresion  { concat_ptr = temp;
+                                        concat_ptr += sprintf(concat_ptr, "(* ");
+                                        struct nodoAST* nodoexp1 = $1.nodo;
+                                        struct nodoAST* nodoexp2 = $3.nodo;
+                                        if ($1.value == 1){
+                                            // Concat $1 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(if %s 1 0) ", $1.prefija);
+                                            node_to_aric(nodoexp1);
+                                        } else {
+                                            // Concat $1 as is
+                                            concat_ptr += sprintf(concat_ptr, "%s ", $1.prefija);
+                                        }
+                                        if ($3.value == 1){
+                                            // Concat $3 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(if %s 1 0))", $3.prefija);
+                                            node_to_aric(nodoexp2);
+                                        } else {
+                                            concat_ptr += sprintf(concat_ptr, "%s )", $3.prefija);
+                                        }
+                                        $$.value = 0;
+                                        $$.prefija = gen_code (temp) ; 
+
+                                        // Nodo AST
+                                        struct nodoAST* nodoMult = crearNodoIntermedioGenerico("multiplicacion", 2, nodoexp1, nodoexp2);
+                                        $$.nodo = nodoMult;
+                                        }
+
+            |   expresion '/' expresion  {concat_ptr = temp; 
+                                        concat_ptr += sprintf(concat_ptr, "(/ ");
+                                        struct nodoAST* nodoexp1 = $1.nodo;
+                                        struct nodoAST* nodoexp2 = $3.nodo;
+                                        if ($1.value == 1){
+                                            // Concat $1 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(if %s 1 0) ", $1.prefija);
+                                            node_to_aric(nodoexp1);
+                                        } else {
+                                            // Concat $1 as is
+                                            concat_ptr += sprintf(concat_ptr, "%s ", $1.prefija);
+                                        }
+                                        if ($3.value == 1){
+                                            // Concat $3 transformed
+                                            concat_ptr += sprintf(concat_ptr, "(if %s 1 0))", $3.prefija);
+                                            node_to_aric(nodoexp2);
+                                        } else {
+                                            concat_ptr += sprintf(concat_ptr, "%s )", $3.prefija);
+                                        }
+                                        $$.value = 0;
+                                        $$.prefija = gen_code (temp) ; 
+
+                                        // Nodo AST
+                                        struct nodoAST* nodoDiv = crearNodoIntermedioGenerico("division", 2, nodoexp1, nodoexp2);
+                                        $$.nodo = nodoDiv;
                                         }
             ;
 
 termino:      operando                           { $$ = $1 ; }
-            | '+' operando %prec UNARY_SIGN    {  // Para calculadora
+            | '+' operando %prec UNARY_SIGN    { 
                                                     $$.value = $2.value ; 
                                                     // Para AST
                                                     struct nodoAST* nodoSigno = crearNodoSigno("+", $2.value);
@@ -412,7 +692,7 @@ termino:      operando                           { $$ = $1 ; }
                                                     sprintf (temp, "(+ %s)", $2.prefija);
                                                     $$.prefija = gen_code(temp);
                                                 }
-            | '-' operando %prec UNARY_SIGN    { // Para calculadora
+            | '-' operando %prec UNARY_SIGN    { 
                                                     $$.value = -$2.value ; 
                                                     // Para AST
                                                     struct nodoAST* nodoSigno = crearNodoSigno("-", - $2.value);
@@ -424,7 +704,7 @@ termino:      operando                           { $$ = $1 ; }
                                                 } 
             ; 
 
-operando:    IDENTIF                    { // Para calculadora
+operando:    IDENTIF                    {    
                                              $$.value = $1.value ;
                                              // Para AST
                                              $$.nodo = crearNodoVariable($1.code, $1.value, "int");
@@ -432,7 +712,7 @@ operando:    IDENTIF                    { // Para calculadora
                                              sprintf (temp, "%s", $1.code);
                                              $$.prefija = gen_code(temp);
                                         }
-            | NUMBER                     { // Para calculadora
+            | NUMBER                     { 
                                              $$.value = $1.value ;
                                              // Para AST
                                              $$.nodo = crearNodoNumero($1.value);
@@ -525,6 +805,16 @@ char *gen_code (char *name)     // copia el argumento a un
     strcpy (p, name) ;
 	
     return p ;
+}
+
+void node_to_bool(struct nodoAST* nodo){
+    nodo = crearNodoIntermedioGenerico("neq", 2, nodo, crearNodoNumero(0));
+    return;
+}
+
+void node_to_aric(struct nodoAST* nodo){
+    nodo = crearNodoIntermedioGenerico("if", 3, nodo, crearNodoNumero(1), crearNodoNumero(0));
+    return;
 }
 
 int yylex ()
