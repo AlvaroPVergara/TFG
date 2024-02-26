@@ -530,7 +530,7 @@ expresion: termino                     { $$.prefija = $1.prefija;
                                         $$.prefija = gen_code (temp) ; 
 
                                         // Nodo AST
-                                        struct nodoAST* nodoGeq = crearNodoIntermedioGenerico("geq", 2, $1.nodo, $3.nodo);
+                                        struct nodoAST* nodoGeq = crearNodoIntermedioGenerico("geq", 2, $1.nodo, $3.nodo    );
                                         $$.nodo = nodoGeq;
                                         }
 
