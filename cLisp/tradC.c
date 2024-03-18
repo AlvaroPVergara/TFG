@@ -40,26 +40,114 @@ void recursiveAstToLisp(struct nodoAST* node){
                 node = node->siguiente_hermano;
             }
             
-            break;
         } else if (strcmp(node->nombre, "asignacion") == 0){
             writeFile("(setq ");
             writeFile(node->primer_nodo->nombre);
             writeFile(" ");
             recursiveAstToLisp(node->primer_nodo->siguiente_hermano);
             writeFile(")\n");
-            break;
+
         } else if (strcmp(node->nombre, "if") == 0){
+            writeFile("(if (");
+            node = node->primer_nodo;
+            recursiveAstToLisp(node);
+
+            writeFile(") (\n");
+            while (node->siguiente_hermano != NULL)
+            {
+                recursiveAstToLisp(node->siguiente_hermano);
+                node = node->siguiente_hermano;
+                writeFile("\n");
+            }
+
+            writeFile(")\n");
+
+        } else if (strcmp(node->nombre, "and") == 0){
+            writeFile("(and ");
+            recursiveAstToLisp(node->primer_nodo);
+            writeFile(" ");
+            recursiveAstToLisp(node->primer_nodo->siguiente_hermano);
+            writeFile(")");
             
-        } else if (strcmp(node->nombre, "axioma") == 0){
+        } else if (strcmp(node->nombre, "or") == 0){
+            writeFile("(or ");
+            recursiveAstToLisp(node->primer_nodo);
+            writeFile(" ");
+            recursiveAstToLisp(node->primer_nodo->siguiente_hermano);
+            writeFile(")");
             
-        } else if (strcmp(node->nombre, "axioma") == 0){
+        } else if (strcmp(node->nombre, "neq") == 0){
+            writeFile("(/= ");
+            recursiveAstToLisp(node->primer_nodo);
+            writeFile(" ");
+            recursiveAstToLisp(node->primer_nodo->siguiente_hermano);
+            writeFile(")");
             
-        } else if (strcmp(node->nombre, "axioma") == 0){
+        } else if (strcmp(node->nombre, "eq") == 0){
+            writeFile("(= ");
+            recursiveAstToLisp(node->primer_nodo);
+            writeFile(" ");
+            recursiveAstToLisp(node->primer_nodo->siguiente_hermano);
+            writeFile(")");
             
-        } else if (strcmp(node->nombre, "axioma") == 0){
+        } else if (strcmp(node->nombre, "lt") == 0){
+            writeFile("(< ");
+            recursiveAstToLisp(node->primer_nodo);
+            writeFile(" ");
+            recursiveAstToLisp(node->primer_nodo->siguiente_hermano);
+            writeFile(")");
+            
+        } else if (strcmp(node->nombre, "leq") == 0){
+            writeFile("(<= ");
+            recursiveAstToLisp(node->primer_nodo);
+            writeFile(" ");
+            recursiveAstToLisp(node->primer_nodo->siguiente_hermano);
+            writeFile(")");
+            
+        } else if (strcmp(node->nombre, "gt") == 0){
+            writeFile("(> ");
+            recursiveAstToLisp(node->primer_nodo);
+            writeFile(" ");
+            recursiveAstToLisp(node->primer_nodo->siguiente_hermano);
+            writeFile(")");
+            
+        } else if (strcmp(node->nombre, "geq") == 0){
+            writeFile("(>= ");
+            recursiveAstToLisp(node->primer_nodo);
+            writeFile(" ");
+            recursiveAstToLisp(node->primer_nodo->siguiente_hermano);
+            writeFile(")");
+            
+        } else if (strcmp(node->nombre, "suma") == 0){
+            writeFile("(+ ");
+            recursiveAstToLisp(node->primer_nodo);
+            writeFile(" ");
+            recursiveAstToLisp(node->primer_nodo->siguiente_hermano);
+            writeFile(")");
+            
+        } else if (strcmp(node->nombre, "resta") == 0){
+            writeFile("(- ");
+            recursiveAstToLisp(node->primer_nodo);
+            writeFile(" ");
+            recursiveAstToLisp(node->primer_nodo->siguiente_hermano);
+            writeFile(")");
+            
+        } else if (strcmp(node->nombre, "multiplicacion") == 0){
+            writeFile("(* ");
+            recursiveAstToLisp(node->primer_nodo);
+            writeFile(" ");
+            recursiveAstToLisp(node->primer_nodo->siguiente_hermano);
+            writeFile(")");
+            
+        } else if (strcmp(node->nombre, "division") == 0){
+            writeFile("(/ ");
+            recursiveAstToLisp(node->primer_nodo);
+            writeFile(" ");
+            recursiveAstToLisp(node->primer_nodo->siguiente_hermano);
+            writeFile(")");
             
         } else { 
-            printf("Error: unknown node type\n");
+            printf("Error: unknown node type %s\n", node->nombre);
         }
         break;
 
@@ -81,6 +169,15 @@ void recursiveAstToLisp(struct nodoAST* node){
         sprintf(temp, "%d", node->valor);
         writeFile(temp);
         writeFile(")\n");
+        break;
+
+    case NODO_HOJA_VARIABLE:
+        writeFile(node->nombre);
+        break;
+
+    case NODO_HOJA_NUMERO:
+        sprintf(temp, "%d", node->valor);
+        writeFile(temp);
         break;
 
     default:

@@ -1,10 +1,14 @@
 (setq a 0)
 (setq b 0)
 (defun fun1 () (
-(setq a )
+(setq a (if ((and (/= 3 0) 1)) (
+1
+0
+)
+)
 )
 (defun fun2 () (
-(setq b )
+(setq b (> 3 1))
 )
 (defun main () (
 (setq c 0)
