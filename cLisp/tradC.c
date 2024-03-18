@@ -180,6 +180,10 @@ void recursiveAstToLisp(struct nodoAST* node){
         writeFile(temp);
         break;
 
+    case NODO_HOJA_SIGNO:
+        writeFile(node->nombre);
+        break;
+
     default:
         break;
     }
