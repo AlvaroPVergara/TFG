@@ -10,7 +10,8 @@ typedef enum{
     NODO_HOJA_VARIABLE,
     NODO_HOJA_VARIABLE_INIT,
     NODO_HOJA_SIGNO,
-    NODO_INTERMEDIO
+    NODO_INTERMEDIO,
+    NODO_FUNCION
 } tipoNodo;
 
 
@@ -28,6 +29,7 @@ struct nodoAST* crearNodoNumero(int valor);
 struct nodoAST* crearNodoVariable(char* nombre, int valor,  char* tipo);
 struct nodoAST* crearNodoVariableInit(char* nombre, int valor, char* tipo);
 struct nodoAST* crearNodoSigno(char* nombre, int valor);
+struct nodoAST* crearNodoFuncion(char* nombre);
 struct nodoAST* crearNodoIntermedio(char* nombre);
 void agregarHijo(struct nodoAST* padre, struct nodoAST* hijo);
 void agregarHermano(struct nodoAST* hermano, struct nodoAST* nuevo);

@@ -53,6 +53,16 @@ struct nodoAST* crearNodoSigno(char* nombre, int valor)
     return nuevoNodo;
 };
 
+struct nodoAST* crearNodoFuncion(char* nombre){
+    struct nodoAST* nuevoNodo = (struct nodoAST*)malloc(sizeof(struct nodoAST));;
+    nuevoNodo->tipo = NODO_FUNCION;
+    nuevoNodo->valor = 0;
+    nuevoNodo->nombre = strdup(nombre);
+    nuevoNodo->tipo_variable = NULL;
+    nuevoNodo->primer_nodo = NULL;
+    nuevoNodo->siguiente_hermano = NULL;
+    return nuevoNodo;
+};
 
 
 // Crea un nodo intermedio con el nombre especificado

@@ -184,7 +184,7 @@ restoVar:                       { $$.value = 0;
 funcionesDef:   funcionArgs ')' '{'                 { lastNode = NULL; }
                 recSentenciaFin    
                 INTEGER funcionesDefRec             { //Nodo de la funcion
-                                                        struct nodoAST* nodoFunc = crearNodoIntermedioGenerico("NombreFuncTemp", 0);
+                                                        struct nodoAST* nodoFunc = crearNodoFuncion("NombreFuncTemp");
                                                         if ( $5.nodo){
                                                             agregarHijo(nodoFunc, $5.nodo);
                                                         }
@@ -237,7 +237,8 @@ mainDef:  MAIN '(' ')' '{'          {
                                         lastNode = NULL;
                                     }
                     recSentenciaFin {   //Nodo AST
-                                        struct nodoAST* nodoMain = crearNodoIntermedioGenerico("main", 1, lastNode);
+                                        struct nodoAST* nodoMain = crearNodoFuncion("main");
+                                        agregarHijo(nodoMain, lastNode);
                                         $$.nodo = nodoMain;
                                         //Notacion prefija
                                         sprintf(temp,"(defun main ()\n%s", $6.prefija);

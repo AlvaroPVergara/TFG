@@ -1,8 +1,10 @@
 (setq a 0)
 (setq b 0)
 (defun fun1 () (
+(setq a )
 )
 (defun fun2 () (
+(setq b )
 )
 (defun main () (
 (setq c 0)

@@ -42,28 +42,36 @@ void recursiveAstToLisp(struct nodoAST* node){
             
             break;
         } else if (strcmp(node->nombre, "asignacion") == 0){
-            break;
-        } else if (strcmp(node->nombre, "axioma") == 0){
-            
-        } else if (strcmp(node->nombre, "axioma") == 0){
-            
-        } else if (strcmp(node->nombre, "axioma") == 0){
-            
-        } else if (strcmp(node->nombre, "axioma") == 0){
-            
-        } else if (strcmp(node->nombre, "axioma") == 0){
-            
-        } else { //Funciones
-            writeFile("(defun ");
-            writeFile(node->nombre);
-            writeFile(" (");
-            //TODO: PRINT ARGS
-            writeFile(") (\n");
-            recursiveAstToLisp(node->primer_nodo);
+            writeFile("(setq ");
+            writeFile(node->primer_nodo->nombre);
+            writeFile(" ");
+            recursiveAstToLisp(node->primer_nodo->siguiente_hermano);
             writeFile(")\n");
+            break;
+        } else if (strcmp(node->nombre, "if") == 0){
+            
+        } else if (strcmp(node->nombre, "axioma") == 0){
+            
+        } else if (strcmp(node->nombre, "axioma") == 0){
+            
+        } else if (strcmp(node->nombre, "axioma") == 0){
+            
+        } else if (strcmp(node->nombre, "axioma") == 0){
+            
+        } else { 
+            printf("Error: unknown node type\n");
         }
         break;
 
+    case NODO_FUNCION:
+        writeFile("(defun ");
+        writeFile(node->nombre);
+        writeFile(" (");
+        //TODO: PRINT ARGS
+        writeFile(") (\n");
+        recursiveAstToLisp(node->primer_nodo);
+        writeFile(")\n");
+        break;
 
     case NODO_HOJA_VARIABLE_INIT:
         writeFile("(setq ");
