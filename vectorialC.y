@@ -69,6 +69,9 @@ axioma:     INTEGER declaraciones mainDef 	{   printf("%s%s", $2.prefija, $3.pre
                                                 }
                                                 
                                                 imprimirAST(nodoAxioma); 
+
+                                                astToLisp(nodoAxioma);
+
                                                 printf("\n\n");
                                                 printf ("Tabla de símbolos:\n");
                                                 Symbol **tabla = initSymbolTable();

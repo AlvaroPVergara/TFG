@@ -8,6 +8,6 @@
 
 #include "AST.h"
 #include "TS.h"
-
+#include "cLisp/tradC.h"
 
 #endif // BASICCALC_H
