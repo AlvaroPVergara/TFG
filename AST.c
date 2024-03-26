@@ -64,6 +64,18 @@ struct nodoAST* crearNodoFuncion(char* nombre){
     return nuevoNodo;
 };
 
+struct nodoAST* crearNodoString(char* nombre){
+    struct nodoAST* nuevoNodo = (struct nodoAST*)malloc(sizeof(struct nodoAST));;
+    nuevoNodo->tipo = NODO_STRING;
+    nuevoNodo->valor = 0;
+    nuevoNodo->nombre = strdup(nombre);
+    nuevoNodo->tipo_variable = NULL;
+    nuevoNodo->primer_nodo = NULL;
+    nuevoNodo->siguiente_hermano = NULL;
+    return nuevoNodo;
+};
+
+
 
 // Crea un nodo intermedio con el nombre especificado
 struct nodoAST* crearNodoIntermedio(char* nombre) {
@@ -176,6 +188,15 @@ void imprimirASTRecursivo(struct nodoAST* nodo, int nivel) {
     // Imprime el valor si es un nodo hoja signo
     if (nodo->tipo == NODO_HOJA_SIGNO) {
         printf("SIGNO");
+        printf(" %s", nodo->nombre);
+    }
+
+    if (nodo->tipo == NODO_FUNCION) {
+        printf("FUNCION");
+        printf(" %s", nodo->nombre);
+    }
+
+    if(nodo->tipo == NODO_STRING){
         printf(" %s", nodo->nombre);
     }
 

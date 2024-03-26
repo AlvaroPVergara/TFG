@@ -9,4 +9,5 @@ int fun2(){
 }
 int main(){
     int c;
+    puts("Hola mundo");
 }

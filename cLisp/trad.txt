@@ -12,4 +12,5 @@
 )
 (defun main () (
 (setq c 0)
+(print "Hola mundo")
 )

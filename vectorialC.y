@@ -324,10 +324,14 @@ sentencia:   asignacion  ';'                                  { $$ = $1; }
                                                                 $$.code = gen_code (temp) ; 
                                                                 }
                                                        
-
-            | PUTS '('  STRING  ')' ';'                         { sprintf(temp, "(print \"%s\")",$4.code);
-                                                                    $$.code = gen_code (temp) ; }
-            | sentenciaWhile                                    { $$.code = NULL; } 
+*/
+            | PUTS '('  STRING  ')' ';'                         { sprintf(temp, "(print \"%s\")",$3.code);
+                                                                $$.prefija = gen_code (temp) ; 
+                                                                struct nodoAST* nodoString = crearNodoString($3.code);
+                                                                struct nodoAST* nodoPuts = crearNodoIntermedioGenerico("puts", 1, nodoString);
+                                                                $$.nodo = nodoPuts;
+                                                                }
+ /*           | sentenciaWhile                                  { $$.code = NULL; } 
             | sentenciaIF                                       { $$.code = NULL; }
             | sentenciaFOR                                      { $$.code = NULL; }
             | funcionLlamada   ';'                              { $$.code = $1.code; }

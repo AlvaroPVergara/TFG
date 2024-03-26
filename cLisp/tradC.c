@@ -146,6 +146,11 @@ void recursiveAstToLisp(struct nodoAST* node){
             recursiveAstToLisp(node->primer_nodo->siguiente_hermano);
             writeFile(")");
             
+        } else if (strcmp(node->nombre, "puts") == 0) {
+            writeFile("(print \"");
+            writeFile(node->primer_nodo->nombre);
+            writeFile("\")\n");
+
         } else { 
             printf("Error: unknown node type %s\n", node->nombre);
         }
@@ -157,7 +162,14 @@ void recursiveAstToLisp(struct nodoAST* node){
         writeFile(" (");
         //TODO: PRINT ARGS
         writeFile(") (\n");
-        recursiveAstToLisp(node->primer_nodo);
+        node = node -> primer_nodo;
+        recursiveAstToLisp(node);
+        while (node->siguiente_hermano != NULL)
+            {
+                recursiveAstToLisp(node->siguiente_hermano);
+                node = node->siguiente_hermano;
+            }
+
         writeFile(")\n");
         break;
 
@@ -182,6 +194,10 @@ void recursiveAstToLisp(struct nodoAST* node){
 
     case NODO_HOJA_SIGNO:
         writeFile(node->nombre);
+        break;
+    
+    case NODO_STRING:
+        writeFile(node -> nombre);
         break;
 
     default:
