@@ -252,48 +252,73 @@ recSentenciaFin:      '}'                              { sprintf(temp,")\n");
                                                         $$.prefija = gen_code(temp);
                                                         $$.nodo = lastNode;
                                                         }
-                    |   RETURN /*expresionAric*/ expresion ';' '}'              { 
-                                                                                sprintf(temp,"%s\n)\n", $2.prefija);
-                                                                                $$.prefija = gen_code(temp);
-                                                                                } 
+                    |   RETURN expresionAric ';' '}'                { 
+                                                                    struct nodoAST* nodoReturn = crearNodoIntermedioGenerico("last-return", 1, $2.nodo);
+                                                                    $$.nodo = nodoReturn;
+                                                                    if (lastNode){
+                                                                        agregarHermano(nodoReturn, lastNode);
+                                                                    }
+                                                                    lastNode = nodoReturn;
+                                                                    sprintf(temp,"%s\n)\n", $2.prefija);
+                                                                    $$.prefija = gen_code(temp);
+                                                                    } 
 
-                    |   RETURN /*expresionAric*/ expresion ';' recSentenciaNoFin { 
-                                                                                sprintf(temp,"(return-from %s %s)\n%s", act_function, $2.prefija, $3.prefija); 
-                                                                                $$.prefija = gen_code(temp); 
-                                                                                }
+                    |   RETURN expresionAric ';' recSentenciaNoFin  { 
+                                                                    struct nodoAST* nodoHojaFun = crearNodoHojaFuncion(act_function);
+                                                                    struct nodoAST* nodoReturn = crearNodoIntermedioGenerico("return", 2, nodoHojaFun, $2.nodo);
+                                                                    $$.nodo = nodoReturn;
+                                                                    if (lastNode){
+                                                                        agregarHermano(nodoReturn, lastNode);
+                                                                    }
+                                                                    lastNode = nodoReturn;
+                                                                    sprintf(temp,"(return-from %s %s)\n%s", act_function, $2.prefija, $4.prefija); 
+                                                                    $$.prefija = gen_code(temp); 
+                                                                    }
 
-                    |   sentencia recSentenciaFin                               { 
-                                                                                // Nodos AST
-                                                                                if ($1.nodo && lastNode) {                                                            
-                                                                                        agregarHermano($1.nodo, lastNode);
-                                                                                } 
-                                                                                $$.nodo = $1.nodo;
-                                                                                lastNode = $1.nodo;
-                                                                                // Notacion prefija
-                                                                                sprintf(temp,"%s\n%s", $1.prefija, $2.prefija);
-                                                                                $$.prefija = gen_code(temp); 
-                                                                                }
+                    |   sentencia recSentenciaFin                   { 
+                                                                    // Nodos AST
+                                                                    if ($1.nodo && lastNode) {                                                            
+                                                                            agregarHermano($1.nodo, lastNode);
+                                                                    } 
+                                                                    $$.nodo = $1.nodo;
+                                                                    lastNode = $1.nodo;
+                                                                    // Notacion prefija
+                                                                    sprintf(temp,"%s\n%s", $1.prefija, $2.prefija);
+                                                                    $$.prefija = gen_code(temp); 
+                                                                    }
                     ;
 
-recSentenciaNoFin:      RETURN /*expresionAric*/ expresion ';' '}'              { 
-                                                                                sprintf(temp,"%s\n)\n", $2.prefija);
-                                                                                $$.prefija = gen_code(temp);
-                                                                                } 
-                    |   RETURN /*expresionAric*/ expresion ';' recSentenciaNoFin { 
-                                                                                sprintf(temp,"(return-from %s %s)\n%s", act_function, $2.prefija, $3.prefija); 
-                                                                                $$.prefija = gen_code(temp); 
-                                                                                }
-                    |   sentencia recSentenciaFin                               { 
-                                                                                // Nodos AST
-                                                                                if ($1.nodo && lastNode) {                                                            
-                                                                                        agregarHermano($1.nodo, lastNode);
-                                                                                } 
-                                                                                $$.nodo = $1.nodo;
-                                                                                lastNode = $1.nodo;
-                                                                                // Notacion prefija
-                                                                                sprintf(temp,"%s\n%s", $1.prefija, $2.prefija);
-                                                                                $$.prefija = gen_code(temp); 
-                                                                                }
+recSentenciaNoFin:      RETURN expresionAric ';' '}'                { 
+                                                                    struct nodoAST* nodoReturn = crearNodoIntermedioGenerico("last-return", 1, $2.nodo);
+                                                                    $$.nodo = nodoReturn;
+                                                                    if (lastNode){
+                                                                        agregarHermano(nodoReturn, lastNode);
+                                                                    }
+                                                                    lastNode = nodoReturn;
+                                                                    sprintf(temp,"%s\n)\n", $2.prefija);
+                                                                    $$.prefija = gen_code(temp);
+                                                                    } 
+                    |   RETURN expresionAric  ';' recSentenciaNoFin { 
+                                                                    struct nodoAST* nodoReturn = crearNodoIntermedioGenerico("return", 1, $2.nodo);
+                                                                    $$.nodo = nodoReturn;
+                                                                    if (lastNode){
+                                                                        agregarHermano(nodoReturn, lastNode);
+                                                                    }
+                                                                    lastNode = nodoReturn;
+                                                                    sprintf(temp,"(return-from %s %s)\n%s", act_function, $2.prefija, $4.prefija); 
+                                                                    $$.prefija = gen_code(temp); 
+                                                                    }
+                    |   sentencia recSentenciaFin                   { 
+                                                                    // Nodos AST
+                                                                    if ($1.nodo && lastNode) {                                                            
+                                                                            agregarHermano($1.nodo, lastNode);
+                                                                    } 
+                                                                    $$.nodo = $1.nodo;
+                                                                    lastNode = $1.nodo;
+                                                                    // Notacion prefija
+                                                                    sprintf(temp,"%s\n%s", $1.prefija, $2.prefija);
+                                                                    $$.prefija = gen_code(temp); 
+                                                                    }
                     ;
 
 /*
@@ -331,7 +356,7 @@ sentencia:   asignacion  ';'                                  { $$ = $1; }
                                                                 struct nodoAST* nodoPuts = crearNodoIntermedioGenerico("puts", 1, nodoString);
                                                                 $$.nodo = nodoPuts;
                                                                 }
- /*           | sentenciaWhile                                  { $$.code = NULL; } 
+ /*         | sentenciaWhile                                  { $$.code = NULL; } 
             | sentenciaIF                                       { $$.code = NULL; }
             | sentenciaFOR                                      { $$.code = NULL; }
             | funcionLlamada   ';'                              { $$.code = $1.code; }

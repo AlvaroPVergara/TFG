@@ -10,4 +10,7 @@ int fun2(){
 int main(){
     int c;
     puts("Hola mundo");
+    return 3;
+    c = 5 + 1;
+    return c;
 }

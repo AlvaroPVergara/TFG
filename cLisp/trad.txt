@@ -13,4 +13,7 @@
 (defun main () (
 (setq c 0)
 (print "Hola mundo")
+(return-from main 3)
+(setq c (+ 5 1))
+c
 )

@@ -47,6 +47,17 @@ void recursiveAstToLisp(struct nodoAST* node){
             recursiveAstToLisp(node->primer_nodo->siguiente_hermano);
             writeFile(")\n");
 
+        } else if (strcmp(node->nombre, "return") == 0){
+            writeFile("(return-from ");
+            writeFile(node->primer_nodo->nombre);
+            writeFile(" ");
+            recursiveAstToLisp(node->primer_nodo->siguiente_hermano);
+            writeFile(")\n");
+        
+        }  else if (strcmp(node->nombre, "last-return") == 0){
+            writeFile(node->primer_nodo->nombre);
+            writeFile("\n");
+            
         } else if (strcmp(node->nombre, "if") == 0){
             writeFile("(if (");
             node = node->primer_nodo;
@@ -171,6 +182,10 @@ void recursiveAstToLisp(struct nodoAST* node){
             }
 
         writeFile(")\n");
+        break;
+
+    case NODO_HOJA_FUNCION:
+        writeFile(node -> nombre);
         break;
 
     case NODO_HOJA_VARIABLE_INIT:
