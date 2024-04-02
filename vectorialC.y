@@ -184,6 +184,7 @@ restoVar:                       { $$.value = 0;
 funcionesDef:   funcionArgs ')' '{'                 { lastNode = NULL; }
                 recSentenciaFin    
                 INTEGER funcionesDefRec             { //Nodo de la funcion
+                                                        // TODO: MANAGE ARGS
                                                         struct nodoAST* nodoFunc = crearNodoFuncion("NombreFuncTemp");
                                                         if ( $5.nodo){
                                                             agregarHijo(nodoFunc, $5.nodo);
@@ -358,9 +359,11 @@ sentencia:   asignacion  ';'                                  { $$ = $1; }
                                                                 }
  /*         | sentenciaWhile                                  { $$.code = NULL; } 
             | sentenciaIF                                       { $$.code = NULL; }
-            | sentenciaFOR                                      { $$.code = NULL; }
-            | funcionLlamada   ';'                              { $$.code = $1.code; }
-*/           
+            | sentenciaFOR                                      { $$.code = NULL; }*/ 
+            | funcionLlamada   ';'                              { $$ = $1; 
+                                                                
+                                                                }
+          
             | declaracion      ';'                                  { $$ = $1; }
             ;
                                                         
@@ -386,6 +389,38 @@ asignacion: IDENTIF '=' expresionAric    {
                                              $$.prefija = gen_code(temp);
                                         }
             ;
+
+funcionLlamada: IDENTIF '(' funcionArgsLlamada ')'      { 
+                                                            struct nodoAST* nodoHojaFun = crearNodoHojaFuncion($1.code);
+                                                            struct nodoAST* nodoArgumentos = crearNodoIntermedioGenerico("argumentos", 1, $3.nodo);
+                                                            
+                                                            struct nodoAST* nodoLlamada = crearNodoIntermedioGenerico("llamada-funcion", 2, nodoHojaFun, nodoArgumentos);
+                                                            $$.nodo = nodoLlamada;
+
+                                                            sprintf(temp,"(%s %s)", $1.code, $3.prefija);
+                                                            $$.prefija = gen_code(temp);
+                                                        }
+            ;
+
+funcionArgsLlamada:                                        { $$.code = ""; }
+                    |  expresionAric recArgFunctLlamada    {   if( $2.code == NULL)    {
+                                                                sprintf(temp, "%s",  $1.code);
+                                                                $$.nodo = $1.nodo;
+                                                            } else{
+                                                                sprintf(temp, "%s %s", $1.code, $2.code);
+                                                                agregarHermano($1.nodo, $2.nodo);
+                                                                $$.nodo = $1.nodo;
+                                                            }
+                                                            $$.prefija = gen_code(temp);
+                                                        }
+                    ;
+
+recArgFunctLlamada:                         { $$.code = NULL; }
+			 | ',' funcionArgsLlamada		{ $$.code = $2.code; 
+                                              $$.nodo = $2.nodo;
+                                            
+                                            }
+             ;
 
 
 /* ------------------------------------- EXPRESSION LEVEL --------------------------------------- */

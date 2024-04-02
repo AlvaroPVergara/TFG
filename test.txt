@@ -11,6 +11,7 @@ int main(){
     int c;
     puts("Hola mundo");
     return 3;
+    fun2(1, 3, 45);
     c = 5 + 1;
     return c;
 }
