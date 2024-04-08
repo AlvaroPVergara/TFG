@@ -289,6 +289,10 @@ recSentenciaFin:      '}'                              { sprintf(temp,")\n");
                                                                     }
                     ;
 
+/*
+recSentenciaNoFin is used for the statement level, but only after a return statement that is not the last statement of the function.
+This is made to ensure that the regular return statement is not the last return statement of the function.
+*/
 recSentenciaNoFin:      RETURN expresionAric ';' '}'                { 
                                                                     struct nodoAST* nodoReturn = crearNodoIntermedioGenerico("last-return", 1, $2.nodo);
                                                                     $$.nodo = nodoReturn;
@@ -312,7 +316,7 @@ recSentenciaNoFin:      RETURN expresionAric ';' '}'                {
                     |   sentencia recSentenciaFin                   { 
                                                                     // Nodos AST
                                                                     if ($1.nodo && lastNode) {                                                            
-                                                                            agregarHermano($1.nodo, lastNode);
+                                                                        agregarHermano($1.nodo, lastNode);
                                                                     } 
                                                                     $$.nodo = $1.nodo;
                                                                     lastNode = $1.nodo;
@@ -321,22 +325,36 @@ recSentenciaNoFin:      RETURN expresionAric ';' '}'                {
                                                                     $$.prefija = gen_code(temp); 
                                                                     }
                     ;
-
 /*
-recSentenciaCond:   '}'                            {printf(")\n"); }
-                    |   sentencia                  { if ($1.code) { printf("%s\n", $1.code); }}
-                        recSentenciaCond           { ; }
-                    |   RETURN expresionAric ';'   { printf("(return-from %s %s)", act_function, $2.code); }
-                        recSentenciaCond           { ; }   
-                    |   declaraciones              { ; }
+recSentenciaCond is the recursive function for the statement level, but is used only for the while, for and if statements.
+Is used this way because it does not leave room for a regular return statement. 
+(which is only posible if is the last statement of the function)*/
+
+recSentenciaCond:   '}'                                             {printf(")\n"); }
+                    |   sentencia recSentenciaCond                  { if ($2.nodo){
+                                                                        agregarHermano($1.nodo, $2.nodo);
+                                                                    }
+                                                                    $$.nodo = $1.nodo; 
+                                                                    sprintf(temp,"%s\n%s", $1.prefija, $2.prefija);
+                                                                    $$.prefija = gen_code(temp); 
+                                                                    }
+                    |   RETURN expresionAric ';' recSentenciaCond   { 
+                                                                    struct nodoAST* nodoReturn = crearNodoIntermedioGenerico("return", 1, $2.nodo);
+                                                                    if (lastNode){
+                                                                        agregarHermano(nodoReturn, $4.nodo);
+                                                                    }
+                                                                    $$.nodo = nodoReturn;
+                                                                    sprintf(temp,"(return-from %s %s)\n%s", act_function, $2.prefija, $4.prefija); 
+                                                                    $$.prefija = gen_code(temp); 
+                                                                    }
                     ;    
-    
+
+/*    
 recSentenciaFor:   '}'                             { ; }
                     |   sentencia                  { if ($1.code) { printf("%s\n", $1.code); }}
                         recSentenciaFor            { ; }
                     |   RETURN expresionAric ';'   { printf("(return-from %s %s)", act_function, $2.code); }
                         recSentenciaFor            { ; }   
-                    |   declaraciones              { ; }
                     ;  
 */
 
@@ -357,9 +375,10 @@ sentencia:   asignacion  ';'                                  { $$ = $1; }
                                                                 struct nodoAST* nodoPuts = crearNodoIntermedioGenerico("puts", 1, nodoString);
                                                                 $$.nodo = nodoPuts;
                                                                 }
- /*         | sentenciaWhile                                  { $$.code = NULL; } 
+ /*         | sentenciaWhile                                  { $$.code = NULL; } */ 
             | sentenciaIF                                       { $$.code = NULL; }
-            | sentenciaFOR                                      { $$.code = NULL; }*/ 
+/*
+            | sentenciaFOR                                      { $$.code = NULL; }*/
             | funcionLlamada   ';'                              { $$ = $1; 
                                                                 
                                                                 }
@@ -389,6 +408,28 @@ asignacion: IDENTIF '=' expresionAric    {
                                              $$.prefija = gen_code(temp);
                                         }
             ;
+
+sentenciaIF:  IF '(' expresionBool  ')' '{' 
+              recSentenciaCond  restoIF         { 
+                                                struct nodoAST* nodoCond = crearNodoIntermedioGenerico("condicion", 1, $3.nodo);
+                                                struct nodoAST* nodoStatements = crearNodoIntermedioGenerico("statements", 1, $6.nodo);
+                                                struct nodoAST* nodoIf = crearNodoIntermedioGenerico("if", 2, nodoCond, nodoStatements);
+                                                if ($7.nodo){
+                                                    agregarHermano(nodoIf, $7.nodo);
+                                                }
+                                                $$.nodo = nodoIf;
+
+                                                }
+            ;
+
+
+restoIF:                                        { $$.nodo = NULL; }
+        | ELSE '{' recSentenciaCond             { struct nodoAST* nodoElse = crearNodoIntermedioGenerico("else", 1, $3.nodo);
+                                                  $$.nodo = nodoElse;
+                                                }
+        ;
+
+
 
 funcionLlamada: IDENTIF '(' funcionArgsLlamada ')'      { 
                                                             struct nodoAST* nodoHojaFun = crearNodoHojaFuncion($1.code);
@@ -425,17 +466,17 @@ recArgFunctLlamada:                         { $$.code = NULL; }
 
 /* ------------------------------------- EXPRESSION LEVEL --------------------------------------- */
 
-/*
-expresionBool: expresion        { if ( $1.code == "0"){
+
+expresionBool: expresion        { if ( $1.value == 0){
                                     sprintf(temp, "(/= 0 %s)", $1.prefija);
                                     $$.prefija = gen_code(temp);
-                                    $$nodo = node_to_bool($1.nodo);
+                                    $$.nodo = node_to_bool($1.nodo);
                                   } else{
                                     $$.prefija = $1.prefija;
-                                    $$nodo = $1.nodo;
+                                    $$.nodo = $1.nodo;
                                   }
                                 }
-            ;*/
+            ;
 
 expresionAric: expresion        { if ( $1.value == 1){
                                     sprintf(temp, "(if %s 1 0)", $1.prefija);

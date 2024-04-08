@@ -75,18 +75,39 @@ void recursiveAstToLisp(struct nodoAST* node){
             writeFile(")\n");
             
         } else if (strcmp(node->nombre, "if") == 0){
-            writeFile("(if (");
+            writeFile("(if ");
+            node = node->primer_nodo;
+            recursiveAstToLisp(node); //nodo condicion
+
+            writeFile(" (\n");
+            node = node->primer_nodo;
+            recursiveAstToLisp(node); //nodo statements
+
+            writeFile(")\n");
+
+        } else if (strcmp(node->nombre, "condicion") == 0){
+            writeFile(" ");
+            recursiveAstToLisp(node->primer_nodo);
+            writeFile(" ");
+
+        } else if (strcmp(node->nombre, "statements") == 0){
             node = node->primer_nodo;
             recursiveAstToLisp(node);
-
-            writeFile(") (\n");
             while (node->siguiente_hermano != NULL)
             {
                 recursiveAstToLisp(node->siguiente_hermano);
                 node = node->siguiente_hermano;
-                writeFile("\n");
             }
 
+        } else if (strcmp(node->nombre, "else") == 0){
+            writeFile("(\n");
+            node = node->primer_nodo;
+            recursiveAstToLisp(node);
+            while (node->siguiente_hermano != NULL)
+            {
+                recursiveAstToLisp(node->siguiente_hermano);
+                node = node->siguiente_hermano;
+            }
             writeFile(")\n");
 
         } else if (strcmp(node->nombre, "and") == 0){
