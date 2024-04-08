@@ -304,7 +304,8 @@ recSentenciaNoFin:      RETURN expresionAric ';' '}'                {
                                                                     $$.prefija = gen_code(temp);
                                                                     } 
                     |   RETURN expresionAric  ';' recSentenciaNoFin { 
-                                                                    struct nodoAST* nodoReturn = crearNodoIntermedioGenerico("return", 1, $2.nodo);
+                                                                    struct nodoAST* nodoHojaFun = crearNodoHojaFuncion(act_function);
+                                                                    struct nodoAST* nodoReturn = crearNodoIntermedioGenerico("return", 2, nodoHojaFun, $2.nodo);
                                                                     $$.nodo = nodoReturn;
                                                                     if (lastNode){
                                                                         agregarHermano(nodoReturn, lastNode);
@@ -339,8 +340,9 @@ recSentenciaCond:   '}'                                             {printf(")\n
                                                                     $$.prefija = gen_code(temp); 
                                                                     }
                     |   RETURN expresionAric ';' recSentenciaCond   { 
-                                                                    struct nodoAST* nodoReturn = crearNodoIntermedioGenerico("return", 1, $2.nodo);
-                                                                    if (lastNode){
+                                                                    struct nodoAST* nodoHojaFun = crearNodoHojaFuncion(act_function);
+                                                                    struct nodoAST* nodoReturn = crearNodoIntermedioGenerico("return", 2, nodoHojaFun, $2.nodo);
+                                                                    if ($4.nodo){
                                                                         agregarHermano(nodoReturn, $4.nodo);
                                                                     }
                                                                     $$.nodo = nodoReturn;

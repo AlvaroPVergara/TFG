@@ -76,12 +76,11 @@ void recursiveAstToLisp(struct nodoAST* node){
             
         } else if (strcmp(node->nombre, "if") == 0){
             writeFile("(if ");
-            node = node->primer_nodo;
-            recursiveAstToLisp(node); //nodo condicion
+
+            recursiveAstToLisp(node->primer_nodo); //nodo condicion
 
             writeFile(" (\n");
-            node = node->primer_nodo;
-            recursiveAstToLisp(node); //nodo statements
+            recursiveAstToLisp(node->primer_nodo->siguiente_hermano); //nodo statements
 
             writeFile(")\n");
 
