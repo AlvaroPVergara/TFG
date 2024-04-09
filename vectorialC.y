@@ -377,10 +377,12 @@ sentencia:   asignacion  ';'                                  { $$ = $1; }
                                                                 struct nodoAST* nodoPuts = crearNodoIntermedioGenerico("puts", 1, nodoString);
                                                                 $$.nodo = nodoPuts;
                                                                 }
- /*         | sentenciaWhile                                  { $$.code = NULL; } */ 
-            | sentenciaIF                                       { $$.code = NULL; }
-/*
-            | sentenciaFOR                                      { $$.code = NULL; }*/
+            | sentenciaWhile                                    { $$.code = NULL; 
+                                                                  $$.nodo = $1.nodo;}  
+            | sentenciaIF                                       { $$.code = NULL; 
+                                                                  $$.nodo = $1.nodo;}       
+            | sentenciaFor                                      { $$.code = NULL; 
+                                                                  $$.nodo = $1.nodo;}
             | funcionLlamada   ';'                              { $$ = $1; 
                                                                 
                                                                 }
@@ -430,6 +432,31 @@ restoIF:                                        { $$.nodo = NULL; }
                                                   $$.nodo = nodoElse;
                                                 }
         ;
+
+
+sentenciaWhile: WHILE '(' expresionBool  ')' '{' 
+                recSentenciaCond                {
+                                                struct nodoAST* nodoCond = crearNodoIntermedioGenerico("condicion", 1, $3.nodo);
+                                                struct nodoAST* nodoStatements = crearNodoIntermedioGenerico("statements", 1, $6.nodo);
+                                                struct nodoAST* nodoWhile = crearNodoIntermedioGenerico("while", 2, nodoCond, nodoStatements);
+                                                $$.nodo = nodoWhile;
+                                                }
+
+
+sentenciaFor: FOR '(' declaracionFor ';' expresionBool 
+                ';' asignacion ')' '{' recSentenciaCond {
+                                                        struct nodoAST* nodoInit = crearNodoIntermedioGenerico("for-init", 1, $3.nodo);
+                                                        struct nodoAST* nodoCond = crearNodoIntermedioGenerico("condicion", 1, $5.nodo);
+                                                        struct nodoAST* nodoInc = crearNodoIntermedioGenerico("incremento", 1, $7.nodo);
+                                                        struct nodoAST* nodoStatements = crearNodoIntermedioGenerico("statements", 1, $10.nodo);
+                                                        struct nodoAST* nodoFor = crearNodoIntermedioGenerico("for", 4,nodoInit, nodoCond, nodoStatements, nodoInc);
+                                                        $$.nodo = nodoFor;
+                                                        }
+
+declaracionFor: INTEGER IDENTIF /*restVar */            {
+                                                        struct nodoAST* nodoVar = crearNodoVariableInit($2.code, 0, "int");
+                                                        $$.nodo = nodoVar;
+                                                        }
 
 
 

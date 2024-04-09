@@ -91,6 +91,7 @@ void recursiveAstToLisp(struct nodoAST* node){
 
         } else if (strcmp(node->nombre, "statements") == 0){
             node = node->primer_nodo;
+            if (node == NULL) return;
             recursiveAstToLisp(node);
             while (node->siguiente_hermano != NULL)
             {
@@ -108,6 +109,33 @@ void recursiveAstToLisp(struct nodoAST* node){
                 node = node->siguiente_hermano;
             }
             writeFile(")\n");
+
+        } else if (strcmp(node->nombre, "while") == 0){
+            writeFile("(loop while ");
+            recursiveAstToLisp(node->primer_nodo); //nodo condicion
+            writeFile(" do \n");
+            recursiveAstToLisp(node->primer_nodo->siguiente_hermano); //nodo statements
+            writeFile(")\n");
+
+        } else if (strcmp(node->nombre, "for") == 0){
+            writeFile("(let ");
+            recursiveAstToLisp(node->primer_nodo); //nodo declaracion (for-init)
+            node = node->primer_nodo->siguiente_hermano;
+            writeFile(")\n");
+            writeFile("(loop while ");
+            recursiveAstToLisp(node); //nodo condicion
+            node = node->siguiente_hermano;
+            writeFile(" do \n");
+            recursiveAstToLisp(node); //nodo statements
+            node = node->siguiente_hermano;
+            recursiveAstToLisp(node); //nodo incremento
+            writeFile(")\n");
+
+        } else if (strcmp(node->nombre, "for-init") == 0){
+            recursiveAstToLisp(node->primer_nodo); 
+
+        } else if (strcmp(node->nombre, "incremento") == 0){
+            recursiveAstToLisp(node->primer_nodo); 
 
         } else if (strcmp(node->nombre, "and") == 0){
             writeFile("(and ");
