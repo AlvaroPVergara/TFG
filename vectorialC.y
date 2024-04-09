@@ -351,14 +351,6 @@ recSentenciaCond:   '}'                                             {printf(")\n
                                                                     }
                     ;    
 
-/*    
-recSentenciaFor:   '}'                             { ; }
-                    |   sentencia                  { if ($1.code) { printf("%s\n", $1.code); }}
-                        recSentenciaFor            { ; }
-                    |   RETURN expresionAric ';'   { printf("(return-from %s %s)", act_function, $2.code); }
-                        recSentenciaFor            { ; }   
-                    ;  
-*/
 
 sentencia:   asignacion  ';'                                  { $$ = $1; }
 /*
