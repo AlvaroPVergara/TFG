@@ -122,11 +122,15 @@ nuevaDeclaracion:  '(' funcionesDef         {
                     | varGlob               { $$.value = $1.value;
                                             $$.nodo = $1.nodo;
                                             $$.prefija = $1.prefija;
-                                            if ($1.code){
+                                            if (strcmp($1.code, "int") == 0){
                                                 $$.code = "int"; //NOT NULL FOR VARIABLES
                                             }
-                                            else {
+                                            else if (strcmp($1.code, "vector") == 0){
                                                 $$.code = "vector"; //NOT NULL FOR VARIABLES
+                                            }
+                                            else{
+                                                $$.code = "vector"; //NOT NULL FOR VARIABLES
+                                                printf("ERROR: NO SE PUDO CREAR LA VARIABLE\n");
                                             }
                                             }
                 ;
@@ -135,11 +139,17 @@ nuevaDeclaracion:  '(' funcionesDef         {
 /*------------ GLOBAL DECLARATION VARIABLE MANAGEMENT ------------*/
 
 varGlob:    restoVar varRecGlob ';' INTEGER declaraciones                       { 
-                                                                                 $$.value = $1.value;
-                                                                                 $$.nodo = $2.nodo;
-                                                                                 sprintf(temp, "%s)%s\n%s", $1.code, $2.code, $5.prefija);
+                                                                                if ($1.code){
+                                                                                    $$.code = "vector";
+                                                                                    $$.value = $1.value;
+                                                                                    sprintf(temp, "%s)%s\n%s",$1.prefija ,$2.prefija, $5.prefija);
+                                                                                } else {
+                                                                                    $$.code = "int";
+                                                                                    $$.value = 0; 
+                                                                                    sprintf(temp, "0)%s\n%s", $2.prefija, $5.prefija);
+                                                                                }
+                                                                                 $$.nodo = $2.nodo;        
                                                                                  $$.prefija = gen_code(temp);
-                                                                                 $$.code = $1.code;
                                                                                  act_function = NULL;
                                                                                 }
                                                                              
@@ -148,6 +158,7 @@ varGlob:    restoVar varRecGlob ';' INTEGER declaraciones                       
 
 varRecGlob:                                                     { $$.code = ""; 
                                                                   $$.nodo = NULL;
+                                                                  $$.prefija = "";
                                                                 }
                         | ',' IDENTIF restoVar varRecGlob     {   struct nodoAST *nodoVar = NULL;
                                                                   sprintf(temp, " (setq %s %s)%s", $2.code, $3.prefija, $4.prefija);
@@ -165,17 +176,16 @@ varRecGlob:                                                     { $$.code = "";
                                                                 }
                         ;
 
-restoVar:                       { $$.value = 0; 
-                                    sprintf(temp, "0");
-                                    $$.prefija = $$.code = gen_code(temp);
-                                    }
-            | '=' NUMBER        { $$.value = $2.value; 
+restoVar:                       {  ; }
+            | '=' NUMBER        {   
+                                    $$.value = $2.value; 
                                     sprintf(temp, "%d", $2.value);
                                     $$.prefija = $$.code = gen_code(temp);}
-            | '[' NUMBER ']'    { $$.value = 0;
+            | '[' NUMBER ']'    {   $$.value = 0;
+                                    printf("CREANDO VECTOR CON %d ELEMENTOS\n", $2.value);
                                     sprintf(temp, "(make-array %d)", $2.value);
 								    $$.prefija = gen_code(temp); 
-                                    $$.code = NULL;}
+                                    $$.code = "vector";}
             ;
 
 
