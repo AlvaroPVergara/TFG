@@ -1,5 +1,5 @@
     %{                      // SECCION 1 
-#include "basicCalc.h"
+#include "baseLanguage/vectorialC.h"
 //int memoria [26] ;   	// Se define una zona de memoria para las variables 
 
 int yylex () ;

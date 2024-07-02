@@ -1,4 +1,4 @@
 all:
-	yacc -d vectorialC.y
-	gcc -Wall y.tab.c AST.c TS.c cLisp/tradC.c -o vectorialC
-	./vectorialC < test.txt
+	yacc -d baseLanguage/vectorialC.y
+	gcc -Wall y.tab.c dataStructures/AST.c dataStructures/TS.c cLisp/tradC.c -o baseLanguage/vectorialC
+	baseLanguage/vectorialC < test.txt
