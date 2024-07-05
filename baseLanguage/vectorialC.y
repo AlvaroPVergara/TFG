@@ -164,7 +164,7 @@ varRecGlob:                                                     { $$.code = "";
                                                                   sprintf(temp, " (setq %s %s)%s", $2.code, $3.prefija, $4.prefija);
                                                                   $$.prefija = gen_code(temp); 
                                                                   $$.code = $3.code;             
-                                                                if ($3.value){      
+                                                                if ($3.code){      
                                                                     nodoVar = crearNodoVariableInit($2.code, 0, "vector");
                                                                 } else {
                                                                     nodoVar = crearNodoVariableInit($2.code, $3.value, "int");
@@ -181,7 +181,7 @@ restoVar:                       {  ; }
                                     $$.value = $2.value; 
                                     sprintf(temp, "%d", $2.value);
                                     $$.prefija = $$.code = gen_code(temp);}
-            | '[' NUMBER ']'    {   $$.value = 0;
+            | '[' NUMBER ']'    {   $$.value = $2.value;
                                     printf("CREANDO VECTOR CON %d ELEMENTOS\n", $2.value);
                                     sprintf(temp, "(make-array %d)", $2.value);
 								    $$.prefija = gen_code(temp); 

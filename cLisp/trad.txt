@@ -1,6 +1,6 @@
 (setq a 0)
 (setq b 0)
-(setq vector 0)
+(setq vector (make-array 10))
 (defun fun1 () (
 (setq a (if (and (/= 3 0) 1) 1 0))
 )

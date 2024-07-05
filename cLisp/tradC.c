@@ -268,8 +268,16 @@ void recursiveAstToLisp(struct nodoAST* node){
         writeFile(node->nombre);
         writeFile(" ");
         //TODO: check type and print arrays
+        if (strcmp(node -> tipo_variable, "vector") == 0){
+            writeFile("(make-array ");
+        }
         sprintf(temp, "%d", node->valor);
         writeFile(temp);
+
+        if (strcmp(node -> tipo_variable, "vector") == 0){
+            writeFile(")");
+        }
+
         writeFile(")\n");
         break;
 

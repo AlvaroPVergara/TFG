@@ -1596,7 +1596,7 @@ yyreduce:
                                                                   sprintf(temp, " (setq %s %s)%s", yyvsp[-2].code, yyvsp[-1].prefija, yyvsp[0].prefija);
                                                                   yyval.prefija = gen_code(temp); 
                                                                   yyval.code = yyvsp[-1].code;             
-                                                                if (yyvsp[-1].value){      
+                                                                if (yyvsp[-1].code){      
                                                                     nodoVar = crearNodoVariableInit(yyvsp[-2].code, 0, "vector");
                                                                 } else {
                                                                     nodoVar = crearNodoVariableInit(yyvsp[-2].code, yyvsp[-1].value, "int");
@@ -1626,7 +1626,7 @@ yyreduce:
 
   case 12:
 #line 184 "baseLanguage/vectorialC.y"
-                                {   yyval.value = 0;
+                                {   yyval.value = yyvsp[-1].value;
                                     printf("CREANDO VECTOR CON %d ELEMENTOS\n", yyvsp[-1].value);
                                     sprintf(temp, "(make-array %d)", yyvsp[-1].value);
 								    yyval.prefija = gen_code(temp); 
