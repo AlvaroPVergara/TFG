@@ -8,6 +8,9 @@ int fun1(){
 }
 int fun2(){
     b = (3 > 1);
+    if (a == b){
+        b = 1;
+    }
 }
 int main(){
     int c;

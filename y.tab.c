@@ -2803,7 +2803,7 @@ struct nodoAST* node_to_bool(struct nodoAST* nodo){
 }
 
 struct nodoAST* node_to_aric(struct nodoAST* nodo){   
-    struct nodoAST* nodo_aric = crearNodoIntermedioGenerico("if", 3, nodo, crearNodoNumero(1), crearNodoNumero(0)); 
+    struct nodoAST* nodo_aric = crearNodoIntermedioGenerico("aric-if", 3, nodo, crearNodoNumero(1), crearNodoNumero(0));
     return nodo_aric;
 }
 
