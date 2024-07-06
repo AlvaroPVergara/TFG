@@ -419,6 +419,17 @@ asignacion: IDENTIF '=' expresionAric    {
                                              sprintf (temp, "(setq %s %s)", $1.code, $3.prefija);
                                              $$.prefija = gen_code(temp);
                                         }
+            | IDENTIF '[' expresionAric ']' '=' expresionAric { 
+                                                                // Para AST
+                                                                struct nodoAST* nodoVar = crearNodoVariable($1.code, $6.value, "vector");
+                                                                struct nodoAST* nodoIndex = crearNodoIntermedioGenerico("index", 1, $3.nodo);
+                                                                struct nodoAST* nuevoNodo = crearNodoIntermedioGenerico("asignacion-vect", 3, nodoVar, nodoIndex, $6.nodo);
+                                                                $$.nodo = nuevoNodo;
+
+                                                                // Para notacion prefija
+                                                                sprintf (temp, "(setf (aref %s %s) %s)", $1.code, $3.prefija, $6.prefija);
+                                                                $$.prefija = gen_code(temp);
+                                                            }
             ;
 
 sentenciaIF:  IF '(' expresionBool  ')' '{' 

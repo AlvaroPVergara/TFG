@@ -4,6 +4,7 @@
 (defun fun1 () (
 (setq vec2 (make-array 30))
 (setq a (if (and (/= 3 0) 1) 1 0))
+(setf (aref vec2 3) 5)
 )
 (defun fun2 () (
 (setq b (> 3 1))

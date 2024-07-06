@@ -47,6 +47,18 @@ void recursiveAstToLisp(struct nodoAST* node){
             recursiveAstToLisp(node->primer_nodo->siguiente_hermano);
             writeFile(")\n");
 
+        } else if (strcmp(node->nombre, "asignacion-vect") == 0){
+            writeFile("(setf (aref ");
+            writeFile(node->primer_nodo->nombre);
+            writeFile(" ");
+            recursiveAstToLisp(node->primer_nodo->siguiente_hermano);
+            writeFile(") ");
+            recursiveAstToLisp(node->primer_nodo->siguiente_hermano->siguiente_hermano);
+            writeFile(")\n");
+
+        } else if (strcmp(node->nombre, "index") == 0){
+            recursiveAstToLisp(node->primer_nodo);
+
         } else if (strcmp(node->nombre, "return") == 0){
             writeFile("(return-from ");
             writeFile(node->primer_nodo->nombre);
