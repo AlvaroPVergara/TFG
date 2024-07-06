@@ -416,7 +416,7 @@ asignacion: IDENTIF '=' expresionAric    {
                                              $$.nodo = nuevoNodo;
 
                                              // Para notacion prefija
-                                             sprintf (temp, "(setq %s %s)", $1.code, $3.prefija);
+                                             sprintf (temp, "(setq %s %s)",  $1.code, $3.prefija);
                                              $$.prefija = gen_code(temp);
                                         }
             | IDENTIF '[' expresionAric ']' '=' expresionAric { 
@@ -547,7 +547,7 @@ expresion: termino                     { $$.prefija = $1.prefija;
                                          }                                       
                                          
                                          $$.nodo = $1.nodo;
-                                         }
+                                        }
 
            | expresion AND expresion  { concat_ptr = temp; 
                                         concat_ptr += sprintf(concat_ptr, "(and ");
@@ -832,10 +832,14 @@ termino:      operando                           { $$ = $1 ; }
                                                 } 
             ; 
 
-operando:    IDENTIF                    {    
+operando:    IDENTIF isVector           {    
                                              $$.value = $1.value ;
                                              // Para AST
-                                             $$.nodo = crearNodoVariable($1.code, $1.value, "int");
+                                             if ($2.nodo){
+                                                $$.nodo = crearNodoVariable($1.code, $2.nodo->valor, "vector");
+                                             } else {
+                                                $$.nodo = crearNodoVariable($1.code, $1.value, "int");
+                                             }
                                              // Para notacion prefija
                                              sprintf (temp, "%s", $1.code);
                                              $$.prefija = gen_code(temp);
@@ -851,6 +855,11 @@ operando:    IDENTIF                    {
                                          }
             | '(' expresion ')'          { $$ = $2 ; }
             ;
+
+isVector:                               { ; }
+            | '[' expresionAric ']'     { $$.nodo = $2.nodo; 
+                                          $$.value = $2.value;
+                                        }
 
 %%
 

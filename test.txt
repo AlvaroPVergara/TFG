@@ -5,8 +5,7 @@ int vector[10];
 
 int fun1(){
     int vec2[30];
-    a = 3 && 1;
-    vec2 [3] = 5;   
+    a = 1 + vec2[4];
 }
 int fun2(){
     b = (3 > 1);

@@ -279,7 +279,6 @@ void recursiveAstToLisp(struct nodoAST* node){
         writeFile("(setq ");
         writeFile(node->nombre);
         writeFile(" ");
-        //TODO: check type and print arrays
         if (strcmp(node -> tipo_variable, "vector") == 0){
             writeFile("(make-array ");
         }
@@ -294,7 +293,19 @@ void recursiveAstToLisp(struct nodoAST* node){
         break;
 
     case NODO_HOJA_VARIABLE:
+        if (strcmp(node -> tipo_variable, "vector") == 0){
+            writeFile("(aref ");
+        }
         writeFile(node->nombre);
+
+        if (strcmp(node -> tipo_variable, "vector") == 0){
+            writeFile(" ");
+            sprintf(temp, "%d", node->valor);
+            writeFile(temp);
+            writeFile(")");
+            printf("GENERO VECTOR %s CON EL VALOR %d \n", node-> nombre, node->valor);
+        }
+
         break;
 
     case NODO_HOJA_NUMERO:
