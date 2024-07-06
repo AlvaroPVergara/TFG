@@ -182,7 +182,6 @@ restoVar:                       {  ; }
                                     sprintf(temp, "%d", $2.value);
                                     $$.prefija = $$.code = gen_code(temp);}
             | '[' NUMBER ']'    {   $$.value = $2.value;
-                                    printf("CREANDO VECTOR CON %d ELEMENTOS\n", $2.value);
                                     sprintf(temp, "(make-array %d)", $2.value);
 								    $$.prefija = gen_code(temp); 
                                     $$.code = "vector";}
@@ -393,11 +392,18 @@ sentencia:   asignacion  ';'                                  { $$ = $1; }
             ;
                                                         
 
-declaracion: INTEGER IDENTIF               { 
+declaracion: INTEGER IDENTIF restoVar   { 
                                              // Para AST
-                                             $$.nodo = crearNodoVariableInit($2.code, 0, "int");
+                                            struct nodoAST *nodoVar = NULL;
+                                            if ($3.code){      
+                                                nodoVar = crearNodoVariableInit($2.code, $3.value, "vector");
+                                            } else {
+                                                nodoVar = crearNodoVariableInit($2.code, $3.value, "int");
+                                            }
+                                            $$.nodo = nodoVar;
+
                                              // Para notacion prefija
-                                             sprintf (temp, "(setq %s 0)", $2.code);
+                                             sprintf(temp, " (setq %s %s)", $2.code, $3.prefija);
                                              $$.prefija = gen_code(temp);
                                         }
            ;

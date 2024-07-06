@@ -2,6 +2,7 @@
 (setq b 0)
 (setq vector (make-array 10))
 (defun fun1 () (
+(setq vec2 (make-array 30))
 (setq a (if (and (/= 3 0) 1) 1 0))
 )
 (defun fun2 () (
@@ -11,7 +12,7 @@
 )
 )
 (defun main () (
-(setq c 0)
+(setq c (make-array 0))
 (print "Hola mundo")
 (loop while  (<= c 6)  do 
 (setq c (+ c 1))

@@ -4,6 +4,7 @@ int vector[10];
 
 
 int fun1(){
+    int vec2[30];
     a = 3 && 1;
 }
 int fun2(){
