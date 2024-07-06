@@ -176,11 +176,11 @@ varRecGlob:                                                     { $$.code = "";
                                                                 }
                         ;
 
-restoVar:                       {  ; }
+restoVar:                       {  $$.code = NULL; }
             | '=' NUMBER        {   
                                     $$.value = $2.value; 
                                     sprintf(temp, "%d", $2.value);
-                                    $$.prefija = $$.code = gen_code(temp);}
+                                    $$.prefija = gen_code(temp);}
             | '[' NUMBER ']'    {   $$.value = $2.value;
                                     sprintf(temp, "(make-array %d)", $2.value);
 								    $$.prefija = gen_code(temp); 
@@ -397,6 +397,7 @@ declaracion: INTEGER IDENTIF restoVar   {
                                             struct nodoAST *nodoVar = NULL;
                                             if ($3.code){      
                                                 nodoVar = crearNodoVariableInit($2.code, $3.value, "vector");
+                                                printf("Variable vector %s creada\n", $2.code);
                                             } else {
                                                 nodoVar = crearNodoVariableInit($2.code, $3.value, "int");
                                             }
@@ -856,7 +857,7 @@ operando:    IDENTIF isVector           {
             | '(' expresion ')'          { $$ = $2 ; }
             ;
 
-isVector:                               { ; }
+isVector:                               { $$.nodo = NULL; }
             | '[' expresionAric ']'     { $$.nodo = $2.nodo; 
                                           $$.value = $2.value;
                                         }

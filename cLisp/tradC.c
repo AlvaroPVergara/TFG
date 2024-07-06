@@ -303,7 +303,6 @@ void recursiveAstToLisp(struct nodoAST* node){
             sprintf(temp, "%d", node->valor);
             writeFile(temp);
             writeFile(")");
-            printf("GENERO VECTOR %s CON EL VALOR %d \n", node-> nombre, node->valor);
         }
 
         break;
