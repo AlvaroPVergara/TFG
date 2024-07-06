@@ -46,6 +46,9 @@ typedef struct s_attr {
 %token NEQ          // NEQ
 %token RETURN
 
+// Tokens de funcionalidades nuevas
+%token VECSUM       // token para la funcion sumavector
+
 
 %right '='                    // es la ultima operacion que se debe realizar
 %left OR
@@ -60,23 +63,25 @@ typedef struct s_attr {
 
                         
 axioma:     INTEGER declaraciones mainDef 	{   printf("%s%s", $2.prefija, $3.prefija);
-                                                printf ("Arbol sintactico abstracto:\n");
                                                 struct nodoAST* nodoAxioma;
                                                 if (lastNodeGlobal){
                                                     nodoAxioma = crearNodoIntermedioGenerico("axioma", 2, lastNodeGlobal, $3.nodo);
                                                 } else {
                                                     nodoAxioma = crearNodoIntermedioGenerico("axioma", 1, $3.nodo);
                                                 }
-                                                
-                                                imprimirAST(nodoAxioma); 
-
-                                                astToLisp(nodoAxioma);
-
-                                                printf("\n\n");
                                                 printf ("Tabla de símbolos:\n");
                                                 Symbol **tabla = initSymbolTable();
                                                 semanticAnalysis(nodoAxioma, tabla);
                                                 destroySymbolTable(tabla);
+                                                printf("\n\n");
+
+
+                                                printf ("Arbol sintactico abstracto:\n");
+                                                imprimirAST(nodoAxioma);
+
+                                                //TRADUCCIÓN A LISP
+                                                astToLisp(nodoAxioma);
+                                               
                                                 liberarAST(nodoAxioma);
                                                 printf ("\n\n");
                                             }
@@ -128,6 +133,12 @@ nuevaDeclaracion:  '(' funcionesDef         {
                                             else if (strcmp($1.code, "vector") == 0){
                                                 $$.code = "vector"; //NOT NULL FOR VARIABLES
                                             }
+                                            else if (strcmp($1.code, "global-int") == 0){
+                                                $$.code = "global-int"; //NOT NULL FOR VARIABLES
+                                            }
+                                            else if (strcmp($1.code, "global-vector") == 0){
+                                                $$.code = "global-vector"; //NOT NULL FOR VARIABLES
+                                            }
                                             else{
                                                 $$.code = "vector"; //NOT NULL FOR VARIABLES
                                                 printf("ERROR: NO SE PUDO CREAR LA VARIABLE\n");
@@ -140,11 +151,11 @@ nuevaDeclaracion:  '(' funcionesDef         {
 
 varGlob:    restoVar varRecGlob ';' INTEGER declaraciones                       { 
                                                                                 if ($1.code){
-                                                                                    $$.code = "vector";
+                                                                                    $$.code = "global-vector";
                                                                                     $$.value = $1.value;
                                                                                     sprintf(temp, "%s)%s\n%s",$1.prefija ,$2.prefija, $5.prefija);
                                                                                 } else {
-                                                                                    $$.code = "int";
+                                                                                    $$.code = "global-int";
                                                                                     $$.value = 0; 
                                                                                     sprintf(temp, "0)%s\n%s", $2.prefija, $5.prefija);
                                                                                 }
@@ -165,9 +176,9 @@ varRecGlob:                                                     { $$.code = "";
                                                                   $$.prefija = gen_code(temp); 
                                                                   $$.code = $3.code;             
                                                                 if ($3.code){      
-                                                                    nodoVar = crearNodoVariableInit($2.code, 0, "vector");
+                                                                    nodoVar = crearNodoVariableInit($2.code, 0, "global-vector");
                                                                 } else {
-                                                                    nodoVar = crearNodoVariableInit($2.code, $3.value, "int");
+                                                                    nodoVar = crearNodoVariableInit($2.code, $3.value, "global-int");
                                                                 }
                                                                 if ($4.nodo){
                                                                     agregarHermano(nodoVar, $4.nodo);
@@ -389,6 +400,7 @@ sentencia:   asignacion  ';'                                  { $$ = $1; }
                                                                 }
           
             | declaracion      ';'                                  { $$ = $1; }
+            | sumavector       ';'                                  { $$ = $1; }
             ;
                                                         
 
@@ -511,6 +523,23 @@ recArgFunctLlamada:                         { $$.code = NULL; }
                                             
                                             }
              ;
+
+/*------------------------------------- FUNCTIONS ADDED TO C BASE  -----------------------------*/
+
+
+// The function sumavector allows to add every element of a vector
+sumavector:  VECSUM  '(' IDENTIF ',' IDENTIF ')' {
+                                        // AST
+                                        struct nodoAST* nodoVar = crearNodoVariable($3.code, 0, "int");
+                                        struct nodoAST* nodoVect = crearNodoVariable($5.code, 0, "vector");
+                                        struct nodoAST* nodoSuma = crearNodoIntermedioGenerico("suma-vector", 2, nodoVar, nodoVect);
+                                        $$.nodo = nodoSuma;
+                                        // Notación prefija ("Realmente no será así la traducción a LISP")
+                                        sprintf(temp, "(sumaVector %s %s)", $3.code, $5.code);
+                                        $$.prefija = gen_code(temp);
+                                    }
+            ;                   
+
 
 
 /* ------------------------------------- EXPRESSION LEVEL --------------------------------------- */
@@ -904,7 +933,7 @@ t_keyword keywords[] = {
     {"main", MAIN}, {"int", INTEGER}, {"puts", PUTS}, {"printf", PRINTF},
     {"while", WHILE}, {"for", FOR}, {"if", IF}, {"else", ELSE},
     {"&&", AND}, {"||", OR}, {"<=", LEQ}, {">=", GEQ}, {"==", EQ},
-    {"!=", NEQ}, {"return", RETURN},
+    {"!=", NEQ}, {"return", RETURN}, {"addvector", VECSUM},
     {NULL, 0} // Marca el fin de la tabla
 };
 

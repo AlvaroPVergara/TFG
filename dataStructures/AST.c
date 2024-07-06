@@ -194,6 +194,7 @@ void imprimirASTRecursivo(struct nodoAST* nodo, int nivel) {
     if (nodo->tipo == NODO_HOJA_VARIABLE || nodo->tipo == NODO_HOJA_VARIABLE_INIT) {
         printf("VAR");
         printf(" %s", nodo->nombre);
+        printf(" %s", nodo->tipo_variable);
     }
 
     // Imprime el valor si es un nodo hoja signo

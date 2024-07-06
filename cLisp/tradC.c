@@ -1,7 +1,7 @@
 #include "tradC.h"
 
 
-char* FILENAME = "cLisp/trad.txt";
+char* FILENAME = "cLisp/trad.lisp";
 char temp [2048];
 
 
@@ -249,26 +249,55 @@ void recursiveAstToLisp(struct nodoAST* node){
             writeFile(node->primer_nodo->nombre);
             writeFile("\")\n");
 
+        } else if (strcmp(node->nombre, "suma-vector") == 0) {
+                // We traduce our created function to understandable lisp
+
+                // We set the value of variable to 0 in case it has a previous value
+                writeFile("(setq ");
+                writeFile(node->primer_nodo->nombre); // result variable name
+                writeFile(" 0)\n");
+
+                // Loop for each element in the vector
+                writeFile("(dotimes (i (length ");
+                writeFile(node ->primer_nodo->siguiente_hermano->nombre); // vector name
+                writeFile(") ");
+                writeFile(node->primer_nodo->nombre); // result variable name
+                writeFile(")\n");
+
+                // Add each element to the result variable
+                writeFile("(incf ");
+                writeFile(node->primer_nodo->nombre); // result variable name
+                writeFile(" (aref ");
+                writeFile(node ->primer_nodo->siguiente_hermano->nombre); // vector name
+                writeFile(" i))\n");
+
         } else { 
             printf("Error: unknown node type %s\n", node->nombre);
         }
         break;
 
     case NODO_FUNCION:
-        writeFile("(defun ");
-        writeFile(node->nombre);
-        writeFile(" (");
-        //TODO: PRINT ARGS
-        writeFile(") (\n");
-        node = node -> primer_nodo;
-        recursiveAstToLisp(node);
-        while (node->siguiente_hermano != NULL)
+        {
+            int isMain;
+            isMain = strcmp(node->nombre, "main") == 0;
+            writeFile("(defun ");
+            writeFile(node->nombre);
+            writeFile(" (");
+            //TODO: PRINT ARGS
+            writeFile(") (\n");
+            node = node -> primer_nodo;
+            recursiveAstToLisp(node);
+            while (node->siguiente_hermano != NULL)
             {
                 recursiveAstToLisp(node->siguiente_hermano);
                 node = node->siguiente_hermano;
             }
 
-        writeFile(")\n");
+            writeFile(")\n");
+            if (isMain) {
+                writeFile("(main)\n");
+            }
+        }
         break;
 
     case NODO_HOJA_FUNCION:
@@ -276,10 +305,23 @@ void recursiveAstToLisp(struct nodoAST* node){
         break;
 
     case NODO_HOJA_VARIABLE_INIT:
-        writeFile("(setq ");
+        if (strcmp(node -> tipo_variable, "global-vector") == 0 || strcmp(node -> tipo_variable, "global-int") == 0){
+            writeFile("(defvar ");
+        } else {
+            writeFile("(setq ");
+        }
+        if (strcmp(node -> tipo_variable, "global-vector") == 0){
+            writeFile("*");
+        }
+
         writeFile(node->nombre);
+
+        if (strcmp(node -> tipo_variable, "global-vector") == 0){
+            writeFile("*");
+        }
+
         writeFile(" ");
-        if (strcmp(node -> tipo_variable, "vector") == 0){
+        if (strcmp(node -> tipo_variable, "vector") == 0 || strcmp(node -> tipo_variable, "global-vector") == 0){
             writeFile("(make-array ");
         }
         sprintf(temp, "%d", node->valor);
@@ -293,12 +335,19 @@ void recursiveAstToLisp(struct nodoAST* node){
         break;
 
     case NODO_HOJA_VARIABLE:
-        if (strcmp(node -> tipo_variable, "vector") == 0){
+        printf("VARIABLE: %s DE TIPO %s", node->nombre, node->tipo_variable);
+        if (strcmp(node -> tipo_variable, "global-vector") == 0 || strcmp(node -> tipo_variable, "vector") == 0){
             writeFile("(aref ");
         }
+        if (strcmp(node -> tipo_variable, "global-vector") == 0){
+            writeFile("*");
+        }
         writeFile(node->nombre);
+        if (strcmp(node -> tipo_variable, "global-vector") == 0){
+            writeFile("*");
+        }
 
-        if (strcmp(node -> tipo_variable, "vector") == 0){
+        if (strcmp(node -> tipo_variable, "global-vector") == 0 || strcmp(node -> tipo_variable, "vector") == 0){
             writeFile(" ");
             sprintf(temp, "%d", node->valor);
             writeFile(temp);

@@ -93,7 +93,14 @@ void semanticAnalysis(struct nodoAST* raiz, Symbol **symTable) {
             // Busca el símbolo en la tabla de símbolos
             Symbol *foundSymbol = searchSymbol(symTable, raiz->nombre);
             if (foundSymbol != NULL) {
-                printf("Símbolo '%s' encontrado en la tabla. Tipo: %s, Tamaño del vecctor: %d, Offset: %d\n", raiz->nombre, foundSymbol->type, foundSymbol->size_array, foundSymbol->array_pos);
+                printf("Símbolo '%s' encontrado en la tabla. Tipo: %s, Tamaño del vector: %d, Offset: %d\n", raiz->nombre, foundSymbol->type, foundSymbol->size_array, foundSymbol->array_pos);
+                if (strcmp(foundSymbol->type, "global-int") == 0 && strcmp(raiz->tipo_variable, "int") == 0){
+                    raiz->tipo_variable = "global-int";
+                    printf("Tipo de variable '%s' actualizado a '%s'.\n", raiz->nombre, raiz->tipo_variable);
+                } else if (strcmp(foundSymbol->type, "global-vector") == 0 && strcmp(raiz->tipo_variable, "vector") == 0){
+                    raiz->tipo_variable = "global-vector";
+                    printf("Tipo de variable '%s' actualizado a '%s'.\n", raiz->nombre, raiz->tipo_variable);
+                }
             } else {
                 printf("Símbolo '%s' no encontrado en la tabla.\n", raiz->nombre);
                 // TODO: RAISE ERROR
