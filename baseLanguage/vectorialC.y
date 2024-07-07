@@ -206,6 +206,11 @@ funcionesDef:   funcionArgs ')' '{'                 { lastNode = NULL; }
                 INTEGER funcionesDefRec             { //Nodo de la funcion
                                                         // TODO: MANAGE ARGS
                                                         struct nodoAST* nodoFunc = crearNodoFuncion("NombreFuncTemp");
+                                                        struct nodoAST* nodoArgs = crearNodoIntermedioGenerico("argumentos", 0);
+                                                        if ($1.nodo){
+                                                            agregarHijo(nodoArgs, $1.nodo);
+                                                        }
+                                                        agregarHijo(nodoFunc, nodoArgs);
                                                         if ( $5.nodo){
                                                             agregarHijo(nodoFunc, $5.nodo);
                                                         }
@@ -236,13 +241,19 @@ funcionesDefRec:                                    { $$.prefija = ""; //Lambda
                 ;
 
 funcionArgs:                                { $$.prefija = ""; }
-            |  INTEGER /*varIdentf*/ IDENTIF recArgFunct {    if( $3.prefija == NULL)    {
-                                                    sprintf(temp, "%s",  $2.code);
-                                                } else{
-                                                    sprintf(temp, "%s %s", $2.code, $3.prefija);
-                                                }
-                                                $$.prefija = gen_code(temp);
-                                            }
+            |  INTEGER /*varIdentf*/ IDENTIF recArgFunct {  // Nodo AST
+                                                            struct nodoAST* nodoVar = crearNodoVariableInit($2.code, 0, "int");
+                
+                
+                
+                                                            // Notacion prefija
+                                                            if( $3.prefija == NULL)    {
+                                                                sprintf(temp, "%s",  $2.code);
+                                                            } else{
+                                                                sprintf(temp, "%s %s", $2.code, $3.prefija);
+                                                            }
+                                                            $$.prefija = gen_code(temp);
+                                                        }
             ;
 
 recArgFunct:                        { $$.prefija = NULL; }
