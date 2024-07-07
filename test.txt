@@ -1,11 +1,17 @@
 int a;
 int vector[10];
 
-int main(){
-    vector[2] = 5; 
-    vector[4] = 9;
-    vector[7] = 17;
+int fun1(int b, int c, int newvec[10]){
+    newvec[2] = b; 
+    newvec[4] = c;
+    newvec[7] = 17;
 
     addvector(a , vector);
+    return a;
+}
+
+int main(){
+    int z;
+    fun1(a, z, vector);
     return a;
 }

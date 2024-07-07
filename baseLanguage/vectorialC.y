@@ -187,7 +187,10 @@ varRecGlob:                                                     { $$.code = "";
                                                                 }
                         ;
 
-restoVar:                       {  $$.code = NULL; }
+restoVar:                       {  $$.code = NULL;
+                                   $$. value = 0;
+                                   $$.prefija = "0";
+                                }
             | '=' NUMBER        {   
                                     $$.value = $2.value; 
                                     sprintf(temp, "%d", $2.value);
@@ -241,11 +244,18 @@ funcionesDefRec:                                    { $$.prefija = ""; //Lambda
                 ;
 
 funcionArgs:                                { $$.prefija = ""; }
-            |  INTEGER /*varIdentf*/ IDENTIF recArgFunct {  // Nodo AST
-                                                            struct nodoAST* nodoVar = crearNodoVariableInit($2.code, 0, "int");
-                
-                
-                
+            |  INTEGER IDENTIF isVector recArgFunct {       // Nodo AST
+                                                            struct nodoAST* nodoVar = NULL;         
+                                                            if ($3.code){
+                                                                nodoVar = crearNodoVariableInit($2.code, $3.nodo -> valor, "vector");
+                                                            } else{
+                                                                nodoVar = crearNodoVariableInit($2.code, 0, "int");
+                                                            }
+                                                            if ($4.nodo){
+                                                                agregarHermano(nodoVar, $4.nodo);
+                                                            }
+                                                            $$.nodo = nodoVar;
+    
                                                             // Notacion prefija
                                                             if( $3.prefija == NULL)    {
                                                                 sprintf(temp, "%s",  $2.code);
@@ -256,8 +266,14 @@ funcionArgs:                                { $$.prefija = ""; }
                                                         }
             ;
 
-recArgFunct:                        { $$.prefija = NULL; }
-			 | ',' funcionArgs		{ $$.prefija = $2.prefija; }
+recArgFunct:                        { 
+                                    $$.nodo = NULL;
+                                    $$.prefija = NULL; 
+                                    }
+			 | ',' funcionArgs		{ 
+                                    $$.nodo = $2.nodo;
+                                    $$.prefija = $2.prefija; 
+                                    }
              ;
 
 
@@ -270,6 +286,8 @@ mainDef:  MAIN '(' ')' '{'          {
                                     }
                     recSentenciaFin {   //Nodo AST
                                         struct nodoAST* nodoMain = crearNodoFuncion("main");
+                                        struct nodoAST* nodoArgs = crearNodoIntermedioGenerico("argumentos", 0);
+                                        agregarHijo(nodoMain, nodoArgs);
                                         agregarHijo(nodoMain, lastNode);
                                         $$.nodo = nodoMain;
                                         //Notacion prefija

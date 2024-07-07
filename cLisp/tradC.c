@@ -3,6 +3,7 @@
 
 char* FILENAME = "cLisp/trad.lisp";
 char temp [2048];
+int local_var_counter = 0;
 
 
 void cleanFile() {
@@ -86,7 +87,20 @@ void recursiveAstToLisp(struct nodoAST* node){
             }
             writeFile(")\n");
             
-        } else if (strcmp(node->nombre, "if") == 0){
+        } else if (strcmp(node->nombre, "argumentos") == 0){
+            node = node-> primer_nodo;
+            if (node == NULL) return;
+            while (node != NULL)
+            {   
+                writeFile(node->nombre);
+                if (node->siguiente_hermano != NULL) {
+                    writeFile(" ");
+                }
+                node = node->siguiente_hermano;
+            }
+
+            
+        }else if (strcmp(node->nombre, "if") == 0){
             writeFile("(if ");
 
             recursiveAstToLisp(node->primer_nodo); //nodo condicion
@@ -283,16 +297,21 @@ void recursiveAstToLisp(struct nodoAST* node){
             writeFile("(defun ");
             writeFile(node->nombre);
             writeFile(" (");
-            //TODO: PRINT ARGS
-            writeFile(") \n");
             node = node -> primer_nodo;
+            recursiveAstToLisp(node);
+            writeFile(") \n");
+            node = node -> siguiente_hermano;
             recursiveAstToLisp(node);
             while (node->siguiente_hermano != NULL)
             {
                 recursiveAstToLisp(node->siguiente_hermano);
                 node = node->siguiente_hermano;
             }
-
+            for (int i = 0; i < local_var_counter; i++)
+            {
+                writeFile(")");
+            }
+            local_var_counter = 0;
             writeFile(")\n");
             if (isMain) {
                 writeFile("(main)\n");
@@ -308,7 +327,8 @@ void recursiveAstToLisp(struct nodoAST* node){
         if (strcmp(node -> tipo_variable, "global-vector") == 0 || strcmp(node -> tipo_variable, "global-int") == 0){
             writeFile("(defvar ");
         } else {
-            writeFile("(setq ");
+            writeFile("(let ((");
+            local_var_counter++;
         }
         if (strcmp(node -> tipo_variable, "global-vector") == 0){
             writeFile("*");
@@ -328,6 +348,9 @@ void recursiveAstToLisp(struct nodoAST* node){
         writeFile(temp);
 
         if ((strcmp(node -> tipo_variable, "vector") == 0) || strcmp(node -> tipo_variable, "global-vector") == 0){
+            writeFile(")");
+        }
+        if (strcmp(node -> tipo_variable, "global-vector") != 0 && strcmp(node -> tipo_variable, "global-int") != 0){
             writeFile(")");
         }
 

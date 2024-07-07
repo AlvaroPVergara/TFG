@@ -97,7 +97,7 @@ void semanticAnalysis(struct nodoAST* raiz, Symbol **symTable) {
                 if (strcmp(foundSymbol->type, "global-int") == 0 && strcmp(raiz->tipo_variable, "int") == 0){
                     raiz->tipo_variable = "global-int";
                     printf("Tipo de variable '%s' actualizado a '%s'.\n", raiz->nombre, raiz->tipo_variable);
-                } else if (strcmp(foundSymbol->type, "global-vector") == 0 && strcmp(raiz->tipo_variable, "vector") == 0){
+                } else if (strcmp(foundSymbol->type, "global-vector") == 0 && strcmp(raiz->tipo_variable, "global-int") != 0){
                     raiz->tipo_variable = "global-vector";
                     printf("Tipo de variable '%s' actualizado a '%s'.\n", raiz->nombre, raiz->tipo_variable);
                 }
