@@ -1,5 +1,4 @@
 int a;
-int b;
 int vector[10];
 
 int main(){

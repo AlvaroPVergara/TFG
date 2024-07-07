@@ -49,7 +49,7 @@ void recursiveAstToLisp(struct nodoAST* node){
 
         } else if (strcmp(node->nombre, "asignacion-vect") == 0){
             writeFile("(setf (aref ");
-            writeFile(node->primer_nodo->nombre);
+            recursiveAstToLisp(node->primer_nodo);
             writeFile(" ");
             recursiveAstToLisp(node->primer_nodo->siguiente_hermano);
             writeFile(") ");
@@ -259,7 +259,7 @@ void recursiveAstToLisp(struct nodoAST* node){
 
                 // Loop for each element in the vector
                 writeFile("(dotimes (i (length ");
-                writeFile(node ->primer_nodo->siguiente_hermano->nombre); // vector name
+                recursiveAstToLisp(node-> primer_nodo->siguiente_hermano); // vector 
                 writeFile(") ");
                 writeFile(node->primer_nodo->nombre); // result variable name
                 writeFile(")\n");
@@ -268,8 +268,8 @@ void recursiveAstToLisp(struct nodoAST* node){
                 writeFile("(incf ");
                 writeFile(node->primer_nodo->nombre); // result variable name
                 writeFile(" (aref ");
-                writeFile(node ->primer_nodo->siguiente_hermano->nombre); // vector name
-                writeFile(" i))\n");
+                recursiveAstToLisp(node-> primer_nodo->siguiente_hermano); // vector name
+                writeFile(" i)))\n");
 
         } else { 
             printf("Error: unknown node type %s\n", node->nombre);
@@ -284,7 +284,7 @@ void recursiveAstToLisp(struct nodoAST* node){
             writeFile(node->nombre);
             writeFile(" (");
             //TODO: PRINT ARGS
-            writeFile(") (\n");
+            writeFile(") \n");
             node = node -> primer_nodo;
             recursiveAstToLisp(node);
             while (node->siguiente_hermano != NULL)
@@ -327,7 +327,7 @@ void recursiveAstToLisp(struct nodoAST* node){
         sprintf(temp, "%d", node->valor);
         writeFile(temp);
 
-        if (strcmp(node -> tipo_variable, "vector") == 0){
+        if ((strcmp(node -> tipo_variable, "vector") == 0) || strcmp(node -> tipo_variable, "global-vector") == 0){
             writeFile(")");
         }
 
@@ -335,25 +335,15 @@ void recursiveAstToLisp(struct nodoAST* node){
         break;
 
     case NODO_HOJA_VARIABLE:
-        printf("VARIABLE: %s DE TIPO %s", node->nombre, node->tipo_variable);
-        if (strcmp(node -> tipo_variable, "global-vector") == 0 || strcmp(node -> tipo_variable, "vector") == 0){
-            writeFile("(aref ");
-        }
+
         if (strcmp(node -> tipo_variable, "global-vector") == 0){
             writeFile("*");
         }
         writeFile(node->nombre);
+        
         if (strcmp(node -> tipo_variable, "global-vector") == 0){
             writeFile("*");
         }
-
-        if (strcmp(node -> tipo_variable, "global-vector") == 0 || strcmp(node -> tipo_variable, "vector") == 0){
-            writeFile(" ");
-            sprintf(temp, "%d", node->valor);
-            writeFile(temp);
-            writeFile(")");
-        }
-
         break;
 
     case NODO_HOJA_NUMERO:
