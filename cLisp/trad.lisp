@@ -1,17 +1,9 @@
 (defvar a 0)
-(defvar *vector* (make-array 10))
-(defun fun1 (b c newvec) 
-(setf (aref newvec 2) b)
-(setf (aref newvec 4) c)
-(setf (aref newvec 7) 17)
-(setq a 0)
-(dotimes (i (length *vector*) a)
-(incf a (aref *vector* i)))
-a
-)
+(defvar *vec1* (make-array 10))
+(defvar *vec2* (make-array 3))
 (defun main () 
 (let ((z 0))
-(fun1 a z *vector*)
-a
+(setq z (reduce #'+ (map 'list #'* *vec1* *vec2*)))
+z
 ))
 (main)

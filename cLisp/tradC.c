@@ -285,6 +285,22 @@ void recursiveAstToLisp(struct nodoAST* node){
                 recursiveAstToLisp(node-> primer_nodo->siguiente_hermano); // vector name
                 writeFile(" i)))\n");
 
+        } else if (strcmp(node->nombre, "producto-escalar") == 0) {
+                // We traduce our created function to understandable lisp
+                // Firstly, we don´t need to check the length of the vectors, because we have already done it in the semantic analysis
+
+
+                writeFile("(setq ");
+                writeFile(node->primer_nodo->nombre); // result variable name
+                writeFile(" (reduce #'+ (map 'list #'* ");
+                recursiveAstToLisp(node-> primer_nodo->siguiente_hermano); // vector 1
+                writeFile(" ");
+                recursiveAstToLisp(node-> primer_nodo->siguiente_hermano->siguiente_hermano); // vector 2
+                writeFile(")))\n");
+
+
+
+
         } else { 
             printf("Error: unknown node type %s\n", node->nombre);
         }

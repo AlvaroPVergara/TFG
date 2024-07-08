@@ -68,7 +68,8 @@ extern int yydebug;
     NEQ = 274,
     RETURN = 275,
     VECSUM = 276,
-    UNARY_SIGN = 277
+    PRODESC = 277,
+    UNARY_SIGN = 278
   };
 #endif
 /* Tokens.  */
@@ -91,7 +92,8 @@ extern int yydebug;
 #define NEQ 274
 #define RETURN 275
 #define VECSUM 276
-#define UNARY_SIGN 277
+#define PRODESC 277
+#define UNARY_SIGN 278
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED

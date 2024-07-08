@@ -103,16 +103,21 @@ void semanticAnalysis(struct nodoAST* raiz, Symbol **symTable) {
                 // Actualiza el tipo de variable en el árbol AST
                 if (strcmp(foundSymbol->type, "global-int") == 0 && strcmp(raiz->tipo_variable, "int") == 0){
                     raiz->tipo_variable = "global-int";
-                    printf("Tipo de variable '%s' actualizado a '%s'.\n", raiz->nombre, raiz->tipo_variable);
+                    // printf("Tipo de variable '%s' actualizado a '%s'.\n", raiz->nombre, raiz->tipo_variable);
                 } else if (strcmp(foundSymbol->type, "global-vector") == 0 && strcmp(raiz->tipo_variable, "global-int") != 0){
                     raiz->tipo_variable = "global-vector";
-                    printf("Tipo de variable '%s' actualizado a '%s'.\n", raiz->nombre, raiz->tipo_variable);
+                    // printf("Tipo de variable '%s' actualizado a '%s'.\n", raiz->nombre, raiz->tipo_variable);
                 }
+                // Actualiza el tamaño del vector en el árbol AST
+                if (foundSymbol->size_array != 0){
+                    raiz->valor = foundSymbol->size_array;
+                }
+
             } else {
                 printf("Símbolo '%s' no encontrado en la tabla.\n", raiz->nombre);
                 // TODO: RAISE ERROR
             }
-        }
+        } 
 
         // Recorre los nodos hijos
         struct nodoAST* temp = raiz->primer_nodo;
@@ -120,6 +125,18 @@ void semanticAnalysis(struct nodoAST* raiz, Symbol **symTable) {
             semanticAnalysis(temp, symTable);
             temp = temp->siguiente_hermano;
         }
+
+        if (raiz->tipo == NODO_INTERMEDIO && strcmp(raiz->nombre, "producto-escalar") == 0) {
+            // Comprobar que los vectores son del mismo tamaño
+            printf("Comprobando tamaño de los vectores...\n");
+            printf("Vector 1: %d\n", raiz->primer_nodo->siguiente_hermano->valor);
+            printf("Vector 2: %d\n", raiz->primer_nodo->siguiente_hermano->siguiente_hermano->valor);
+            if (raiz->primer_nodo->siguiente_hermano->valor != raiz->primer_nodo->siguiente_hermano->siguiente_hermano->valor){
+                printf("Los vectores no tienen el mismo tamaño.\n");
+                //TODO: THROW ERROR
+            }
+        } 
+
     }    
     return;
 }

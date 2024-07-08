@@ -48,6 +48,8 @@ typedef struct s_attr {
 
 // Tokens de funcionalidades nuevas
 %token VECSUM       // token para la funcion sumavector
+%token PRODESC      // token para la funcion productoEscalar
+
 
 
 %right '='                    // es la ultima operacion que se debe realizar
@@ -430,6 +432,7 @@ sentencia:   asignacion  ';'                                  { $$ = $1; }
           
             | declaracion      ';'                                  { $$ = $1; }
             | sumavector       ';'                                  { $$ = $1; }
+            | productoEscalar  ';'                                  { $$ = $1; }
             ;
                                                         
 
@@ -563,12 +566,25 @@ sumavector:  VECSUM  '(' IDENTIF ',' IDENTIF ')' {
                                         struct nodoAST* nodoVect = crearNodoVariable($5.code, 0, "vector");
                                         struct nodoAST* nodoSuma = crearNodoIntermedioGenerico("suma-vector", 2, nodoVar, nodoVect);
                                         $$.nodo = nodoSuma;
-                                        // Notación prefija ("Realmente no será así la traducción a LISP")
+                                        // Notación prefija (Realmente no será así la traducción a LISP)
                                         sprintf(temp, "(sumaVector %s %s)", $3.code, $5.code);
                                         $$.prefija = gen_code(temp);
                                     }
             ;                   
 
+
+productoEscalar: PRODESC '(' IDENTIF ',' IDENTIF ',' IDENTIF ')' {
+                                                        // AST
+                                                        struct nodoAST* nodoVar = crearNodoVariable($3.code, 0, "int");
+                                                        struct nodoAST* nodoVect1 = crearNodoVariable($5.code, 0, "vector");
+                                                        struct nodoAST* nodoVect2 = crearNodoVariable($7.code, 0, "vector");
+                                                        struct nodoAST* nodoProd = crearNodoIntermedioGenerico("producto-escalar", 3, nodoVar, nodoVect1, nodoVect2);
+                                                        $$.nodo = nodoProd;
+                                                        // Notación prefija (De nuevo, no será así la traducción a LISP)
+                                                        sprintf(temp, "(productoEscalar %s %s)", $3.code, $5.code);
+                                                        $$.prefija = gen_code(temp);
+                                                    }
+            ;
 
 
 /* ------------------------------------- EXPRESSION LEVEL --------------------------------------- */
@@ -962,7 +978,7 @@ t_keyword keywords[] = {
     {"main", MAIN}, {"int", INTEGER}, {"puts", PUTS}, {"printf", PRINTF},
     {"while", WHILE}, {"for", FOR}, {"if", IF}, {"else", ELSE},
     {"&&", AND}, {"||", OR}, {"<=", LEQ}, {">=", GEQ}, {"==", EQ},
-    {"!=", NEQ}, {"return", RETURN}, {"addvector", VECSUM},
+    {"!=", NEQ}, {"return", RETURN}, {"addvector", VECSUM}, {"productoescalar", PRODESC},
     {NULL, 0} // Marca el fin de la tabla
 };
 
