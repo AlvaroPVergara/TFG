@@ -84,7 +84,13 @@ void semanticAnalysis(struct nodoAST* raiz, Symbol **symTable) {
                 printf("Símbolo '%s' ya existe en la tabla.\n", raiz->nombre);
                 //TODO: RAISE ERROR
             } else {
-                insertSymbol(symTable, raiz->nombre, raiz->tipo_variable, 0, 0);
+                if (strcmp(raiz->tipo_variable, "int") == 0 || strcmp(raiz->tipo_variable, "global-int") == 0){
+                    insertSymbol(symTable, raiz->nombre, raiz->tipo_variable, 0, 0);
+                } else if (strcmp(raiz->tipo_variable, "vector") == 0 || strcmp(raiz->tipo_variable, "global-vector") == 0){
+                    insertSymbol(symTable, raiz->nombre, raiz->tipo_variable, raiz->valor, 0);
+                } else {
+                    printf("Tipo de variable '%s' no válido.\n", raiz->nombre);
+                }
                 printf("Símbolo '%s' insertado en la tabla.\n", raiz->nombre);
             }
         } 
@@ -94,6 +100,7 @@ void semanticAnalysis(struct nodoAST* raiz, Symbol **symTable) {
             Symbol *foundSymbol = searchSymbol(symTable, raiz->nombre);
             if (foundSymbol != NULL) {
                 printf("Símbolo '%s' encontrado en la tabla. Tipo: %s, Tamaño del vector: %d, Offset: %d\n", raiz->nombre, foundSymbol->type, foundSymbol->size_array, foundSymbol->array_pos);
+                // Actualiza el tipo de variable en el árbol AST
                 if (strcmp(foundSymbol->type, "global-int") == 0 && strcmp(raiz->tipo_variable, "int") == 0){
                     raiz->tipo_variable = "global-int";
                     printf("Tipo de variable '%s' actualizado a '%s'.\n", raiz->nombre, raiz->tipo_variable);
