@@ -4,6 +4,9 @@
 (defun main () 
 (let ((z 0))
 (setq z (reduce #'+ (map 'list #'* *vec1* *vec2*)))
+(coerce (reverse (coerce *vec1* 'list)) 'vector)
+(dotimes (i (length *vec1*))
+(setf (aref *vec1* i) (+ (aref *vec1* i) (+ 1 (/ 5 3)))))
 z
 ))
 (main)

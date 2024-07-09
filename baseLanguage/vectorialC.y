@@ -47,8 +47,10 @@ typedef struct s_attr {
 %token RETURN
 
 // Tokens de funcionalidades nuevas
-%token VECSUM       // token para la funcion sumavector
+%token ELEMSUM       // token para la funcion sumarelementos
 %token PRODESC      // token para la funcion productoEscalar
+%token INVECT       // token para la funcion invertirvector
+%token VECSUM       // token para la funcion sumavector
 
 
 
@@ -431,8 +433,10 @@ sentencia:   asignacion  ';'                                  { $$ = $1; }
                                                                 }
           
             | declaracion      ';'                                  { $$ = $1; }
-            | sumavector       ';'                                  { $$ = $1; }
+            | sumarelementos   ';'                                  { $$ = $1; }
             | productoEscalar  ';'                                  { $$ = $1; }
+            | invertirvector   ';'                                  { $$ = $1; }
+            | sumaravector     ';'                                  { $$ = $1; }
             ;
                                                         
 
@@ -559,15 +563,15 @@ recArgFunctLlamada:                         { $$.code = NULL; }
 /*------------------------------------- FUNCTIONS ADDED TO C BASE  -----------------------------*/
 
 
-// The function sumavector allows to add every element of a vector
-sumavector:  VECSUM  '(' IDENTIF ',' IDENTIF ')' {
+// The function sumarelementos allows to add every element of a vector
+sumarelementos:  ELEMSUM  '(' IDENTIF ',' IDENTIF ')' {
                                         // AST
                                         struct nodoAST* nodoVar = crearNodoVariable($3.code, 0, "int");
                                         struct nodoAST* nodoVect = crearNodoVariable($5.code, 0, "vector");
-                                        struct nodoAST* nodoSuma = crearNodoIntermedioGenerico("suma-vector", 2, nodoVar, nodoVect);
+                                        struct nodoAST* nodoSuma = crearNodoIntermedioGenerico("suma-elementos", 2, nodoVar, nodoVect);
                                         $$.nodo = nodoSuma;
                                         // Notación prefija (Realmente no será así la traducción a LISP)
-                                        sprintf(temp, "(sumaVector %s %s)", $3.code, $5.code);
+                                        sprintf(temp, "(sumarelementos %s %s)", $3.code, $5.code);
                                         $$.prefija = gen_code(temp);
                                     }
             ;                   
@@ -584,6 +588,30 @@ productoEscalar: PRODESC '(' IDENTIF ',' IDENTIF ',' IDENTIF ')' {
                                                         sprintf(temp, "(productoEscalar %s %s)", $3.code, $5.code);
                                                         $$.prefija = gen_code(temp);
                                                     }
+            ;
+
+
+invertirvector: INVECT '(' IDENTIF ')' {
+                                        // AST
+                                        struct nodoAST* nodoVect = crearNodoVariable($3.code, 0, "vector");
+                                        struct nodoAST* nodoInv = crearNodoIntermedioGenerico("invertir-vector", 1, nodoVect);
+                                        $$.nodo = nodoInv;
+                                        // Notación prefija (De nuevo, no será así la traducción a LISP)
+                                        sprintf(temp, "(invertirVector %s)", $3.code);
+                                        $$.prefija = gen_code(temp);
+                                    }
+            ;
+
+
+sumaravector: VECSUM '(' expresionAric ',' IDENTIF ')' {
+                                        // AST
+                                        struct nodoAST* nodoVect = crearNodoVariable($5.code, 0, "vector");
+                                        struct nodoAST* nodoSuma = crearNodoIntermedioGenerico("suma-vector", 2, $3.nodo ,nodoVect);
+                                        $$.nodo = nodoSuma;
+                                        // Notación prefija (De nuevo, no será así la traducción a LISP)
+                                        sprintf(temp, "(sumarVector %d %s)", $3.value, $5.code);
+                                        $$.prefija = gen_code(temp);
+                                    }
             ;
 
 
@@ -978,7 +1006,8 @@ t_keyword keywords[] = {
     {"main", MAIN}, {"int", INTEGER}, {"puts", PUTS}, {"printf", PRINTF},
     {"while", WHILE}, {"for", FOR}, {"if", IF}, {"else", ELSE},
     {"&&", AND}, {"||", OR}, {"<=", LEQ}, {">=", GEQ}, {"==", EQ},
-    {"!=", NEQ}, {"return", RETURN}, {"addvector", VECSUM}, {"productoescalar", PRODESC},
+    {"!=", NEQ}, {"return", RETURN}, {"sumarelementos", ELEMSUM}, {"productoescalar", PRODESC},
+    {"invertir", INVECT}, {"sumaravector", VECSUM},
     {NULL, 0} // Marca el fin de la tabla
 };
 

@@ -263,43 +263,60 @@ void recursiveAstToLisp(struct nodoAST* node){
             writeFile(node->primer_nodo->nombre);
             writeFile("\")\n");
 
-        } else if (strcmp(node->nombre, "suma-vector") == 0) {
-                // We traduce our created function to understandable lisp
+        } else if (strcmp(node->nombre, "suma-elementos") == 0) {
+            // We traduce our created function to understandable lisp
 
-                // We set the value of variable to 0 in case it has a previous value
-                writeFile("(setq ");
-                writeFile(node->primer_nodo->nombre); // result variable name
-                writeFile(" 0)\n");
+            // We set the value of variable to 0 in case it has a previous value
+            writeFile("(setq ");
+            writeFile(node->primer_nodo->nombre); // result variable name
+            writeFile(" 0)\n");
 
-                // Loop for each element in the vector
-                writeFile("(dotimes (i (length ");
-                recursiveAstToLisp(node-> primer_nodo->siguiente_hermano); // vector 
-                writeFile(") ");
-                writeFile(node->primer_nodo->nombre); // result variable name
-                writeFile(")\n");
+            // Loop for each element in the vector
+            writeFile("(dotimes (i (length ");
+            recursiveAstToLisp(node-> primer_nodo->siguiente_hermano); // vector 
+            writeFile(") ");
+            writeFile(node->primer_nodo->nombre); // result variable name
+            writeFile(")\n");
 
-                // Add each element to the result variable
-                writeFile("(incf ");
-                writeFile(node->primer_nodo->nombre); // result variable name
-                writeFile(" (aref ");
-                recursiveAstToLisp(node-> primer_nodo->siguiente_hermano); // vector name
-                writeFile(" i)))\n");
+            // Add each element to the result variable
+            writeFile("(incf ");
+            writeFile(node->primer_nodo->nombre); // result variable name
+            writeFile(" (aref ");
+            recursiveAstToLisp(node-> primer_nodo->siguiente_hermano); // vector name
+            writeFile(" i)))\n");
 
         } else if (strcmp(node->nombre, "producto-escalar") == 0) {
-                // We traduce our created function to understandable lisp
-                // Firstly, we don´t need to check the length of the vectors, because we have already done it in the semantic analysis
+            // We traduce our created function to understandable lisp
+            // Firstly, we don´t need to check the length of the vectors, because we have already done it in the semantic analysis
 
+            writeFile("(setq ");
+            writeFile(node->primer_nodo->nombre); // result variable name
+            writeFile(" (reduce #'+ (map 'list #'* ");
+            recursiveAstToLisp(node-> primer_nodo->siguiente_hermano); // vector 1
+            writeFile(" ");
+            recursiveAstToLisp(node-> primer_nodo->siguiente_hermano->siguiente_hermano); // vector 2
+            writeFile(")))\n");
 
-                writeFile("(setq ");
-                writeFile(node->primer_nodo->nombre); // result variable name
-                writeFile(" (reduce #'+ (map 'list #'* ");
-                recursiveAstToLisp(node-> primer_nodo->siguiente_hermano); // vector 1
-                writeFile(" ");
-                recursiveAstToLisp(node-> primer_nodo->siguiente_hermano->siguiente_hermano); // vector 2
-                writeFile(")))\n");
+        } else if (strcmp(node->nombre, "invertir-vector") == 0) {
+            // We traduce our created function to understandable lisp
 
+            writeFile("(coerce (reverse (coerce ");
+            recursiveAstToLisp(node->primer_nodo); // vector name
+            writeFile(" 'list)) 'vector)\n");
 
-
+        } else if (strcmp(node->nombre, "suma-vector") == 0) {
+            // We traduce our created function to understandable lisp
+            writeFile("(dotimes (i (length ");
+            recursiveAstToLisp(node->primer_nodo->siguiente_hermano); // vector name
+            writeFile("))\n");
+            writeFile("(setf (aref ");
+            recursiveAstToLisp(node->primer_nodo->siguiente_hermano); // vector name
+            writeFile(" i) (+ (aref ");
+            recursiveAstToLisp(node->primer_nodo->siguiente_hermano); // vector name
+            writeFile(" i) ");
+            recursiveAstToLisp(node->primer_nodo); // value to add
+            writeFile(")))\n");
+                
 
         } else { 
             printf("Error: unknown node type %s\n", node->nombre);
