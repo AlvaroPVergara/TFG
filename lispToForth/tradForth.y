@@ -11,10 +11,13 @@ char *my_malloc (int nbytes) ;
 
 char temp [2048] ;
 char *concat_ptr;
+char *last_return = "";
+
 
 typedef struct s_attr {
      int value ;       //  - valor numerico entero 
      int type ;        //  - tipo de dato
+     char* trad;       //  - traduccion a Forth
      char* code ;    
      struct nodoAST* nodo;     //  - nodo del arbol sintactico abstracto
 } t_attr ;
@@ -71,69 +74,54 @@ typedef struct s_attr {
                         // SECCION 3: Gramatica - Semantico 
 
 
-axioma: instrucciones                             { ; } 
+axioma: instrucciones                             { writeFile($1.trad); } 
         ;
 
-instrucciones:                                    { ; } // lambda
-                | sentencia instrucciones         { ; } 
+instrucciones:                                    { $$.trad = ""; } // lambda
+                | sentencia instrucciones         { sprintf(temp, "%s%s", $1.trad, $2.trad); 
+                                                    $$.trad = gen_code(temp); 
+                                                } 
             ;
 
 
-sentencia:   '(' definicion ')'                 { ; } 
-            | '(' asignacion ')'                { ; }
-            | expresion                         { ; }
-            | '(' condicion                     { ; }
-            | '(' bucle ')'                     { ; }
-            | '(' llamada ')'                   { ; }
-            | '(' deffuncion                    { ; }
-            | PRINT STRING                  { ; }
-            | RETURN sentencia              { ; }
+sentencia:   '(' definicion ')'                 { $$=$2; } 
+            | '(' asignacion ')'                { $$=$2; }
+            | expresion                         { $$=$1; }
+            | '(' condicion                     { $$=$2; }
+            | '(' bucle ')'                     { $$=$2; }
+            | '(' llamada ')'                   { $$=$2; }
+            | '(' deffuncion                    { $$=$2; }
+            | PRINT STRING                      { ; }
+            | RETURN sentencia                  { ; }
             ;
 
 // FUNCIONES
-deffuncion: DEFUN IDENTIF '(' argumentosfun ')' instrucciones ')' { ; }
+deffuncion: DEFUN IDENTIF '(' argumentosfun ')' instrucciones ')' 
+                                                {                                    
+                                                sprintf(temp, ": %s (%s-- %s)\n%s;", $2.code, $4.trad, last_return, $7.trad);
+                                                $$.trad = gen_code(temp);
+                                                last_return = "";
+                                                }
+
             ;
 
-argumentosfun:   |                             { ; } // lambda
-                variable argumentosfun         { ; }
+argumentosfun:                                  { $$.trad =" "; } // lambda
+                | variable argumentosfun        { sprintf(temp, "%s %s", $1.code, $2.trad); 
+                                                $$.trad = gen_code(temp); 
+                                                }
                 ;
 
 
 // DEFINICIONES
 definicion: DEFVAR variable restodef                 { if ($3.type == 0) { // INT CASE
-                                                        // Creación de variables
-                                                        writeFile("VARIABLE ");
-                                                        writeFile($2.code);
-                                                        writeFile("\n");
-                                                        // Inicialización de variables
-                                                        sprintf(temp, "%d", $3.value);
-                                                        writeFile(temp);
-                                                        writeFile(" ");
-                                                        writeFile($2.code);
-                                                        writeFile(" !\n");
+                                                        sprintf(temp, "VARIABLE %s\n%d %s !\n", $2.code, $3.value, $2.code);
+                                                        $$.trad = gen_code(temp);
+
                                                         }
                                                         else { // VECTOR CASE
-                                                        // Creación de vectores
-                                                        writeFile("CREATE ");
-                                                        writeFile($2.code);
-                                                        writeFile(" ");
-                                                        sprintf(temp, "%d", $3.value);
-                                                        writeFile(temp);
-                                                        writeFile(" ALLOT\n");
-                                                        // Inicialización de vectores
-                                                        writeFile(": inicializar-");
-                                                        writeFile($2.code);
-                                                        writeFile(" ( --)\n");
-                                                        writeFile($2.code);
-                                                        writeFile(" ");
-                                                        sprintf(temp, "%d", $3.value);
-                                                        writeFile(temp);
-                                                        writeFile(" CELLS 0 DO\n\t i "); // Inicializa el vector en 0
-                                                        writeFile($2.code);
-                                                        writeFile(" + !\nLOOP;\n");
-                                                        writeFile("inicializar-");
-                                                        writeFile($2.code);
-                                                        writeFile("\n");
+                                                        sprintf(temp, "CREATE %s %d ALLOT\n: inicializar-%s ( -- )\n\t%s %d CELLS 0 DO\n i %s +!\nLOOP;\n", 
+                                                        $2.code, $3.value, $2.code, $2.code, $3.value, $2.code);
+                                                        $$.trad = gen_code(temp);
                                                         }
                                                     }
             ;
