@@ -83,15 +83,18 @@ char *concat_ptr;
 
 typedef struct s_attr {
      int value ;       //  - valor numerico entero 
+     int type ;        //  - tipo de dato
      char* code ;    
-     char* prefija;   //  - expresion prefija
      struct nodoAST* nodo;     //  - nodo del arbol sintactico abstracto
 } t_attr ;
 
 #define YYSTYPE t_attr
 
 
-#line 95 "y.tab.c"
+
+
+
+#line 98 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -578,11 +581,11 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    71,    71,    74,    75,    79,    80,    81,    82,    83,
-      84,    85,    86,    87,    91,    94,    94,    94,   100,   103,
-     104,   108,   109,   110,   115,   119,   120,   124,   129,   136,
-     137,   138,   139,   140,   141,   142,   143,   144,   145,   146,
-     147,   148,   151,   152,   153,   156,   157
+       0,    74,    74,    77,    78,    82,    83,    84,    85,    86,
+      87,    88,    89,    90,    94,    97,    97,    97,   103,   141,
+     144,   150,   151,   152,   157,   161,   162,   166,   171,   178,
+     179,   180,   181,   182,   183,   184,   185,   186,   187,   188,
+     189,   190,   193,   194,   195,   198,   199
 };
 #endif
 
@@ -1473,271 +1476,310 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 71 "lispToForth/tradForth.y"
-                                                  { cleanFile() ; }
-#line 1479 "y.tab.c"
+#line 74 "lispToForth/tradForth.y"
+                                                  { ; }
+#line 1482 "y.tab.c"
     break;
 
   case 3:
-#line 74 "lispToForth/tradForth.y"
+#line 77 "lispToForth/tradForth.y"
                                                   { ; }
-#line 1485 "y.tab.c"
+#line 1488 "y.tab.c"
     break;
 
   case 4:
-#line 75 "lispToForth/tradForth.y"
+#line 78 "lispToForth/tradForth.y"
                                                   { ; }
-#line 1491 "y.tab.c"
+#line 1494 "y.tab.c"
     break;
 
   case 5:
-#line 79 "lispToForth/tradForth.y"
+#line 82 "lispToForth/tradForth.y"
                                                 { ; }
-#line 1497 "y.tab.c"
+#line 1500 "y.tab.c"
     break;
 
   case 6:
-#line 80 "lispToForth/tradForth.y"
+#line 83 "lispToForth/tradForth.y"
                                                 { ; }
-#line 1503 "y.tab.c"
+#line 1506 "y.tab.c"
     break;
 
   case 7:
-#line 81 "lispToForth/tradForth.y"
+#line 84 "lispToForth/tradForth.y"
                                                 { ; }
-#line 1509 "y.tab.c"
+#line 1512 "y.tab.c"
     break;
 
   case 8:
-#line 82 "lispToForth/tradForth.y"
+#line 85 "lispToForth/tradForth.y"
                                                 { ; }
-#line 1515 "y.tab.c"
+#line 1518 "y.tab.c"
     break;
 
   case 9:
-#line 83 "lispToForth/tradForth.y"
+#line 86 "lispToForth/tradForth.y"
                                                 { ; }
-#line 1521 "y.tab.c"
+#line 1524 "y.tab.c"
     break;
 
   case 10:
-#line 84 "lispToForth/tradForth.y"
+#line 87 "lispToForth/tradForth.y"
                                                 { ; }
-#line 1527 "y.tab.c"
+#line 1530 "y.tab.c"
     break;
 
   case 11:
-#line 85 "lispToForth/tradForth.y"
+#line 88 "lispToForth/tradForth.y"
                                                 { ; }
-#line 1533 "y.tab.c"
+#line 1536 "y.tab.c"
     break;
 
   case 12:
-#line 86 "lispToForth/tradForth.y"
+#line 89 "lispToForth/tradForth.y"
                                             { ; }
-#line 1539 "y.tab.c"
+#line 1542 "y.tab.c"
     break;
 
   case 13:
-#line 87 "lispToForth/tradForth.y"
+#line 90 "lispToForth/tradForth.y"
                                             { ; }
-#line 1545 "y.tab.c"
+#line 1548 "y.tab.c"
     break;
 
   case 14:
-#line 91 "lispToForth/tradForth.y"
+#line 94 "lispToForth/tradForth.y"
                                                                   { ; }
-#line 1551 "y.tab.c"
+#line 1554 "y.tab.c"
     break;
 
   case 16:
-#line 94 "lispToForth/tradForth.y"
+#line 97 "lispToForth/tradForth.y"
                                                { ; }
-#line 1557 "y.tab.c"
+#line 1560 "y.tab.c"
     break;
 
   case 17:
-#line 95 "lispToForth/tradForth.y"
+#line 98 "lispToForth/tradForth.y"
                                                { ; }
-#line 1563 "y.tab.c"
+#line 1566 "y.tab.c"
     break;
 
   case 18:
-#line 100 "lispToForth/tradForth.y"
-                                           { ; }
-#line 1569 "y.tab.c"
+#line 103 "lispToForth/tradForth.y"
+                                                     { if (yyvsp[0].type == 0) { // INT CASE
+                                                        // Creación de variables
+                                                        writeFile("VARIABLE ");
+                                                        writeFile(yyvsp[-1].code);
+                                                        writeFile("\n");
+                                                        // Inicialización de variables
+                                                        sprintf(temp, "%d", yyvsp[0].value);
+                                                        writeFile(temp);
+                                                        writeFile(" ");
+                                                        writeFile(yyvsp[-1].code);
+                                                        writeFile(" !\n");
+                                                        }
+                                                        else { // VECTOR CASE
+                                                        // Creación de vectores
+                                                        writeFile("CREATE ");
+                                                        writeFile(yyvsp[-1].code);
+                                                        writeFile(" ");
+                                                        sprintf(temp, "%d", yyvsp[0].value);
+                                                        writeFile(temp);
+                                                        writeFile(" ALLOT\n");
+                                                        // Inicialización de vectores
+                                                        writeFile(": inicializar-");
+                                                        writeFile(yyvsp[-1].code);
+                                                        writeFile(" ( --)\n");
+                                                        writeFile(yyvsp[-1].code);
+                                                        writeFile(" ");
+                                                        sprintf(temp, "%d", yyvsp[0].value);
+                                                        writeFile(temp);
+                                                        writeFile(" CELLS 0 DO\n\t i "); // Inicializa el vector en 0
+                                                        writeFile(yyvsp[-1].code);
+                                                        writeFile(" + !\nLOOP;\n");
+                                                        writeFile("inicializar-");
+                                                        writeFile(yyvsp[-1].code);
+                                                        writeFile("\n");
+                                                        }
+                                                    }
+#line 1607 "y.tab.c"
     break;
 
   case 19:
-#line 103 "lispToForth/tradForth.y"
-                                                { ; }
-#line 1575 "y.tab.c"
+#line 141 "lispToForth/tradForth.y"
+                                                     { yyval.type = 0; 
+                                                       yyval.value = yyvsp[0].value; 
+                                                     }
+#line 1615 "y.tab.c"
     break;
 
   case 20:
-#line 104 "lispToForth/tradForth.y"
-                                                     { ; }
-#line 1581 "y.tab.c"
-    break;
-
-  case 21:
-#line 108 "lispToForth/tradForth.y"
-                                                         { ; }
-#line 1587 "y.tab.c"
-    break;
-
-  case 22:
-#line 109 "lispToForth/tradForth.y"
-                                                         { ; }
-#line 1593 "y.tab.c"
-    break;
-
-  case 23:
-#line 111 "lispToForth/tradForth.y"
-                                                        { ; }
-#line 1599 "y.tab.c"
-    break;
-
-  case 24:
-#line 116 "lispToForth/tradForth.y"
-                                                      { ; }
-#line 1605 "y.tab.c"
-    break;
-
-  case 25:
-#line 119 "lispToForth/tradForth.y"
-                                                      { ; }
-#line 1611 "y.tab.c"
-    break;
-
-  case 26:
-#line 120 "lispToForth/tradForth.y"
-                                                             { ; }
-#line 1617 "y.tab.c"
-    break;
-
-  case 27:
-#line 124 "lispToForth/tradForth.y"
-                                                        { ; }
+#line 144 "lispToForth/tradForth.y"
+                                                     { yyval.type = 1; 
+                                                      yyval.value = yyvsp[-1].value; 
+                                                     }
 #line 1623 "y.tab.c"
     break;
 
-  case 28:
-#line 129 "lispToForth/tradForth.y"
-                                                { ; }
+  case 21:
+#line 150 "lispToForth/tradForth.y"
+                                                         { ; }
 #line 1629 "y.tab.c"
     break;
 
-  case 29:
-#line 136 "lispToForth/tradForth.y"
-                                                { ; }
+  case 22:
+#line 151 "lispToForth/tradForth.y"
+                                                         { ; }
 #line 1635 "y.tab.c"
     break;
 
-  case 30:
-#line 137 "lispToForth/tradForth.y"
-                                                 { ; }
+  case 23:
+#line 153 "lispToForth/tradForth.y"
+                                                        { ; }
 #line 1641 "y.tab.c"
     break;
 
-  case 31:
-#line 138 "lispToForth/tradForth.y"
-                                                 { ; }
+  case 24:
+#line 158 "lispToForth/tradForth.y"
+                                                      { ; }
 #line 1647 "y.tab.c"
     break;
 
-  case 32:
-#line 139 "lispToForth/tradForth.y"
-                                                 { ; }
+  case 25:
+#line 161 "lispToForth/tradForth.y"
+                                                      { ; }
 #line 1653 "y.tab.c"
     break;
 
-  case 33:
-#line 140 "lispToForth/tradForth.y"
-                                                 { ; }
+  case 26:
+#line 162 "lispToForth/tradForth.y"
+                                                             { ; }
 #line 1659 "y.tab.c"
     break;
 
-  case 34:
-#line 141 "lispToForth/tradForth.y"
-                                                 { ; }
+  case 27:
+#line 166 "lispToForth/tradForth.y"
+                                                        { ; }
 #line 1665 "y.tab.c"
     break;
 
-  case 35:
-#line 142 "lispToForth/tradForth.y"
-                                                 { ; }
+  case 28:
+#line 171 "lispToForth/tradForth.y"
+                                                { ; }
 #line 1671 "y.tab.c"
     break;
 
-  case 36:
-#line 143 "lispToForth/tradForth.y"
-                                                 { ; }
+  case 29:
+#line 178 "lispToForth/tradForth.y"
+                                                { ; }
 #line 1677 "y.tab.c"
     break;
 
-  case 37:
-#line 144 "lispToForth/tradForth.y"
+  case 30:
+#line 179 "lispToForth/tradForth.y"
                                                  { ; }
 #line 1683 "y.tab.c"
     break;
 
-  case 38:
-#line 145 "lispToForth/tradForth.y"
+  case 31:
+#line 180 "lispToForth/tradForth.y"
                                                  { ; }
 #line 1689 "y.tab.c"
     break;
 
-  case 39:
-#line 146 "lispToForth/tradForth.y"
+  case 32:
+#line 181 "lispToForth/tradForth.y"
                                                  { ; }
 #line 1695 "y.tab.c"
     break;
 
-  case 40:
-#line 147 "lispToForth/tradForth.y"
+  case 33:
+#line 182 "lispToForth/tradForth.y"
                                                  { ; }
 #line 1701 "y.tab.c"
     break;
 
-  case 41:
-#line 148 "lispToForth/tradForth.y"
+  case 34:
+#line 183 "lispToForth/tradForth.y"
                                                  { ; }
 #line 1707 "y.tab.c"
     break;
 
-  case 42:
-#line 151 "lispToForth/tradForth.y"
-                                                { ; }
+  case 35:
+#line 184 "lispToForth/tradForth.y"
+                                                 { ; }
 #line 1713 "y.tab.c"
     break;
 
-  case 43:
-#line 152 "lispToForth/tradForth.y"
+  case 36:
+#line 185 "lispToForth/tradForth.y"
                                                  { ; }
 #line 1719 "y.tab.c"
     break;
 
-  case 44:
-#line 153 "lispToForth/tradForth.y"
-                                                { ; }
+  case 37:
+#line 186 "lispToForth/tradForth.y"
+                                                 { ; }
 #line 1725 "y.tab.c"
     break;
 
-  case 45:
-#line 156 "lispToForth/tradForth.y"
+  case 38:
+#line 187 "lispToForth/tradForth.y"
                                                  { ; }
 #line 1731 "y.tab.c"
     break;
 
-  case 46:
-#line 157 "lispToForth/tradForth.y"
-                                                { ; }
+  case 39:
+#line 188 "lispToForth/tradForth.y"
+                                                 { ; }
 #line 1737 "y.tab.c"
     break;
 
+  case 40:
+#line 189 "lispToForth/tradForth.y"
+                                                 { ; }
+#line 1743 "y.tab.c"
+    break;
 
-#line 1741 "y.tab.c"
+  case 41:
+#line 190 "lispToForth/tradForth.y"
+                                                 { ; }
+#line 1749 "y.tab.c"
+    break;
+
+  case 42:
+#line 193 "lispToForth/tradForth.y"
+                                                { ; }
+#line 1755 "y.tab.c"
+    break;
+
+  case 43:
+#line 194 "lispToForth/tradForth.y"
+                                                 { ; }
+#line 1761 "y.tab.c"
+    break;
+
+  case 44:
+#line 195 "lispToForth/tradForth.y"
+                                                { ; }
+#line 1767 "y.tab.c"
+    break;
+
+  case 45:
+#line 198 "lispToForth/tradForth.y"
+                                                { yyval.code = yyvsp[0].code; }
+#line 1773 "y.tab.c"
+    break;
+
+  case 46:
+#line 199 "lispToForth/tradForth.y"
+                                                { yyval.code = yyvsp[-1].code; }
+#line 1779 "y.tab.c"
+    break;
+
+
+#line 1783 "y.tab.c"
 
       default: break;
     }
@@ -1969,7 +2011,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 160 "lispToForth/tradForth.y"
+#line 202 "lispToForth/tradForth.y"
 
 
                         /* SECCION 4  Codigo en C */
@@ -2169,5 +2211,6 @@ int yylex ()
 
 int main ()
 {
+    cleanFile(); // limpia el archivo de salida
     yyparse () ;
 }   

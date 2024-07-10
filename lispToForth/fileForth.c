@@ -21,3 +21,4 @@ void writeFile(const char* text) {
     fprintf(file, "%s", text);
     fclose(file);
 }
+

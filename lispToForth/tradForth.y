@@ -14,12 +14,15 @@ char *concat_ptr;
 
 typedef struct s_attr {
      int value ;       //  - valor numerico entero 
+     int type ;        //  - tipo de dato
      char* code ;    
-     char* prefija;   //  - expresion prefija
      struct nodoAST* nodo;     //  - nodo del arbol sintactico abstracto
 } t_attr ;
 
 #define YYSTYPE t_attr
+
+
+
 
 %}
                      // SECCION 2 
@@ -68,7 +71,7 @@ typedef struct s_attr {
                         // SECCION 3: Gramatica - Semantico 
 
 
-axioma: instrucciones                             { cleanFile() ; } 
+axioma: instrucciones                             { ; } 
         ;
 
 instrucciones:                                    { ; } // lambda
@@ -97,11 +100,50 @@ argumentosfun:   |                             { ; } // lambda
 
 
 // DEFINICIONES
-definicion: DEFVAR variable restodef       { ; }
+definicion: DEFVAR variable restodef                 { if ($3.type == 0) { // INT CASE
+                                                        // Creación de variables
+                                                        writeFile("VARIABLE ");
+                                                        writeFile($2.code);
+                                                        writeFile("\n");
+                                                        // Inicialización de variables
+                                                        sprintf(temp, "%d", $3.value);
+                                                        writeFile(temp);
+                                                        writeFile(" ");
+                                                        writeFile($2.code);
+                                                        writeFile(" !\n");
+                                                        }
+                                                        else { // VECTOR CASE
+                                                        // Creación de vectores
+                                                        writeFile("CREATE ");
+                                                        writeFile($2.code);
+                                                        writeFile(" ");
+                                                        sprintf(temp, "%d", $3.value);
+                                                        writeFile(temp);
+                                                        writeFile(" ALLOT\n");
+                                                        // Inicialización de vectores
+                                                        writeFile(": inicializar-");
+                                                        writeFile($2.code);
+                                                        writeFile(" ( --)\n");
+                                                        writeFile($2.code);
+                                                        writeFile(" ");
+                                                        sprintf(temp, "%d", $3.value);
+                                                        writeFile(temp);
+                                                        writeFile(" CELLS 0 DO\n\t i "); // Inicializa el vector en 0
+                                                        writeFile($2.code);
+                                                        writeFile(" + !\nLOOP;\n");
+                                                        writeFile("inicializar-");
+                                                        writeFile($2.code);
+                                                        writeFile("\n");
+                                                        }
+                                                    }
             ;
         
-restodef:   expresion                           { ; }
-            | '(' MAKE '-' ARRAY expresion ')'       { ; }
+restodef:   expresion                                { $$.type = 0; 
+                                                       $$.value = $1.value; 
+                                                     }
+            | '(' MAKE '-' ARRAY expresion ')'       { $$.type = 1; 
+                                                      $$.value = $5.value; 
+                                                     }   
             ;
 
 // ASIGNACIONES
@@ -153,8 +195,8 @@ operando:       NUMBER                          { ; }
                 | '(' expresion ')'             { ; }
                 ;
 
-variable:        IDENTIF                         { ; }
-                | '*' IDENTIF '*'               { ; }
+variable:        IDENTIF                        { $$.code = $1.code; }
+                | '*' IDENTIF '*'               { $$.code = $2.code; }
                 ;
 
 %%
@@ -356,5 +398,6 @@ int yylex ()
 
 int main ()
 {
+    cleanFile(); // limpia el archivo de salida
     yyparse () ;
 }   
