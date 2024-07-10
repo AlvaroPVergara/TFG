@@ -1,20 +1,12 @@
 (defvar a 0)
 (defvar *vec1* (make-array 10))
-(defvar *vec2* (make-array 3))
-(defun fun1 (b) 
-(if  (<= b 3)  (
-(setq b 3)
-)
-(
-(setq b 2)
-))
-)
 (defun main () 
-(let ((z 0))
-(setq z (reduce #'+ (map 'list #'* *vec1* *vec2*)))
-(coerce (reverse (coerce *vec1* 'list)) 'vector)
-(dotimes (i (length *vec1*))
-(setf (aref *vec1* i) (+ (aref *vec1* i) (+ 1 (/ 5 3)))))
-z
+(if  (<= a 3)  (progn
+(setq a 3)
+)
+(progn
+(setq a 2)
 ))
+a
+)
 (main)

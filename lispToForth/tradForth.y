@@ -37,6 +37,7 @@ typedef struct s_attr {
 %token WHILE
 %token LOOP     
 %token IF
+%token PROGN
 %token DO
 %token PRINT
 %token RETURN
@@ -98,13 +99,13 @@ asignacion:   SETQ IDENTIF sentencia                    { ; }
             ;
 
 // CONDICIONALES
-condicion: IF '(' expresion ')' '('    
+condicion: IF '(' expresion ')' '(' PROGN   
             instrucciones ')' restoif 
             { ; }
             ;
 
 restoif:    ')'                                       { ; }
-            | '(' instrucciones ')' ')'               { ; }
+            | '(' PROGN  instrucciones ')' ')'               { ; }
             ;
 
 // BUCLES
@@ -183,7 +184,7 @@ typedef struct s_keyword { // para las palabras reservadas de C
 t_keyword keywords[] = {
     {"setq", SETQ}, {"setf", SETF}, {"aref", AREF}, {"return-from", RETURN}, // QUIZÁ SE NECESITE DIVIDIR RETURN EN 2
     {"while", WHILE}, {"loop", LOOP}, {"if", IF}, {"do", DO}, {"defvar", DEFVAR}, 
-    {"make-array", MAKEARRAY},
+    {"make-array", MAKEARRAY}, {"progn", PROGN}, 
     {"and", AND}, {"or", OR}, {"<=", LEQ}, {">=", GEQ}, 
     {"/=", NEQ}, {"let", LET}, {"print", PRINT}, {"dotimes", DOTIMES},
     {"length", LENGTH}, {"incf", INCF}, {"reduce",REDUCE}, //TODO:COMPLETAR CON FUNCIONALIDADES ADICIONALES

@@ -105,7 +105,7 @@ void recursiveAstToLisp(struct nodoAST* node){
 
             recursiveAstToLisp(node->primer_nodo); //nodo condicion
 
-            writeFile(" (\n");
+            writeFile(" (progn\n");
             recursiveAstToLisp(node->primer_nodo->siguiente_hermano); //nodo statements
 
             writeFile(")\n");
@@ -126,7 +126,7 @@ void recursiveAstToLisp(struct nodoAST* node){
             }
 
         } else if (strcmp(node->nombre, "else") == 0){ //TODO: FIX ELSE
-            writeFile("(\n");
+            writeFile("(progn\n");
             node = node->primer_nodo;
             recursiveAstToLisp(node);
             while (node->siguiente_hermano != NULL)

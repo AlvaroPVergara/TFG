@@ -62,15 +62,16 @@ extern int yydebug;
     WHILE = 268,
     LOOP = 269,
     IF = 270,
-    DO = 271,
-    PRINT = 272,
-    RETURN = 273,
-    AND = 274,
-    OR = 275,
-    LEQ = 276,
-    GEQ = 277,
-    NEQ = 278,
-    DOTIMES = 279
+    PROGN = 271,
+    DO = 272,
+    PRINT = 273,
+    RETURN = 274,
+    AND = 275,
+    OR = 276,
+    LEQ = 277,
+    GEQ = 278,
+    NEQ = 279,
+    DOTIMES = 280
   };
 #endif
 /* Tokens.  */
@@ -87,15 +88,16 @@ extern int yydebug;
 #define WHILE 268
 #define LOOP 269
 #define IF 270
-#define DO 271
-#define PRINT 272
-#define RETURN 273
-#define AND 274
-#define OR 275
-#define LEQ 276
-#define GEQ 277
-#define NEQ 278
-#define DOTIMES 279
+#define PROGN 271
+#define DO 272
+#define PRINT 273
+#define RETURN 274
+#define AND 275
+#define OR 276
+#define LEQ 277
+#define GEQ 278
+#define NEQ 279
+#define DOTIMES 280
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
