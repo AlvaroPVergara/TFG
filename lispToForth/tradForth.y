@@ -32,7 +32,8 @@ typedef struct s_attr {
 %token SETQ  
 %token SETF       
 %token AREF 
-%token MAKEARRAY
+%token MAKE
+%token ARRAY
 %token LET
 %token WHILE
 %token LOOP     
@@ -40,7 +41,9 @@ typedef struct s_attr {
 %token PROGN
 %token DO
 %token PRINT
+%token DEFUN
 %token RETURN
+%token FROM
 
 %token AND          // tokens logical
 %token OR  
@@ -49,6 +52,9 @@ typedef struct s_attr {
 %token NEQ          // NEQ
 
 %token DOTIMES
+%token LENGTH
+%token INCF
+%token REDUCE
 
 
 
@@ -62,10 +68,10 @@ typedef struct s_attr {
                         // SECCION 3: Gramatica - Semantico 
 
 
-axioma: instrucciones       { printf ("axioma\n") ; } 
+axioma: instrucciones                             { cleanFile() ; } 
         ;
 
-instrucciones:                                      { ; } // lambda
+instrucciones:                                    { ; } // lambda
                 | sentencia instrucciones         { ; } 
             ;
 
@@ -76,32 +82,38 @@ sentencia:   '(' definicion ')'                 { ; }
             | '(' condicion                     { ; }
             | '(' bucle ')'                     { ; }
             | '(' llamada ')'                   { ; }
+            | '(' deffuncion                    { ; }
             | PRINT STRING                  { ; }
             | RETURN sentencia              { ; }
             ;
 
+// FUNCIONES
+deffuncion: DEFUN IDENTIF '(' argumentosfun ')' instrucciones ')' { ; }
+            ;
 
+argumentosfun:   |                             { ; } // lambda
+                variable argumentosfun         { ; }
+                ;
 
 
 // DEFINICIONES
-definicion: DEFVAR IDENTIF restodef       { ; }
+definicion: DEFVAR variable restodef       { ; }
             ;
         
 restodef:   expresion                           { ; }
-            | '(' MAKEARRAY expresion ')'       { ; }
+            | '(' MAKE '-' ARRAY expresion ')'       { ; }
             ;
 
 // ASIGNACIONES
-asignacion:   SETQ IDENTIF sentencia                    { ; }
-            | SETF IDENTIF sentencia                    { ; }
-            |  LET '(' '(' IDENTIF expresion ')' ')' 
+asignacion:   SETQ variable sentencia                    { ; }
+            | SETF variable sentencia                    { ; }
+            |  LET '(' '(' variable expresion ')' ')' 
             instrucciones                               { ; }
             ;
 
 // CONDICIONALES
 condicion: IF '(' expresion ')' '(' PROGN   
-            instrucciones ')' restoif 
-            { ; }
+            instrucciones ')' restoif                 { ; }
             ;
 
 restoif:    ')'                                       { ; }
@@ -137,10 +149,13 @@ expresion:          operando                    { ; }
                 ;
 
 operando:       NUMBER                          { ; }
-                | IDENTIF                       { ; }
+                | variable                       { ; }
                 | '(' expresion ')'             { ; }
                 ;
 
+variable:        IDENTIF                         { ; }
+                | '*' IDENTIF '*'               { ; }
+                ;
 
 %%
 
@@ -182,9 +197,9 @@ typedef struct s_keyword { // para las palabras reservadas de C
 } t_keyword ;
 
 t_keyword keywords[] = {
-    {"setq", SETQ}, {"setf", SETF}, {"aref", AREF}, {"return-from", RETURN}, // QUIZÁ SE NECESITE DIVIDIR RETURN EN 2
+    {"setq", SETQ}, {"setf", SETF}, {"aref", AREF}, {"return-", RETURN}, {"from", FROM},
     {"while", WHILE}, {"loop", LOOP}, {"if", IF}, {"do", DO}, {"defvar", DEFVAR}, 
-    {"make-array", MAKEARRAY}, {"progn", PROGN}, 
+    {"make", MAKE}, {"array", ARRAY}, {"progn", PROGN}, {"defun", DEFUN},
     {"and", AND}, {"or", OR}, {"<=", LEQ}, {">=", GEQ}, 
     {"/=", NEQ}, {"let", LET}, {"print", PRINT}, {"dotimes", DOTIMES},
     {"length", LENGTH}, {"incf", INCF}, {"reduce",REDUCE}, //TODO:COMPLETAR CON FUNCIONALIDADES ADICIONALES

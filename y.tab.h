@@ -57,21 +57,27 @@ extern int yydebug;
     SETQ = 263,
     SETF = 264,
     AREF = 265,
-    MAKEARRAY = 266,
-    LET = 267,
-    WHILE = 268,
-    LOOP = 269,
-    IF = 270,
-    PROGN = 271,
-    DO = 272,
-    PRINT = 273,
-    RETURN = 274,
-    AND = 275,
-    OR = 276,
-    LEQ = 277,
-    GEQ = 278,
-    NEQ = 279,
-    DOTIMES = 280
+    MAKE = 266,
+    ARRAY = 267,
+    LET = 268,
+    WHILE = 269,
+    LOOP = 270,
+    IF = 271,
+    PROGN = 272,
+    DO = 273,
+    PRINT = 274,
+    DEFUN = 275,
+    RETURN = 276,
+    FROM = 277,
+    AND = 278,
+    OR = 279,
+    LEQ = 280,
+    GEQ = 281,
+    NEQ = 282,
+    DOTIMES = 283,
+    LENGTH = 284,
+    INCF = 285,
+    REDUCE = 286
   };
 #endif
 /* Tokens.  */
@@ -83,21 +89,27 @@ extern int yydebug;
 #define SETQ 263
 #define SETF 264
 #define AREF 265
-#define MAKEARRAY 266
-#define LET 267
-#define WHILE 268
-#define LOOP 269
-#define IF 270
-#define PROGN 271
-#define DO 272
-#define PRINT 273
-#define RETURN 274
-#define AND 275
-#define OR 276
-#define LEQ 277
-#define GEQ 278
-#define NEQ 279
-#define DOTIMES 280
+#define MAKE 266
+#define ARRAY 267
+#define LET 268
+#define WHILE 269
+#define LOOP 270
+#define IF 271
+#define PROGN 272
+#define DO 273
+#define PRINT 274
+#define DEFUN 275
+#define RETURN 276
+#define FROM 277
+#define AND 278
+#define OR 279
+#define LEQ 280
+#define GEQ 281
+#define NEQ 282
+#define DOTIMES 283
+#define LENGTH 284
+#define INCF 285
+#define REDUCE 286
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED

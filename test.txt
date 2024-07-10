@@ -3,11 +3,6 @@ int vec1[10];
 
 
 int main(){
-    if (a <= 3){
-        a = 3;
-    }
-    else{ 
-        a = 2;
-    }
+    a = 1;
     return a;
 }
