@@ -125,7 +125,7 @@ void recursiveAstToLisp(struct nodoAST* node){
                 node = node->siguiente_hermano;
             }
 
-        } else if (strcmp(node->nombre, "else") == 0){
+        } else if (strcmp(node->nombre, "else") == 0){ //TODO: FIX ELSE
             writeFile("(\n");
             node = node->primer_nodo;
             recursiveAstToLisp(node);
@@ -134,7 +134,7 @@ void recursiveAstToLisp(struct nodoAST* node){
                 recursiveAstToLisp(node->siguiente_hermano);
                 node = node->siguiente_hermano;
             }
-            writeFile(")\n");
+            writeFile("))\n");
 
         }  else if (strcmp(node->nombre, "aric-if") == 0){
             writeFile("(if ");

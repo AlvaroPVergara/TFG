@@ -2,6 +2,16 @@ int a;
 int vec1[10];
 int vec2[3];
 
+int fun1(int b){
+    if (b <= 3){
+        b = 3;
+    }
+    else{ 
+        b = 2;
+    }
+
+}
+
 
 int main(){
     int z;

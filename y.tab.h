@@ -53,25 +53,24 @@ extern int yydebug;
     IDENTIF = 259,
     INTEGER = 260,
     STRING = 261,
-    MAIN = 262,
-    WHILE = 263,
-    FOR = 264,
-    IF = 265,
-    ELSE = 266,
-    PUTS = 267,
-    PRINTF = 268,
-    AND = 269,
-    OR = 270,
-    LEQ = 271,
-    GEQ = 272,
-    EQ = 273,
-    NEQ = 274,
-    RETURN = 275,
-    ELEMSUM = 276,
-    PRODESC = 277,
-    INVECT = 278,
-    VECSUM = 279,
-    UNARY_SIGN = 280
+    DEFVAR = 262,
+    SETQ = 263,
+    SETF = 264,
+    AREF = 265,
+    MAKEARRAY = 266,
+    LET = 267,
+    WHILE = 268,
+    LOOP = 269,
+    IF = 270,
+    DO = 271,
+    PRINT = 272,
+    RETURN = 273,
+    AND = 274,
+    OR = 275,
+    LEQ = 276,
+    GEQ = 277,
+    NEQ = 278,
+    DOTIMES = 279
   };
 #endif
 /* Tokens.  */
@@ -79,25 +78,24 @@ extern int yydebug;
 #define IDENTIF 259
 #define INTEGER 260
 #define STRING 261
-#define MAIN 262
-#define WHILE 263
-#define FOR 264
-#define IF 265
-#define ELSE 266
-#define PUTS 267
-#define PRINTF 268
-#define AND 269
-#define OR 270
-#define LEQ 271
-#define GEQ 272
-#define EQ 273
-#define NEQ 274
-#define RETURN 275
-#define ELEMSUM 276
-#define PRODESC 277
-#define INVECT 278
-#define VECSUM 279
-#define UNARY_SIGN 280
+#define DEFVAR 262
+#define SETQ 263
+#define SETF 264
+#define AREF 265
+#define MAKEARRAY 266
+#define LET 267
+#define WHILE 268
+#define LOOP 269
+#define IF 270
+#define DO 271
+#define PRINT 272
+#define RETURN 273
+#define AND 274
+#define OR 275
+#define LEQ 276
+#define GEQ 277
+#define NEQ 278
+#define DOTIMES 279
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
