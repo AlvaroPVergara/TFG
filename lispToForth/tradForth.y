@@ -12,6 +12,7 @@ char *my_malloc (int nbytes) ;
 char temp [2048] ;
 char *concat_ptr;
 char *last_return = "";
+char *act_function = "";
 
 
 typedef struct s_attr {
@@ -79,8 +80,13 @@ axioma: instrucciones                             { writeFile($1.trad); }
 
 instrucciones:                                    { $$.trad = ""; } // lambda
                 | sentencia instrucciones         { sprintf(temp, "%s%s", $1.trad, $2.trad); 
-                                                    $$.trad = gen_code(temp); 
-                                                } 
+                                                    $$.trad = gen_code(temp);
+                                                    printf("\n\n\n\n\n");
+                                                    printf("La sentencia añadida es: %s\n", $1.trad);
+                                                    printf("Las instrucciones ya existentes son: %s\n", $2.trad);
+                                                    printf("La traducción final es: %s/n", $$.trad); 
+                                                    
+                                                    } 
             ;
 
 
@@ -96,11 +102,13 @@ sentencia:   '(' definicion ')'                 { $$=$2; }
             ;
 
 // FUNCIONES
-deffuncion: DEFUN IDENTIF '(' argumentosfun ')' instrucciones ')' 
-                                                {                                    
-                                                sprintf(temp, ": %s (%s-- %s)\n%s;", $2.code, $4.trad, last_return, $7.trad);
+deffuncion: DEFUN IDENTIF                       { act_function = $2.code; }
+            '(' argumentosfun ')' instrucciones ')' 
+                                                {                              
+                                                sprintf(temp, ": %s (%s-- %s)\n%s;\n", $2.code, $5.trad, last_return, $7.trad);
                                                 $$.trad = gen_code(temp);
                                                 last_return = "";
+                                                act_function = "";
                                                 }
 
             ;
@@ -119,10 +127,23 @@ definicion: DEFVAR variable restodef                 { if ($3.type == 0) { // IN
 
                                                         }
                                                         else { // VECTOR CASE
-                                                        sprintf(temp, "CREATE %s %d ALLOT\n: inicializar-%s ( -- )\n\t%s %d CELLS 0 DO\n i %s +!\nLOOP;\n", 
-                                                        $2.code, $3.value, $2.code, $2.code, $3.value, $2.code);
+                                                        sprintf(temp, "CREATE %s %d ALLOT\n: inicializar-%s ( -- )\n\t%s %d CELLS 0 DO\n i %s +!\nLOOP;\ninicializar-%s\n", 
+                                                        $2.code, $3.value, $2.code, $2.code, $3.value, $2.code,$2.code);
                                                         $$.trad = gen_code(temp);
                                                         }
+                                                    }
+            |  LET '(' '(' variable restodef ')' ')' 
+            instrucciones                           {   // For simlicity, we ignore the use of local variables
+                                                        if ($5.type == 0) { // INT CASE
+                                                        sprintf(temp, "VARIABLE %s\n%d %s !\n%s", $4.code, $5.value, $4.code, $8.trad);
+                                                        $$.trad = gen_code(temp);
+                                                        }
+                                                        else { // VECTOR CASE
+                                                        sprintf(temp, "CREATE %s %d ALLOT\n: inicializar-%s ( -- )\n\t%s %d CELLS 0 DO\n i %s +!\nLOOP;\ninicializar-%s\n%s", 
+                                                        $4.code, $5.value, $4.code, $4.code, $5.value, $4.code, $4.code, $8.trad);
+                                                        $$.trad = gen_code(temp);
+                                                        }
+
                                                     }
             ;
         
@@ -135,10 +156,14 @@ restodef:   expresion                                { $$.type = 0;
             ;
 
 // ASIGNACIONES
-asignacion:   SETQ variable sentencia                    { ; }
-            | SETF variable sentencia                    { ; }
-            |  LET '(' '(' variable expresion ')' ')' 
-            instrucciones                               { ; }
+asignacion:   SETQ variable sentencia                           { 
+                                                                sprintf(temp, "%s %s !\n", $3.trad, $2.code); 
+                                                                $$.trad = gen_code(temp);
+                                                                }
+            | SETF '(' AREF variable expresion ')' sentencia    { 
+                                                                sprintf(temp, "%s %s CELLS %s + !\n", $7.trad, $5.trad, $4.code);
+                                                                $$.trad = gen_code(temp);
+                                                                }   
             ;
 
 // CONDICIONALES
@@ -163,8 +188,22 @@ llamada: IDENTIF '(' instrucciones ')'          { ; }
 
 
 
-expresion:          operando                    { ; }
-                |    '+' expresion expresion     { ; }
+expresion:          operando                     { $$=$1; }
+                |    '+' expresion expresion     { 
+                                                    concat_ptr = temp;
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $2.trad);
+                                                    if (strcmp($2.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $3.trad);
+                                                    if (strcmp($3.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "+");
+                                                    $$.trad = gen_code(temp);
+                                                    $$.code = "oper";
+
+                                                 }
                 |    '-' expresion expresion     { ; }
                 |    '*' expresion expresion     { ; }
                 |    '/' expresion expresion     { ; }
@@ -178,9 +217,18 @@ expresion:          operando                    { ; }
                 |    NEQ expresion expresion     { ; }
                 ;
 
-operando:       NUMBER                          { ; }
-                | variable                       { ; }
-                | '(' expresion ')'             { ; }
+operando:       NUMBER                          { sprintf(temp, "%d", $1.value);
+                                                $$.trad = gen_code(temp);
+                                                $$.value = $1.value; 
+                                                $$.code = "number";
+                                                }
+                | variable                      { 
+
+                                                sprintf(temp, "%s", $1.code);
+                                                $$.trad = gen_code(temp);
+                                                $$.code = "variable";
+                                                }
+                | '(' expresion ')'             { $$=$2; }
                 ;
 
 variable:        IDENTIF                        { $$.code = $1.code; }

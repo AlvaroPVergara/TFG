@@ -3,6 +3,10 @@ int vec1[10];
 
 
 int main(){
-    a = 1;
+    int vector[3];
+    int b;
+    b = 1;
+    vec1[3] = b;
+    
     return a;
 }

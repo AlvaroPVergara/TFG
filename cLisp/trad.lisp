@@ -1,7 +1,10 @@
 (defvar a 0)
 (defvar *vec1* (make-array 10))
 (defun main () 
-(setq a 1)
+(let ((vector (make-array 3)))
+(let ((b 0))
+(setq b 1)
+(setf (aref *vec1* 3) b)
 a
-)
+)))
 (main)
