@@ -6,16 +6,16 @@ CREATE vec1 10 ALLOT
  i vec1 +!
 LOOP;
 inicializar-vec1
+: fun1 (b vec  -- )
+b @ 3 + b !
+;
 : main ( -- )
-CREATE vector 3 ALLOT
-: inicializar-vector ( -- )
-	vector 3 CELLS 0 DO
- i vector +!
-LOOP;
-inicializar-vector
-VARIABLE b
-0 b !
-1 b !
-b 3 CELLS vec1 + !
-a;
+a @
+vec1 @
+fun1
+BEGIN
+a @ 5 < WHILE
+a @ 1 + a !
+REPEAT
+;
 main

@@ -80,20 +80,14 @@ axioma: instrucciones                             { writeFile($1.trad); }
 
 instrucciones:                                    { $$.trad = ""; } // lambda
                 | sentencia instrucciones         { sprintf(temp, "%s%s", $1.trad, $2.trad); 
-                                                    $$.trad = gen_code(temp);
-                                                    printf("\n\n\n\n\n");
-                                                    printf("La sentencia añadida es: %s\n", $1.trad);
-                                                    printf("Las instrucciones ya existentes son: %s\n", $2.trad);
-                                                    printf("La traducción final es: %s/n", $$.trad); 
-                                                    
+                                                    $$.trad = gen_code(temp);                 
                                                     } 
             ;
 
 
 sentencia:   '(' definicion ')'                 { $$=$2; } 
             | '(' asignacion ')'                { $$=$2; }
-            | expresion                         { $$=$1; }
-            | '(' condicion                     { $$=$2; }
+            | '(' condicion                     { $$=$2; } 
             | '(' bucle ')'                     { $$=$2; }
             | '(' llamada ')'                   { $$=$2; }
             | '(' deffuncion                    { $$=$2; }
@@ -156,32 +150,58 @@ restodef:   expresion                                { $$.type = 0;
             ;
 
 // ASIGNACIONES
-asignacion:   SETQ variable sentencia                           { 
+asignacion:   SETQ variable expresion                           { 
                                                                 sprintf(temp, "%s %s !\n", $3.trad, $2.code); 
                                                                 $$.trad = gen_code(temp);
                                                                 }
-            | SETF '(' AREF variable expresion ')' sentencia    { 
+            | SETF '(' AREF variable expresion ')' expresion    { 
                                                                 sprintf(temp, "%s %s CELLS %s + !\n", $7.trad, $5.trad, $4.code);
                                                                 $$.trad = gen_code(temp);
                                                                 }   
             ;
 
 // CONDICIONALES
-condicion: IF '(' expresion ')' '(' PROGN   
-            instrucciones ')' restoif                 { ; }
+condicion: IF  expresion '(' PROGN   
+            instrucciones ')' restoif                 { 
+                                                        sprintf(temp, "%s IF\n%s%sTHEN\n", $2.trad, $5.trad, $7.trad);
+                                                        $$.trad = gen_code(temp);
+                                                    }
             ;
 
-restoif:    ')'                                       { ; }
-            | '(' PROGN  instrucciones ')' ')'               { ; }
+restoif:    ')'                                     { $$.trad=""; }
+            | '(' PROGN  instrucciones ')' ')'      {  
+                                                    sprintf(temp, "ELSE\n%s", $3.trad);
+                                                    $$.trad = gen_code(temp);
+                                                    }
             ;
 
 // BUCLES
-bucle:   LOOP WHILE '(' expresion ')' DO instrucciones  { ; }
+bucle:   LOOP WHILE  expresion  DO instrucciones  { 
+                                                        sprintf(temp, "BEGIN\n%s WHILE\n%sREPEAT\n", $3.trad, $5.trad);   
+                                                        $$.trad = gen_code(temp); 
+                                                        }
 
 
 
-// LLAMADAS
-llamada: IDENTIF '(' instrucciones ')'          { ; }
+// LLAMADAS FUNCIONES
+llamada:    IDENTIF argumentos               { 
+                                                 sprintf(temp, "%s%s\n", $2.trad, $1.code);
+                                                 $$.trad = gen_code(temp);
+                                                 }
+            ;
+
+
+argumentos:                                      { $$.trad = ""; } // lambda
+            | expresion argumentos               { 
+                                                    if (strcmp($1.code, "variable") == 0){
+                                                        sprintf(temp, "%s @\n%s", $1.trad, $2.trad); 
+                                                    }
+                                                    else{
+                                                        sprintf(temp, "%s\n%s", $1.trad, $2.trad); 
+                                                    }
+                                                    $$.trad = gen_code(temp); 
+                                                }
+            ;
 
 
 // OPERACIONES
@@ -189,14 +209,14 @@ llamada: IDENTIF '(' instrucciones ')'          { ; }
 
 
 expresion:          operando                     { $$=$1; }
-                |    '+' expresion expresion     { 
+                |   '(' '+' expresion expresion ')' { 
                                                     concat_ptr = temp;
-                                                    concat_ptr += sprintf(concat_ptr, "%s ", $2.trad);
-                                                    if (strcmp($2.code, "variable") == 0){
-                                                        concat_ptr += sprintf(concat_ptr, "@ ");
-                                                    }
                                                     concat_ptr += sprintf(concat_ptr, "%s ", $3.trad);
                                                     if (strcmp($3.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $4.trad);
+                                                    if (strcmp($4.code, "variable") == 0){
                                                         concat_ptr += sprintf(concat_ptr, "@ ");
                                                     }
                                                     concat_ptr += sprintf(concat_ptr, "+");
@@ -204,17 +224,162 @@ expresion:          operando                     { $$=$1; }
                                                     $$.code = "oper";
 
                                                  }
-                |    '-' expresion expresion     { ; }
-                |    '*' expresion expresion     { ; }
-                |    '/' expresion expresion     { ; }
-                |    AND expresion expresion     { ; }
-                |    OR expresion expresion      { ; }
-                |    '=' expresion expresion     { ; }
-                |    '<' expresion expresion     { ; }
-                |    '>' expresion expresion     { ; }
-                |    LEQ expresion expresion     { ; }
-                |    GEQ expresion expresion     { ; }
-                |    NEQ expresion expresion     { ; }
+                |   '(' '-' expresion expresion ')' { 
+                                                    concat_ptr = temp;
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $3.trad);
+                                                    if (strcmp($3.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $4.trad);
+                                                    if (strcmp($4.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "-");
+                                                    $$.trad = gen_code(temp);
+                                                    $$.code = "oper";
+                                                 }
+                |   '(' '*' expresion expresion  ')' {  
+                                                    concat_ptr = temp;
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $3.trad);
+                                                    if (strcmp($3.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $4.trad);
+                                                    if (strcmp($4.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "*");
+                                                    $$.trad = gen_code(temp);
+                                                    $$.code = "oper";
+                                                 }
+                |  '(' '/' expresion expresion ')' {  
+                                                    concat_ptr = temp;
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $3.trad);
+                                                    if (strcmp($3.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $4.trad);
+                                                    if (strcmp($4.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "/");
+                                                    $$.trad = gen_code(temp);
+                                                    $$.code = "oper";
+                                                 }
+                | '(' AND expresion expresion  ')' {
+                                                    concat_ptr = temp;
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $3.trad);
+                                                    if (strcmp($3.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $4.trad);
+                                                    if (strcmp($4.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "AND");
+                                                    $$.trad = gen_code(temp);
+                                                    $$.code = "oper";
+                                                }   
+                | '(' OR expresion expresion ')'  {
+                                                    concat_ptr = temp;
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $3.trad);
+                                                    if (strcmp($3.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $4.trad);
+                                                    if (strcmp($4.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "OR");
+                                                    $$.trad = gen_code(temp);
+                                                    $$.code = "oper";
+                                               
+                                                }
+                | '(' '=' expresion expresion ')' {
+                                                    concat_ptr = temp;
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $3.trad);
+                                                    if (strcmp($3.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $4.trad);
+                                                    if (strcmp($4.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "=");
+                                                    $$.trad = gen_code(temp);
+                                                    $$.code = "oper";
+                                                }
+                | '(' '<' expresion expresion ')' {
+                                                    concat_ptr = temp;
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $3.trad);
+                                                    if (strcmp($3.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $4.trad);
+                                                    if (strcmp($4.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "<");
+                                                    $$.trad = gen_code(temp);
+                                                    $$.code = "oper";
+
+                                                }
+                | '(' '>' expresion expresion ')' {
+                                                    concat_ptr = temp;
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $3.trad);
+                                                    if (strcmp($3.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $4.trad);
+                                                    if (strcmp($4.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, ">");
+                                                    $$.trad = gen_code(temp);
+                                                    $$.code = "oper";
+                                                }
+                | '(' LEQ expresion expresion ')' {
+                                                    concat_ptr = temp;
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $3.trad);
+                                                    if (strcmp($3.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $4.trad);
+                                                    if (strcmp($4.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "<=");
+                                                    $$.trad = gen_code(temp);
+                                                    $$.code = "oper";
+                                                }
+                | '(' GEQ expresion expresion ')' { 
+                                                    concat_ptr = temp;
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $3.trad);
+                                                    if (strcmp($3.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $4.trad);
+                                                    if (strcmp($4.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, ">=");
+                                                    $$.trad = gen_code(temp);
+                                                    $$.code = "oper";
+                                                }
+                | '(' NEQ expresion expresion ')' {
+                                                    concat_ptr = temp;
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $3.trad);
+                                                    if (strcmp($3.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "%s ", $4.trad);
+                                                    if (strcmp($4.code, "variable") == 0){
+                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                    }
+                                                    concat_ptr += sprintf(concat_ptr, "/=");
+                                                    $$.trad = gen_code(temp);
+                                                    $$.code = "oper";
+                                                }
                 ;
 
 operando:       NUMBER                          { sprintf(temp, "%d", $1.value);
@@ -228,7 +393,6 @@ operando:       NUMBER                          { sprintf(temp, "%d", $1.value);
                                                 $$.trad = gen_code(temp);
                                                 $$.code = "variable";
                                                 }
-                | '(' expresion ')'             { $$=$2; }
                 ;
 
 variable:        IDENTIF                        { $$.code = $1.code; }

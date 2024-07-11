@@ -1,12 +1,13 @@
 int a;
 int vec1[10];
 
+int fun1(int b, int vec[10]){
+    b = b + 3;
+}
 
 int main(){
-    int vector[3];
-    int b;
-    b = 1;
-    vec1[3] = b;
-    
-    return a;
+    fun1(a, vec1);
+    while (a < 5){
+        a = a + 1;
+    } 
 }
