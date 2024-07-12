@@ -1,7 +1,7 @@
 #include "tradForth.h"
 
 
-char* FILENAME = "lispToForth/finalTrad.forth";
+char* FILENAME = "lispToForth/finalTrad.fs";
 
 void cleanFile() {
     FILE* file = fopen(FILENAME, "w");

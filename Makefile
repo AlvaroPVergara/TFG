@@ -6,3 +6,4 @@ all:
 	yacc -d -v lispToForth/tradForth.y
 	gcc -Wall y.tab.c lispToForth/fileForth.c -o lispToForth/tradForth
 	lispToForth/tradForth < cLisp/trad.lisp
+	echo bye | gforth lispToForth/finalTrad.fs

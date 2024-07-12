@@ -99,7 +99,7 @@ sentencia:   '(' definicion ')'                 { $$=$2; }
 deffuncion: DEFUN IDENTIF                       { act_function = $2.code; }
             '(' argumentosfun ')' instrucciones ')' 
                                                 {                              
-                                                sprintf(temp, ": %s (%s-- n )\n%s;\n", $2.code, $5.trad, $7.trad);
+                                                sprintf(temp, ": %s ( %s-- n )\n%s;\n", $2.code, $5.trad, $7.trad);
                                                 $$.trad = gen_code(temp);
                                                 act_function = ""; //TODO: REMOVE IF NOT USED
                                                 }
@@ -128,7 +128,7 @@ definicion: DEFVAR variable restodef                 { if ($3.type == 0) { // IN
 
                                                         }
                                                         else { // VECTOR CASE
-                                                        sprintf(temp, "CREATE %s %d ALLOT\n: inicializar-%s ( -- )\n\t%s %d CELLS 0 DO\n i %s +!\nLOOP;\ninicializar-%s\n", 
+                                                        sprintf(temp, "CREATE %s %d ALLOT\n: inicializar-%s ( -- )\n\t%s %d CELLS 0 DO\n i %s +!\nLOOP ;\ninicializar-%s\n", 
                                                         $2.code, $3.value, $2.code, $2.code, $3.value, $2.code,$2.code);
                                                         $$.trad = gen_code(temp);
                                                         }
@@ -140,7 +140,7 @@ definicion: DEFVAR variable restodef                 { if ($3.type == 0) { // IN
                                                         $$.trad = gen_code(temp);
                                                         }
                                                         else { // VECTOR CASE
-                                                        sprintf(temp, "CREATE %s %d ALLOT\n: inicializar-%s ( -- )\n\t%s %d CELLS 0 DO\n i %s +!\nLOOP;\ninicializar-%s\n%s", 
+                                                        sprintf(temp, "CREATE %s %d ALLOT\n: inicializar-%s ( -- )\n\t%s %d CELLS 0 DO\n i %s +!\nLOOP ;\ninicializar-%s\n%s", 
                                                         $4.code, $5.value, $4.code, $4.code, $5.value, $4.code, $4.code, $8.trad);
                                                         $$.trad = gen_code(temp);
                                                         }
@@ -215,7 +215,7 @@ print: PRINT restoprint                        { $$ = $2; }
         ;
 
 restoprint: STRING                             {
-                                                sprintf(temp, ".\"%s\"\n", $1.code);
+                                                sprintf(temp, "S\" %s\" TYPE\n", $1.code);
                                                 $$.trad = gen_code(temp);
                                                 }
             | expresion                         { 

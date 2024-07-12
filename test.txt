@@ -1,16 +1,17 @@
 int a;
 int vec1[10];
 
-int fun1(int b, int vec[10]){
-    b = b + 3;
+int fun1(int a, int vec1[10]){
+    a = a + 3;
 }
 
 int main(){
     fun1(a, vec1);
-    return 3;
+    
     puts("Hola mundo");
     printf("%d", 7);
     printf("%d", (7+1));
+    return 3;
     while (a < 5){
         a = a + 1;
     } 

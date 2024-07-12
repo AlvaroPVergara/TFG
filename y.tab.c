@@ -1550,7 +1550,7 @@ yyreduce:
   case 14:
 #line 101 "lispToForth/tradForth.y"
                                                 {                              
-                                                sprintf(temp, ": %s (%s-- n )\n%s;\n", yyvsp[-6].code, yyvsp[-3].trad, yyvsp[-1].trad);
+                                                sprintf(temp, ": %s ( %s-- n )\n%s;\n", yyvsp[-6].code, yyvsp[-3].trad, yyvsp[-1].trad);
                                                 yyval.trad = gen_code(temp);
                                                 act_function = ""; //TODO: REMOVE IF NOT USED
                                                 }
@@ -1588,7 +1588,7 @@ yyreduce:
 
                                                         }
                                                         else { // VECTOR CASE
-                                                        sprintf(temp, "CREATE %s %d ALLOT\n: inicializar-%s ( -- )\n\t%s %d CELLS 0 DO\n i %s +!\nLOOP;\ninicializar-%s\n", 
+                                                        sprintf(temp, "CREATE %s %d ALLOT\n: inicializar-%s ( -- )\n\t%s %d CELLS 0 DO\n i %s +!\nLOOP ;\ninicializar-%s\n", 
                                                         yyvsp[-1].code, yyvsp[0].value, yyvsp[-1].code, yyvsp[-1].code, yyvsp[0].value, yyvsp[-1].code,yyvsp[-1].code);
                                                         yyval.trad = gen_code(temp);
                                                         }
@@ -1604,7 +1604,7 @@ yyreduce:
                                                         yyval.trad = gen_code(temp);
                                                         }
                                                         else { // VECTOR CASE
-                                                        sprintf(temp, "CREATE %s %d ALLOT\n: inicializar-%s ( -- )\n\t%s %d CELLS 0 DO\n i %s +!\nLOOP;\ninicializar-%s\n%s", 
+                                                        sprintf(temp, "CREATE %s %d ALLOT\n: inicializar-%s ( -- )\n\t%s %d CELLS 0 DO\n i %s +!\nLOOP ;\ninicializar-%s\n%s", 
                                                         yyvsp[-4].code, yyvsp[-3].value, yyvsp[-4].code, yyvsp[-4].code, yyvsp[-3].value, yyvsp[-4].code, yyvsp[-4].code, yyvsp[0].trad);
                                                         yyval.trad = gen_code(temp);
                                                         }
@@ -1718,7 +1718,7 @@ yyreduce:
   case 32:
 #line 217 "lispToForth/tradForth.y"
                                                {
-                                                sprintf(temp, ".\" %s\"\n", yyvsp[0].code);
+                                                sprintf(temp, "S\" %s\" TYPE\n", yyvsp[0].code);
                                                 yyval.trad = gen_code(temp);
                                                 }
 #line 1725 "y.tab.c"
