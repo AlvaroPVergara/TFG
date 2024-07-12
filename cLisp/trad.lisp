@@ -5,6 +5,7 @@
 )
 (defun main () 
 (fun1 a *vec1*)
+(return-from main 3)
 (loop while  (< a 5)  do 
 (setq a (+ a 1))
 )

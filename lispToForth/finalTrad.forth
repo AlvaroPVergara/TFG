@@ -6,13 +6,15 @@ CREATE vec1 10 ALLOT
  i vec1 +!
 LOOP;
 inicializar-vec1
-: fun1 (b vec  -- )
+: fun1 (b vec  -- n )
 b @ 3 + b !
 ;
-: main ( -- )
+: main ( -- n )
 a @
 vec1 @
 fun1
+3
+EXIT
 BEGIN
 a @ 5 < WHILE
 a @ 1 + a !

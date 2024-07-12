@@ -11,7 +11,7 @@ char *my_malloc (int nbytes) ;
 
 char temp [2048] ;
 char *concat_ptr;
-char *last_return = "";
+
 char *act_function = "";
 
 
@@ -92,17 +92,16 @@ sentencia:   '(' definicion ')'                 { $$=$2; }
             | '(' llamada ')'                   { $$=$2; }
             | '(' deffuncion                    { $$=$2; }
             | PRINT STRING                      { ; }
-            | RETURN sentencia                  { ; }
+            | '(' returnfrom ')'                { $$=$2; }
             ;
 
 // FUNCIONES
 deffuncion: DEFUN IDENTIF                       { act_function = $2.code; }
             '(' argumentosfun ')' instrucciones ')' 
                                                 {                              
-                                                sprintf(temp, ": %s (%s-- %s)\n%s;\n", $2.code, $5.trad, last_return, $7.trad);
+                                                sprintf(temp, ": %s (%s-- n )\n%s;\n", $2.code, $5.trad, $7.trad);
                                                 $$.trad = gen_code(temp);
-                                                last_return = "";
-                                                act_function = "";
+                                                act_function = ""; //TODO: REMOVE IF NOT USED
                                                 }
 
             ;
@@ -112,6 +111,14 @@ argumentosfun:                                  { $$.trad =" "; } // lambda
                                                 $$.trad = gen_code(temp); 
                                                 }
                 ;
+
+
+// RETURN
+returnfrom: RETURN '-' FROM IDENTIF expresion  { 
+                                                sprintf(temp, "%s\nEXIT\n", $5.trad);
+                                                $$.trad = gen_code(temp);
+                                                }
+            ;
 
 
 // DEFINICIONES
@@ -439,7 +446,7 @@ typedef struct s_keyword { // para las palabras reservadas de C
 } t_keyword ;
 
 t_keyword keywords[] = {
-    {"setq", SETQ}, {"setf", SETF}, {"aref", AREF}, {"return-", RETURN}, {"from", FROM},
+    {"setq", SETQ}, {"setf", SETF}, {"aref", AREF}, {"return", RETURN}, {"from", FROM},
     {"while", WHILE}, {"loop", LOOP}, {"if", IF}, {"do", DO}, {"defvar", DEFVAR}, 
     {"make", MAKE}, {"array", ARRAY}, {"progn", PROGN}, {"defun", DEFUN},
     {"and", AND}, {"or", OR}, {"<=", LEQ}, {">=", GEQ}, 

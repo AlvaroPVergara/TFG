@@ -329,10 +329,12 @@ void recursiveAstToLisp(struct nodoAST* node){
             isMain = strcmp(node->nombre, "main") == 0;
             writeFile("(defun ");
             writeFile(node->nombre);
+            // Args
             writeFile(" (");
             node = node -> primer_nodo;
             recursiveAstToLisp(node);
             writeFile(") \n");
+            //rest of the function
             node = node -> siguiente_hermano;
             recursiveAstToLisp(node);
             while (node->siguiente_hermano != NULL)
