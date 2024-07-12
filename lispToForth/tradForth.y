@@ -91,7 +91,7 @@ sentencia:   '(' definicion ')'                 { $$=$2; }
             | '(' bucle ')'                     { $$=$2; }
             | '(' llamada ')'                   { $$=$2; }
             | '(' deffuncion                    { $$=$2; }
-            | PRINT STRING                      { ; }
+            | '(' print ')'                     { $$=$2; }
             | '(' returnfrom ')'                { $$=$2; }
             ;
 
@@ -210,10 +210,28 @@ argumentos:                                      { $$.trad = ""; } // lambda
                                                 }
             ;
 
+// PRINT
+print: PRINT restoprint                        { $$ = $2; }
+        ;
+
+restoprint: STRING                             {
+                                                sprintf(temp, ".\"%s\"\n", $1.code);
+                                                $$.trad = gen_code(temp);
+                                                }
+            | expresion                         { 
+                                                if (strcmp($1.code, "variable") == 0){
+                                                    sprintf(temp, "%s @ .\n", $1.trad);
+                                                }
+                                                else{
+                                                    sprintf(temp, "%s .\n", $1.trad);
+                                                }
+                                                $$.trad = gen_code(temp);
+                                                }
+            ;
+
+
 
 // OPERACIONES
-
-
 
 expresion:          operando                     { $$=$1; }
                 |   '(' '+' expresion expresion ')' { 

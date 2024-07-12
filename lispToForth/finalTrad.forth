@@ -15,6 +15,9 @@ vec1 @
 fun1
 3
 EXIT
+." Hola mundo"
+7 .
+7 1 + .
 BEGIN
 a @ 5 < WHILE
 a @ 1 + a !

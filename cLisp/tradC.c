@@ -263,6 +263,11 @@ void recursiveAstToLisp(struct nodoAST* node){
             writeFile(node->primer_nodo->nombre);
             writeFile("\")\n");
 
+        } else if (strcmp(node->nombre, "printf") == 0) {
+            writeFile("(print ");
+            recursiveAstToLisp(node->primer_nodo);
+            writeFile(")\n");
+
         } else if (strcmp(node->nombre, "suma-elementos") == 0) {
             // We traduce our created function to understandable lisp
 

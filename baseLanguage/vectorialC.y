@@ -406,16 +406,17 @@ recSentenciaCond:   '}'                                             {printf(")\n
 
 
 sentencia:   asignacion  ';'                                  { $$ = $1; }
-/*
-            | PRINTF '(' STRING ',' expresion printRec ')' ';'  { if ($6.code) {
-                                                                    sprintf (temp, "(print %s) %s", $5.code, $6.code);
-                                                                 } else {
+
+            | PRINTF '(' STRING ',' expresion ')' ';'           { 
+                                                                    // Nodo AST
+                                                                    struct nodoAST *nodoPrint = crearNodoIntermedioGenerico("printf", 1, $5.nodo);
+                                                                    $$.nodo = nodoPrint;
+                                                                    // Notación prefija
                                                                     sprintf (temp, "(print %s)", $5.code);
-                                                                 }
-                                                                $$.code = gen_code (temp) ; 
+                                                                    $$.code = gen_code (temp) ; 
                                                                 }
                                                        
-*/
+
             | PUTS '('  STRING  ')' ';'                         { sprintf(temp, "(print \"%s\")",$3.code);
                                                                 $$.prefija = gen_code (temp) ; 
                                                                 struct nodoAST* nodoString = crearNodoString($3.code);

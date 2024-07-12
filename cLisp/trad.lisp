@@ -6,6 +6,9 @@
 (defun main () 
 (fun1 a *vec1*)
 (return-from main 3)
+(print "Hola mundo")
+(print 7)
+(print (+ 7 1))
 (loop while  (< a 5)  do 
 (setq a (+ a 1))
 )
