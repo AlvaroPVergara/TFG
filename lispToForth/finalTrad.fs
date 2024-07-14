@@ -1,26 +1,26 @@
 VARIABLE a
 0 a !
-CREATE vec1 10 ALLOT
-: inicializar-vec1 ( -- )
-	vec1 10 CELLS 0 DO
- i vec1 +!
+VARIABLE b
+0 b !
+CREATE vector 10 ALLOT
+: inicializar-vector ( -- )
+	vector 10 CELLS 0 DO
+ i vector +!
 LOOP ;
-inicializar-vec1
-: fun1 ( a vec1  -- n )
-a @ 3 + a !
+inicializar-vector
+: fun1 (  -- n )
+1 a !
+LOCALS| x |
+0 x !
+10 x !
+;
+: fun2 ( numero  -- n )
+3 1 > b !
 ;
 : main (  -- n )
-a @
-vec1 @
-fun1
+LOCALS| c |
+0 c !
 S" Hola mundo" TYPE
-7 .
-7 1 + .
-3
-EXIT
-BEGIN
-a @ 5 < WHILE
-a @ 1 + a !
-REPEAT
+c
 ;
 main

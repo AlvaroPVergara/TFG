@@ -93,6 +93,9 @@ sentencia:   '(' definicion ')'                 { $$=$2; }
             | '(' deffuncion                    { $$=$2; }
             | '(' print ')'                     { $$=$2; }
             | '(' returnfrom ')'                { $$=$2; }
+            | variable                          { sprintf(temp, "%s\n", $1.code); 
+                                                    $$.trad = gen_code(temp); 
+                                                }
             ;
 
 // FUNCIONES
@@ -134,9 +137,9 @@ definicion: DEFVAR variable restodef                 { if ($3.type == 0) { // IN
                                                         }
                                                     }
             |  LET '(' '(' variable restodef ')' ')' 
-            instrucciones                           {   // For simlicity, we ignore the use of local variables
+            instrucciones                           {   
                                                         if ($5.type == 0) { // INT CASE
-                                                        sprintf(temp, "VARIABLE %s\n%d %s !\n%s", $4.code, $5.value, $4.code, $8.trad);
+                                                        sprintf(temp, "LOCALS| %s |\n%d %s !\n%s", $4.code, $5.value, $4.code, $8.trad);
                                                         $$.trad = gen_code(temp);
                                                         }
                                                         else { // VECTOR CASE
@@ -159,6 +162,10 @@ restodef:   expresion                                { $$.type = 0;
 // ASIGNACIONES
 asignacion:   SETQ variable expresion                           { 
                                                                 sprintf(temp, "%s %s !\n", $3.trad, $2.code); 
+                                                                $$.trad = gen_code(temp);
+                                                                }
+            | SETQ variable '(' condicion                       { 
+                                                                sprintf(temp, "%s %s !\n", $4.trad, $2.code); 
                                                                 $$.trad = gen_code(temp);
                                                                 }
             | SETF '(' AREF variable expresion ')' expresion    { 
