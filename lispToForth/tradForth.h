@@ -6,6 +6,8 @@
 #include <string.h>
 #include <stdlib.h> 
 
+#include "../dataStructures/TS.h"
+
 void writeFile(const char* text);
 void cleanFile();
 

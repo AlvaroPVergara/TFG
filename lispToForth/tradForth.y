@@ -13,6 +13,10 @@ char temp [2048] ;
 char *concat_ptr;
 
 char *act_function = "";
+char* vars_locales = "";
+Symbol **tabla = NULL;
+Symbol* sym = NULL;
+int long_variable = 0;
 
 
 typedef struct s_attr {
@@ -75,7 +79,10 @@ typedef struct s_attr {
                         // SECCION 3: Gramatica - Semantico 
 
 
-axioma: instrucciones                             { writeFile($1.trad); } 
+axioma: instrucciones                             {
+                                                    writeFile($1.trad); 
+                                                    destroySymbolTable(tabla);
+                                                  } 
         ;
 
 instrucciones:                                    { $$.trad = ""; } // lambda
@@ -93,6 +100,7 @@ sentencia:   '(' definicion ')'                 { $$=$2; }
             | '(' deffuncion                    { $$=$2; }
             | '(' print ')'                     { $$=$2; }
             | '(' returnfrom ')'                { $$=$2; }
+            | '(' incf ')'                      { $$=$2; }
             | variable                          { sprintf(temp, "%s\n", $1.code); 
                                                     $$.trad = gen_code(temp); 
                                                 }
@@ -101,10 +109,15 @@ sentencia:   '(' definicion ')'                 { $$=$2; }
 // FUNCIONES
 deffuncion: DEFUN IDENTIF                       { act_function = $2.code; }
             '(' argumentosfun ')' instrucciones ')' 
-                                                {                              
-                                                sprintf(temp, ": %s ( %s-- n )\n%s;\n", $2.code, $5.trad, $7.trad);
+                                                {         
+                                                if (tabla == NULL){
+                                                    tabla = initSymbolTable();
+                                                }
+                                                vars_locales = getSymbolsByType(tabla, act_function);                     
+                                                sprintf(temp, ": %s ( %s %s -- n )\n%s;\n", $2.code, $5.trad, vars_locales ,$7.trad);
                                                 $$.trad = gen_code(temp);
-                                                act_function = ""; //TODO: REMOVE IF NOT USED
+                                                act_function = "";
+                                                vars_locales = ""; 
                                                 }
 
             ;
@@ -125,22 +138,29 @@ returnfrom: RETURN '-' FROM IDENTIF expresion  {
 
 
 // DEFINICIONES
-definicion: DEFVAR variable restodef                 { if ($3.type == 0) { // INT CASE
+definicion: DEFVAR variable restodef                 { 
+                                                        if (tabla == NULL){
+                                                            tabla = initSymbolTable();
+                                                        }
+                                                        if ($3.type == 0) { // INT CASE
                                                         sprintf(temp, "VARIABLE %s\n%d %s !\n", $2.code, $3.value, $2.code);
                                                         $$.trad = gen_code(temp);
+                                                        
+                                                        insertSymbol(tabla, $2.code, "global", 0, 0);
 
                                                         }
                                                         else { // VECTOR CASE
-                                                        sprintf(temp, "CREATE %s %d ALLOT\n: inicializar-%s ( -- )\n\t%s %d CELLS 0 DO\n i %s +!\nLOOP ;\ninicializar-%s\n", 
-                                                        $2.code, $3.value, $2.code, $2.code, $3.value, $2.code,$2.code);
+                                                        sprintf(temp, "CREATE %s %d CELLS ALLOT\n: init-vector ( -- )\n%s %d 0 DO\n0 over I CELLS + !\nLOOP\n DROP ;\ninit-vector\n", $2.code, $3.value, $2.code, $3.value);
                                                         $$.trad = gen_code(temp);
+                                                        insertSymbol(tabla, $2.code, "global", $3.value, 0);
                                                         }
+                                                        
                                                     }
             |  LET '(' '(' variable restodef ')' ')' 
             instrucciones                           {   
                                                         if ($5.type == 0) { // INT CASE
-                                                        sprintf(temp, "LOCALS| %s |\n%d %s !\n%s", $4.code, $5.value, $4.code, $8.trad);
-                                                        $$.trad = gen_code(temp);
+                                                        $$.trad = "";
+                                                        insertSymbol(tabla, $4.code, act_function, 0, 0);
                                                         }
                                                         else { // VECTOR CASE
                                                         sprintf(temp, "CREATE %s %d ALLOT\n: inicializar-%s ( -- )\n\t%s %d CELLS 0 DO\n i %s +!\nLOOP ;\ninicializar-%s\n%s", 
@@ -194,6 +214,14 @@ bucle:   LOOP WHILE  expresion  DO instrucciones  {
                                                         sprintf(temp, "BEGIN\n%s WHILE\n%sREPEAT\n", $3.trad, $5.trad);   
                                                         $$.trad = gen_code(temp); 
                                                         }
+        | DOTIMES '(' variable '(' LENGTH variable')' variable ')'
+         instrucciones                            { 
+                                                    sym = searchSymbol(tabla, $6.code);
+                                                    long_variable = sym -> size_array;
+                                                    sprintf(temp, "%d 0 DO\n%sLOOP\n", long_variable, $10.trad);
+                                                    $$.trad = gen_code(temp); 
+
+                                                  }
 
 
 
@@ -235,6 +263,14 @@ restoprint: STRING                             {
                                                 $$.trad = gen_code(temp);
                                                 }
             ;
+
+// INCREMENTO
+incf: INCF  variable '(' AREF variable expresion ')' { 
+                                                    sprintf(temp, "S\" VALOR A SUMAR \" TYPE\n over i cells + @ . \n");
+
+                                                    $$.trad = gen_code(temp); // TODO: REVISAR
+                                                    }
+    ;
 
 
 

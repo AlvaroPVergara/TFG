@@ -4,15 +4,18 @@ int vector[10];
 
 
 int fun1(){
-    a = 1;
-    int x;
-    x = 10;
+    vector[4] = 5;
+    vector[7] = 29;
+    vector[0] = 1;
 }
 int fun2(){
     b = (3 > 1);
 }
 int main(){
+    fun1();
     int c;
+    sumarelementos(c, vector);
+    printf("%s", c);
     puts("Hola mundo");
     return c;
 }

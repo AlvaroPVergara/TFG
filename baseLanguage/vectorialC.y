@@ -247,7 +247,9 @@ funcionesDefRec:                                    { $$.prefija = ""; //Lambda
                                                     }
                 ;
 
-funcionArgs:                                { $$.prefija = ""; }
+funcionArgs:                                       { $$.prefija = ""; 
+                                                    $$.nodo = NULL;
+                                                    }
             |  INTEGER IDENTIF isVector recArgFunct {       // Nodo AST
                                                             struct nodoAST* nodoVar = NULL;         
                                                             if ($3.code){

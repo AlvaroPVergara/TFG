@@ -22,7 +22,11 @@ Symbol* createSymbol(const char *name, const char *type, int size_array, int arr
 // Inserta un símbolo en la tabla
 void insertSymbol(Symbol **symTable, const char *name, const char *type, int size_array, int array_pos) {
     unsigned int index = hash(name);
-    
+    if (symTable == NULL) {
+        printf("Tabla de símbolos no inicializada.\n");
+        return;
+    }
+
     // Verifica si el índice está ocupado
     if (symTable[index] == NULL) {
         // Espacio libre, crea un nuevo símbolo
@@ -45,6 +49,18 @@ Symbol* searchSymbol(Symbol **symTable, const char *name) {
         // Puedes manejar colisiones o simplemente devolver NULL
         return NULL;
     }
+}
+
+char * getSymbolsByType(Symbol **symTable, const char *type) {
+    char *result = (char*)malloc(255);
+    strcpy(result, "");
+    for (int i = 0; i < TABLE_SIZE; ++i) {
+        if (symTable[i] != NULL && strcmp(symTable[i]->type, type) == 0) {
+            strcat(result, symTable[i]->name);
+            strcat(result, " ");
+        }
+    }
+    return result;
 }
 
 // Libera la memoria de la tabla de símbolos

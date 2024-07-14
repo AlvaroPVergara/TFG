@@ -22,5 +22,8 @@ typedef struct SymbolTable {
 
 void semanticAnalysis(struct nodoAST* raiz, Symbol **symTable);
 Symbol** initSymbolTable();
+void insertSymbol(Symbol **symTable, const char *name, const char *type, int size_array, int array_pos);
+Symbol* searchSymbol(Symbol **symTable, const char *name);
+char * getSymbolsByType(Symbol **symTable, const char *type);
 void destroySymbolTable(Symbol **symTable);
 #endif // TS_H

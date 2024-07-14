@@ -4,6 +4,6 @@ all:
 	baseLanguage/vectorialC < test.txt
 	sbcl --script cLisp/trad.lisp
 	yacc -d -v lispToForth/tradForth.y
-	gcc -Wall y.tab.c lispToForth/fileForth.c -o lispToForth/tradForth
+	gcc -Wall y.tab.c dataStructures/TS.c lispToForth/fileForth.c -o lispToForth/tradForth
 	lispToForth/tradForth < cLisp/trad.lisp
 	echo bye | gforth lispToForth/finalTrad.fs
