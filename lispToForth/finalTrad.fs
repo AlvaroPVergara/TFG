@@ -9,15 +9,27 @@ vector 10 0 DO
 LOOP
  DROP ;
 init-vector
-: fun1 (    -- n )
+: fun1 (   -- n )
 5 4 CELLS vector + !
 29 7 CELLS vector + !
 1 0 CELLS vector + !
 ;
-: fun2 (    -- n )
+: fun2 (   -- n )
 3 1 > b !
 ;
-: main (   c  -- n )
+: main (   -- n )
 fun1
+0 LOCALS| c |
+0 LOCALS| d |
+5 to c
+10 to d
+0 to c
+10 0 DO
+i CELLS vector + @
+c + to c
+LOOP
+c .
+S" Hola mundo" TYPE
+c
 ;
 main

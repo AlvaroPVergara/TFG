@@ -13,7 +13,6 @@ char temp [2048] ;
 char *concat_ptr;
 
 char *act_function = "";
-char* vars_locales = "";
 Symbol **tabla = NULL;
 Symbol* sym = NULL;
 int long_variable = 0;
@@ -109,15 +108,10 @@ sentencia:   '(' definicion ')'                 { $$=$2; }
 // FUNCIONES
 deffuncion: DEFUN IDENTIF                       { act_function = $2.code; }
             '(' argumentosfun ')' instrucciones ')' 
-                                                {         
-                                                if (tabla == NULL){
-                                                    tabla = initSymbolTable();
-                                                }
-                                                vars_locales = getSymbolsByType(tabla, act_function);                     
-                                                sprintf(temp, ": %s ( %s %s -- n )\n%s;\n", $2.code, $5.trad, vars_locales ,$7.trad);
+                                                {                              
+                                                sprintf(temp, ": %s ( %s -- n )\n%s;\n", $2.code, $5.trad ,$7.trad);
                                                 $$.trad = gen_code(temp);
                                                 act_function = "";
-                                                vars_locales = ""; 
                                                 }
 
             ;
@@ -138,33 +132,40 @@ returnfrom: RETURN '-' FROM IDENTIF expresion  {
 
 
 // DEFINICIONES
-definicion: DEFVAR variable restodef                 { 
+definicion: DEFVAR variable restodef                    { 
                                                         if (tabla == NULL){
                                                             tabla = initSymbolTable();
                                                         }
                                                         if ($3.type == 0) { // INT CASE
-                                                        sprintf(temp, "VARIABLE %s\n%d %s !\n", $2.code, $3.value, $2.code);
-                                                        $$.trad = gen_code(temp);
-                                                        
                                                         insertSymbol(tabla, $2.code, "global", 0, 0);
+                                                        sprintf(temp, "VARIABLE %s\n%d %s !\n", $2.code, $3.value, $2.code);
+                                                        $$.trad = gen_code(temp);      
 
                                                         }
                                                         else { // VECTOR CASE
+                                                        insertSymbol(tabla, $2.code, "global", $3.value, 0);
                                                         sprintf(temp, "CREATE %s %d CELLS ALLOT\n: init-vector ( -- )\n%s %d 0 DO\n0 over I CELLS + !\nLOOP\n DROP ;\ninit-vector\n", $2.code, $3.value, $2.code, $3.value);
                                                         $$.trad = gen_code(temp);
-                                                        insertSymbol(tabla, $2.code, "global", $3.value, 0);
                                                         }
                                                         
                                                     }
-            |  LET '(' '(' variable restodef ')' ')' 
+            |  LET '(' '(' variable restodef ')' ')'
+                                                    { if ($5.type == 0) { // INT CASE
+                                                            insertSymbol(tabla, $4.code, "local", 0, 0);
+                                                        }
+                                                        else { // VECTOR CASE
+                                                            insertSymbol(tabla, $4.code, "local", $5.value, 0);
+                                                        }
+                                                    }
             instrucciones                           {   
                                                         if ($5.type == 0) { // INT CASE
-                                                        $$.trad = "";
-                                                        insertSymbol(tabla, $4.code, act_function, 0, 0);
+                                                        sprintf(temp, "%d LOCALS| %s |\n%s", $5.value, $4.code,  $9.trad);
+                                                        $$.trad = gen_code(temp);
+                                                        
                                                         }
                                                         else { // VECTOR CASE
                                                         sprintf(temp, "CREATE %s %d ALLOT\n: inicializar-%s ( -- )\n\t%s %d CELLS 0 DO\n i %s +!\nLOOP ;\ninicializar-%s\n%s", 
-                                                        $4.code, $5.value, $4.code, $4.code, $5.value, $4.code, $4.code, $8.trad);
+                                                        $4.code, $5.value, $4.code, $4.code, $5.value, $4.code, $4.code, $9.trad);
                                                         $$.trad = gen_code(temp);
                                                         }
 
@@ -181,7 +182,17 @@ restodef:   expresion                                { $$.type = 0;
 
 // ASIGNACIONES
 asignacion:   SETQ variable expresion                           { 
-                                                                sprintf(temp, "%s %s !\n", $3.trad, $2.code); 
+                                                                sym = searchSymbol(tabla, $2.code);
+                                                                if (sym == NULL) {
+                                                                    yyerror("Variable no declarada");
+                                                                } else if (strcmp(sym->type, "global")== 0){
+                                                                    sprintf(temp, "%s %s !\n", $3.trad, $2.code); 
+
+                                                                } else if (strcmp(sym->type, "local")== 0){
+                                                                    sprintf(temp, "%s to %s\n", $3.trad, $2.code);
+
+                                                                }
+
                                                                 $$.trad = gen_code(temp);
                                                                 }
             | SETQ variable '(' condicion                       { 
@@ -255,7 +266,16 @@ restoprint: STRING                             {
                                                 }
             | expresion                         { 
                                                 if (strcmp($1.code, "variable") == 0){
-                                                    sprintf(temp, "%s @ .\n", $1.trad);
+                                                    sym = searchSymbol(tabla, $1.trad);
+                                                    if (sym == NULL) {
+                                                        yyerror("Variable no declarada");
+                                                        sprintf(temp, "%s @ .\n", $1.trad);
+                                                    } else if (strcmp(sym->type, "global")== 0){
+                                                        sprintf(temp, "%s @ .\n", $1.trad);
+                                                    } else if (strcmp(sym->type, "local")== 0){
+                                                        sprintf(temp, "%s .\n", $1.trad);
+                                                    }
+
                                                 }
                                                 else{
                                                     sprintf(temp, "%s .\n", $1.trad);
@@ -266,8 +286,14 @@ restoprint: STRING                             {
 
 // INCREMENTO
 incf: INCF  variable '(' AREF variable expresion ')' { 
-                                                    sprintf(temp, "S\" VALOR A SUMAR \" TYPE\n over i cells + @ . \n");
-
+                                                    sym = searchSymbol(tabla, $2.code);
+                                                    if (sym == NULL) {
+                                                        yyerror("Variable no declarada");
+                                                    } else if (strcmp(sym->type, "global")== 0){
+                                                        sprintf(temp, "i CELLS %s + @\n%s + %s !\n", $5.code, $2.code, $2.code );
+                                                    } else if (strcmp(sym->type, "local")== 0){
+                                                        sprintf(temp, "i CELLS %s + @\n%s + to %s\n", $5.code, $2.code, $2.code );
+                                                    }
                                                     $$.trad = gen_code(temp); // TODO: REVISAR
                                                     }
     ;
