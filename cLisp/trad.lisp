@@ -11,6 +11,9 @@
 (print *vector*)
 (coerce (reverse (coerce *vector* 'list)) 'vector)
 (print *vector*)
+(dotimes (i (length *vector*))
+(setf (aref *vector* i) (+ (aref *vector* i) 1)))
+(print *vector*)
 (print "Hola mundo")
 a
 )

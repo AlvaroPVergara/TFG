@@ -264,6 +264,14 @@ bucle:   LOOP WHILE  expresion  DO instrucciones  {
                                                     $$.trad = gen_code(temp); 
 
                                                   }
+        | DOTIMES '(' variable '(' LENGTH variable')' ')'
+         instrucciones                            { 
+                                                    sym = searchSymbol(tabla, $6.code);
+                                                    long_variable = sym -> size_array;
+                                                    sprintf(temp, "%d 0 DO\n%sLOOP\n", long_variable, $9.trad);
+                                                    $$.trad = gen_code(temp); 
+
+                                                  }
 
 
 
@@ -529,6 +537,11 @@ operando:       NUMBER                          { sprintf(temp, "%d", $1.value);
                 | variable                      { 
 
                                                 sprintf(temp, "%s", $1.code);
+                                                $$.trad = gen_code(temp);
+                                                $$.code = "variable";
+                                                }
+                | AREF variable expresion    { 
+                                                sprintf(temp, "%s %s CELLS + @", $3.trad, $2.code);
                                                 $$.trad = gen_code(temp);
                                                 $$.code = "variable";
                                                 }
