@@ -2,7 +2,7 @@
 
 
 char* FILENAME = "cLisp/trad.lisp";
-char temp [2048];
+char temporal [2048];
 int local_var_counter = 0;
 
 
@@ -382,8 +382,8 @@ void recursiveAstToLisp(struct nodoAST* node){
         if (strcmp(node -> tipo_variable, "vector") == 0 || strcmp(node -> tipo_variable, "global-vector") == 0){
             writeFile("(make-array ");
         }
-        sprintf(temp, "%d", node->valor);
-        writeFile(temp);
+        sprintf(temporal, "%d", node->valor);
+        writeFile(temporal);
 
         if ((strcmp(node -> tipo_variable, "vector") == 0) || strcmp(node -> tipo_variable, "global-vector") == 0){
             writeFile(")");
@@ -408,8 +408,8 @@ void recursiveAstToLisp(struct nodoAST* node){
         break;
 
     case NODO_HOJA_NUMERO:
-        sprintf(temp, "%d", node->valor);
-        writeFile(temp);
+        sprintf(temporal, "%d", node->valor);
+        writeFile(temporal);
         break;
 
     case NODO_HOJA_SIGNO:

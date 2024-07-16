@@ -14,22 +14,16 @@ init-vector
 29 7 CELLS vector + !
 1 0 CELLS vector + !
 ;
-: fun2 (   -- n )
-3 1 > b !
-;
 : main (   -- n )
 fun1
-0 LOCALS| c |
-0 LOCALS| d |
-5 to c
-10 to d
-0 to c
 10 0 DO
-i CELLS vector + @
-c + to c
+I CELLS vector + @
+I CELLS vector + @
+*
+ a @ + a !
 LOOP
-c .
+a @ .
 S" Hola mundo" TYPE
-c
+a
 ;
 main

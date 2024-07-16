@@ -65,6 +65,8 @@ typedef struct s_attr {
 %token LENGTH
 %token INCF
 %token REDUCE
+%token MAP
+%token LIST
 
 
 
@@ -198,11 +200,37 @@ asignacion:   SETQ variable expresion                           {
             | SETQ variable '(' condicion                       { 
                                                                 sprintf(temp, "%s %s !\n", $4.trad, $2.code); 
                                                                 $$.trad = gen_code(temp);
-                                                                }
+                                                                }         
             | SETF '(' AREF variable expresion ')' expresion    { 
                                                                 sprintf(temp, "%s %s CELLS %s + !\n", $7.trad, $5.trad, $4.code);
                                                                 $$.trad = gen_code(temp);
                                                                 }   
+            // PRODUCTO ESCALAR
+            | SETQ variable '(' REDUCE '#' '\'' '+' '(' 
+            MAP '\'' LIST '#' '\'' '*' variable variable ')' ')' { 
+                                                                sym = searchSymbol(tabla, $2.code);
+                                                                if (sym == NULL) {
+                                                                    yyerror("Variable no declarada");
+                                                                } else if (strcmp(sym->type, "global")== 0){
+                                                                    sym = searchSymbol(tabla, $15.code);
+                                                                    if (sym == NULL) {
+                                                                        yyerror("Variable no declarada");
+                                                                    } else{
+                                                                        sprintf(temp,"%d 0 DO\nI CELLS %s + @\nI CELLS %s + @\n*\n %s @ + %s !\nLOOP\n", 
+                                                                        sym -> size_array, $15.code, $16.code, $2.code, $2.code);
+                                                                    }
+                                                    
+                                                                } else if (strcmp(sym->type, "local")== 0){
+                                                                    sym = searchSymbol(tabla, $15.code);
+                                                                    if (sym == NULL) {
+                                                                        yyerror("Variable no declarada");
+                                                                    } else{
+                                                                        sprintf(temp,"%d 0 DO\nI CELLS %s + @\nI CELLS %s + @\n*\n %s + to %s\nLOOP\n", 
+                                                                        sym -> size_array, $15.code, $16.code, $2.code, $2.code);
+                                                                    }
+                                                                }
+                                                                $$.trad = gen_code(temp);
+                                                                }
             ;
 
 // CONDICIONALES
@@ -538,7 +566,7 @@ t_keyword keywords[] = {
     {"make", MAKE}, {"array", ARRAY}, {"progn", PROGN}, {"defun", DEFUN},
     {"and", AND}, {"or", OR}, {"<=", LEQ}, {">=", GEQ}, 
     {"/=", NEQ}, {"let", LET}, {"print", PRINT}, {"dotimes", DOTIMES},
-    {"length", LENGTH}, {"incf", INCF}, {"reduce",REDUCE}, //TODO:COMPLETAR CON FUNCIONALIDADES ADICIONALES
+    {"length", LENGTH}, {"incf", INCF}, {"reduce",REDUCE}, {"map", MAP}, {"list", LIST},
     {NULL, 0} // Marca el fin de la tabla
 };
 
@@ -588,18 +616,13 @@ int yylex ()
     int i ;
     unsigned char c ;
     unsigned char cc ;
-    char expandable_ops [] = "!<=>|%/&+-*" ;
+    char expandable_ops [] = "!<=>|%/&+-*#\'" ;
     char temp_str [256] ;
     t_keyword *symbol ;
 
     do {
         c = getchar () ;
 
-        if (c == '#') {	// Ignora las lineas que empiezan por #  (#define, #include)
-            do {		//	OJO que puede funcionar mal si una linea contiene #
-                c = getchar () ;
-            } while (c != '\n') ;
-        }
 
         if (c == '/') {	// Si la linea contiene un / puede ser inicio de comentario
             cc = getchar () ;

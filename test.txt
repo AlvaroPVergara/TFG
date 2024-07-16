@@ -8,17 +8,10 @@ int fun1(){
     vector[7] = 29;
     vector[0] = 1;
 }
-int fun2(){
-    b = (3 > 1);
-}
 int main(){
     fun1();
-    int c;
-    int d;
-    c = 5;
-    d = 10;
-    sumarelementos(c, vector);
-    printf("%s", c);
+    productoescalar(a, vector, vector);
+    printf("%s", a);
     puts("Hola mundo");
-    return c;
+    return a;
 }
