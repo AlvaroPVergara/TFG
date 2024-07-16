@@ -10,8 +10,9 @@ int fun1(){
 }
 int main(){
     fun1();
-    productoescalar(a, vector, vector);
-    printf("%s", a);
+    printf("%s", vector[0]);
+    invertir(vector);
+    printf("%s", vector[0]);
     puts("Hola mundo");
     return a;
 }

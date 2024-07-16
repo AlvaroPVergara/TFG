@@ -84,7 +84,9 @@ extern int yydebug;
     INCF = 285,                    /* INCF  */
     REDUCE = 286,                  /* REDUCE  */
     MAP = 287,                     /* MAP  */
-    LIST = 288                     /* LIST  */
+    LIST = 288,                    /* LIST  */
+    COERCE = 289,                  /* COERCE  */
+    REVERSE = 290                  /* REVERSE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -124,6 +126,8 @@ extern int yydebug;
 #define REDUCE 286
 #define MAP 287
 #define LIST 288
+#define COERCE 289
+#define REVERSE 290
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED

@@ -16,13 +16,14 @@ init-vector
 ;
 : main (   -- n )
 fun1
-10 0 DO
+vector @ .
+10 2 / 0 DO
 I CELLS vector + @
-I CELLS vector + @
-*
- a @ + a !
+ 10 1 - I - CELLS vector + @
+I CELLS vector + !
+10 1 - I - CELLS vector + !
 LOOP
-a @ .
+vector @ .
 S" Hola mundo" TYPE
 a
 ;

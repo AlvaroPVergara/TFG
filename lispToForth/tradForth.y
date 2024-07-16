@@ -67,6 +67,8 @@ typedef struct s_attr {
 %token REDUCE
 %token MAP
 %token LIST
+%token COERCE
+%token REVERSE
 
 
 
@@ -102,6 +104,7 @@ sentencia:   '(' definicion ')'                 { $$=$2; }
             | '(' print ')'                     { $$=$2; }
             | '(' returnfrom ')'                { $$=$2; }
             | '(' incf ')'                      { $$=$2; }
+            | '(' invertir ')'                  { $$=$2; }
             | variable                          { sprintf(temp, "%s\n", $1.code); 
                                                     $$.trad = gen_code(temp); 
                                                 }
@@ -326,6 +329,20 @@ incf: INCF  variable '(' AREF variable expresion ')' {
                                                     }
     ;
 
+
+// INVERTIR VECTOR
+invertir: COERCE '(' REVERSE '(' COERCE variable '\'' LIST ')' ')' '\'' variable { 
+                                                    sym = searchSymbol(tabla, $6.code);
+                                                    if (sym == NULL) {
+                                                        yyerror("Variable no declarada");
+                                                        sprintf(temp, "\n");
+                                                    } else {
+                                                        sprintf(temp,"%d 2 / 0 DO\nI CELLS %s + @\n %d 1 - I - CELLS %s + @\nI CELLS %s + !\n%d 1 - I - CELLS %s + !\nLOOP\n",
+                                                        sym -> size_array, $6.code, sym -> size_array, $6.code, $6.code, sym -> size_array, $6.code);
+                                                    }
+                                                    $$.trad = gen_code(temp);
+                                                    }
+            ;
 
 
 // OPERACIONES
@@ -564,8 +581,8 @@ t_keyword keywords[] = {
     {"setq", SETQ}, {"setf", SETF}, {"aref", AREF}, {"return", RETURN}, {"from", FROM},
     {"while", WHILE}, {"loop", LOOP}, {"if", IF}, {"do", DO}, {"defvar", DEFVAR}, 
     {"make", MAKE}, {"array", ARRAY}, {"progn", PROGN}, {"defun", DEFUN},
-    {"and", AND}, {"or", OR}, {"<=", LEQ}, {">=", GEQ}, 
-    {"/=", NEQ}, {"let", LET}, {"print", PRINT}, {"dotimes", DOTIMES},
+    {"and", AND}, {"or", OR}, {"<=", LEQ}, {">=", GEQ}, {"/=", NEQ}, {"let", LET}, {"print", PRINT}, 
+    {"dotimes", DOTIMES}, {"coerce", COERCE}, {"reverse", REVERSE},
     {"length", LENGTH}, {"incf", INCF}, {"reduce",REDUCE}, {"map", MAP}, {"list", LIST},
     {NULL, 0} // Marca el fin de la tabla
 };

@@ -8,8 +8,9 @@
 )
 (defun main () 
 (fun1)
-(setq a (reduce #'+ (map 'list #'* *vector* *vector*)))
-(print a)
+(print *vector*)
+(coerce (reverse (coerce *vector* 'list)) 'vector)
+(print *vector*)
 (print "Hola mundo")
 a
 )
