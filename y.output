@@ -21,28 +21,28 @@ Grammar
    10          | '(' print ')'
    11          | '(' returnfrom ')'
    12          | '(' incf ')'
-   13          | '(' invertir ')'
-   14          | variable
+   13          | variable
 
-   15 $@1: ε
+   14 $@1: ε
 
-   16 deffuncion: DEFUN IDENTIF $@1 '(' argumentosfun ')' instrucciones ')'
+   15 deffuncion: DEFUN IDENTIF $@1 '(' argumentosfun ')' instrucciones ')'
 
-   17 argumentosfun: ε
-   18              | variable argumentosfun
+   16 argumentosfun: ε
+   17              | variable argumentosfun
 
-   19 returnfrom: RETURN '-' FROM IDENTIF expresion
+   18 returnfrom: RETURN '-' FROM IDENTIF expresion
 
-   20 definicion: DEFVAR variable restodef
+   19 definicion: DEFVAR variable restodef
 
-   21 $@2: ε
+   20 $@2: ε
 
-   22 definicion: LET '(' '(' variable restodef ')' ')' $@2 instrucciones
+   21 definicion: LET '(' '(' variable restodef ')' ')' $@2 instrucciones
 
-   23 restodef: expresion
-   24         | '(' MAKE '-' ARRAY expresion ')'
+   22 restodef: expresion
+   23         | '(' MAKE '-' ARRAY expresion ')'
 
-   25 asignacion: SETQ variable expresion
+   24 asignacion: SETQ variable expresion
+   25           | SETQ variable '(' invertir ')'
    26           | SETQ variable '(' condicion
    27           | SETF '(' AREF variable expresion ')' expresion
    28           | SETQ variable '(' REDUCE '#' '\'' '+' '(' MAP '\'' LIST '#' '\'' '*' variable variable ')' ')'
@@ -97,36 +97,36 @@ Terminals, with rules where they appear
     $end (0) 0
     '#' (35) 28
     '\'' (39) 28 42
-    '(' (40) 4 5 6 7 8 9 10 11 12 13 16 22 24 26 27 28 29 31 33 34 41 42 44 45 46 47 48 49 50 51 52 53 54 55 58
-    ')' (41) 4 5 7 8 10 11 12 13 16 22 24 27 28 29 30 31 33 34 41 42 44 45 46 47 48 49 50 51 52 53 54 55 58
+    '(' (40) 4 5 6 7 8 9 10 11 12 15 21 23 25 26 27 28 29 31 33 34 41 42 44 45 46 47 48 49 50 51 52 53 54 55 58
+    ')' (41) 4 5 7 8 10 11 12 15 21 23 25 27 28 29 30 31 33 34 41 42 44 45 46 47 48 49 50 51 52 53 54 55 58
     '*' (42) 28 46 60
     '+' (43) 28 44
-    '-' (45) 19 24 45
+    '-' (45) 18 23 45
     '/' (47) 47
     '<' (60) 51
     '=' (61) 50
     '>' (62) 52
     error (256)
     NUMBER (258) 56
-    IDENTIF (259) 16 19 35 59 60
+    IDENTIF (259) 15 18 35 59 60
     INTEGER (260)
     STRING (261) 39
-    DEFVAR (262) 20
-    SETQ (263) 25 26 28
+    DEFVAR (262) 19
+    SETQ (263) 24 25 26 28
     SETF (264) 27
     AREF (265) 27 41 58
-    MAKE (266) 24
-    ARRAY (267) 24
-    LET (268) 22
+    MAKE (266) 23
+    ARRAY (267) 23
+    LET (268) 21
     WHILE (269) 32
     LOOP (270) 32
     IF (271) 29
     PROGN (272) 29 31
     DO (273) 32
     PRINT (274) 38
-    DEFUN (275) 16
-    RETURN (276) 19
-    FROM (277) 19
+    DEFUN (275) 15
+    RETURN (276) 18
+    FROM (277) 18
     AND (278) 48
     OR (279) 49
     LEQ (280) 53
@@ -151,33 +151,33 @@ Nonterminals, with rules where they appear
         on right: 0
     instrucciones (49)
         on left: 2 3
-        on right: 1 3 16 22 29 31 32 33 34
+        on right: 1 3 15 21 29 31 32 33 34
     sentencia (50)
-        on left: 4 5 6 7 8 9 10 11 12 13 14
+        on left: 4 5 6 7 8 9 10 11 12 13
         on right: 3
     deffuncion (51)
-        on left: 16
+        on left: 15
         on right: 9
     $@1 (52)
-        on left: 15
-        on right: 16
+        on left: 14
+        on right: 15
     argumentosfun (53)
-        on left: 17 18
-        on right: 16 18
+        on left: 16 17
+        on right: 15 17
     returnfrom (54)
-        on left: 19
+        on left: 18
         on right: 11
     definicion (55)
-        on left: 20 22
+        on left: 19 21
         on right: 4
     $@2 (56)
-        on left: 21
-        on right: 22
+        on left: 20
+        on right: 21
     restodef (57)
-        on left: 23 24
-        on right: 20 22
+        on left: 22 23
+        on right: 19 21
     asignacion (58)
-        on left: 25 26 27 28
+        on left: 24 25 26 27 28
         on right: 5
     condicion (59)
         on left: 29
@@ -205,16 +205,16 @@ Nonterminals, with rules where they appear
         on right: 12
     invertir (67)
         on left: 42
-        on right: 13
+        on right: 25
     expresion (68)
         on left: 43 44 45 46 47 48 49 50 51 52 53 54 55
-        on right: 19 23 24 25 27 29 32 37 40 41 44 45 46 47 48 49 50 51 52 53 54 55 58
+        on right: 18 22 23 24 27 29 32 37 40 41 44 45 46 47 48 49 50 51 52 53 54 55 58
     operando (69)
         on left: 56 57 58
         on right: 43
     variable (70)
         on left: 59 60
-        on right: 14 18 20 22 25 26 27 28 33 34 41 42 57 58
+        on right: 13 17 19 21 24 25 26 27 28 33 34 41 42 57 58
 
 
 State 0
@@ -258,7 +258,6 @@ State 3
    10          | '(' • print ')'
    11          | '(' • returnfrom ')'
    12          | '(' • incf ')'
-   13          | '(' • invertir ')'
 
     IDENTIF  shift, and go to state 9
     DEFVAR   shift, and go to state 10
@@ -272,25 +271,23 @@ State 3
     RETURN   shift, and go to state 18
     DOTIMES  shift, and go to state 19
     INCF     shift, and go to state 20
-    COERCE   shift, and go to state 21
 
-    deffuncion  go to state 22
-    returnfrom  go to state 23
-    definicion  go to state 24
-    asignacion  go to state 25
-    condicion   go to state 26
-    bucle       go to state 27
-    llamada     go to state 28
-    print       go to state 29
-    incf        go to state 30
-    invertir    go to state 31
+    deffuncion  go to state 21
+    returnfrom  go to state 22
+    definicion  go to state 23
+    asignacion  go to state 24
+    condicion   go to state 25
+    bucle       go to state 26
+    llamada     go to state 27
+    print       go to state 28
+    incf        go to state 29
 
 
 State 4
 
     0 $accept: axioma • $end
 
-    $end  shift, and go to state 32
+    $end  shift, and go to state 30
 
 
 State 5
@@ -310,127 +307,128 @@ State 6
 
     $default  reduce using rule 2 (instrucciones)
 
-    instrucciones  go to state 33
+    instrucciones  go to state 31
     sentencia      go to state 6
     variable       go to state 7
 
 
 State 7
 
-   14 sentencia: variable •
+   13 sentencia: variable •
 
-    $default  reduce using rule 14 (sentencia)
+    $default  reduce using rule 13 (sentencia)
 
 
 State 8
 
    60 variable: '*' IDENTIF • '*'
 
-    '*'  shift, and go to state 34
+    '*'  shift, and go to state 32
 
 
 State 9
 
    35 llamada: IDENTIF • argumentos
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
     $default  reduce using rule 36 (argumentos)
 
-    argumentos  go to state 37
-    expresion   go to state 38
-    operando    go to state 39
-    variable    go to state 40
+    argumentos  go to state 35
+    expresion   go to state 36
+    operando    go to state 37
+    variable    go to state 38
 
 
 State 10
 
-   20 definicion: DEFVAR • variable restodef
+   19 definicion: DEFVAR • variable restodef
 
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
 
-    variable  go to state 41
+    variable  go to state 39
 
 
 State 11
 
-   25 asignacion: SETQ • variable expresion
+   24 asignacion: SETQ • variable expresion
+   25           | SETQ • variable '(' invertir ')'
    26           | SETQ • variable '(' condicion
    28           | SETQ • variable '(' REDUCE '#' '\'' '+' '(' MAP '\'' LIST '#' '\'' '*' variable variable ')' ')'
 
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
 
-    variable  go to state 42
+    variable  go to state 40
 
 
 State 12
 
    27 asignacion: SETF • '(' AREF variable expresion ')' expresion
 
-    '('  shift, and go to state 43
+    '('  shift, and go to state 41
 
 
 State 13
 
-   22 definicion: LET • '(' '(' variable restodef ')' ')' $@2 instrucciones
+   21 definicion: LET • '(' '(' variable restodef ')' ')' $@2 instrucciones
 
-    '('  shift, and go to state 44
+    '('  shift, and go to state 42
 
 
 State 14
 
    32 bucle: LOOP • WHILE expresion DO instrucciones
 
-    WHILE  shift, and go to state 45
+    WHILE  shift, and go to state 43
 
 
 State 15
 
    29 condicion: IF • expresion '(' PROGN instrucciones ')' restoif
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
-    expresion  go to state 46
-    operando   go to state 39
-    variable   go to state 40
+    expresion  go to state 44
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 16
 
    38 print: PRINT • restoprint
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
-    STRING   shift, and go to state 47
+    STRING   shift, and go to state 45
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
-    restoprint  go to state 48
-    expresion   go to state 49
-    operando    go to state 39
-    variable    go to state 40
+    restoprint  go to state 46
+    expresion   go to state 47
+    operando    go to state 37
+    variable    go to state 38
 
 
 State 17
 
-   16 deffuncion: DEFUN • IDENTIF $@1 '(' argumentosfun ')' instrucciones ')'
+   15 deffuncion: DEFUN • IDENTIF $@1 '(' argumentosfun ')' instrucciones ')'
 
-    IDENTIF  shift, and go to state 50
+    IDENTIF  shift, and go to state 48
 
 
 State 18
 
-   19 returnfrom: RETURN • '-' FROM IDENTIF expresion
+   18 returnfrom: RETURN • '-' FROM IDENTIF expresion
 
-    '-'  shift, and go to state 51
+    '-'  shift, and go to state 49
 
 
 State 19
@@ -438,7 +436,7 @@ State 19
    33 bucle: DOTIMES • '(' variable '(' LENGTH variable ')' variable ')' instrucciones
    34      | DOTIMES • '(' variable '(' LENGTH variable ')' ')' instrucciones
 
-    '('  shift, and go to state 52
+    '('  shift, and go to state 50
 
 
 State 20
@@ -448,115 +446,101 @@ State 20
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
 
-    variable  go to state 53
+    variable  go to state 51
 
 
 State 21
-
-   42 invertir: COERCE • '(' REVERSE '(' COERCE variable '\'' LIST ')' ')' '\'' variable
-
-    '('  shift, and go to state 54
-
-
-State 22
 
     9 sentencia: '(' deffuncion •
 
     $default  reduce using rule 9 (sentencia)
 
 
-State 23
+State 22
 
    11 sentencia: '(' returnfrom • ')'
 
-    ')'  shift, and go to state 55
+    ')'  shift, and go to state 52
+
+
+State 23
+
+    4 sentencia: '(' definicion • ')'
+
+    ')'  shift, and go to state 53
 
 
 State 24
 
-    4 sentencia: '(' definicion • ')'
+    5 sentencia: '(' asignacion • ')'
 
-    ')'  shift, and go to state 56
+    ')'  shift, and go to state 54
 
 
 State 25
-
-    5 sentencia: '(' asignacion • ')'
-
-    ')'  shift, and go to state 57
-
-
-State 26
 
     6 sentencia: '(' condicion •
 
     $default  reduce using rule 6 (sentencia)
 
 
-State 27
+State 26
 
     7 sentencia: '(' bucle • ')'
 
-    ')'  shift, and go to state 58
+    ')'  shift, and go to state 55
+
+
+State 27
+
+    8 sentencia: '(' llamada • ')'
+
+    ')'  shift, and go to state 56
 
 
 State 28
 
-    8 sentencia: '(' llamada • ')'
+   10 sentencia: '(' print • ')'
 
-    ')'  shift, and go to state 59
+    ')'  shift, and go to state 57
 
 
 State 29
 
-   10 sentencia: '(' print • ')'
+   12 sentencia: '(' incf • ')'
 
-    ')'  shift, and go to state 60
+    ')'  shift, and go to state 58
 
 
 State 30
-
-   12 sentencia: '(' incf • ')'
-
-    ')'  shift, and go to state 61
-
-
-State 31
-
-   13 sentencia: '(' invertir • ')'
-
-    ')'  shift, and go to state 62
-
-
-State 32
 
     0 $accept: axioma $end •
 
     $default  accept
 
 
-State 33
+State 31
 
     3 instrucciones: sentencia instrucciones •
 
     $default  reduce using rule 3 (instrucciones)
 
 
-State 34
+State 32
 
    60 variable: '*' IDENTIF '*' •
 
     $default  reduce using rule 60 (variable)
 
 
-State 35
+State 33
 
    56 operando: NUMBER •
 
     $default  reduce using rule 56 (operando)
 
 
-State 36
+State 34
 
    44 expresion: '(' • '+' expresion expresion ')'
    45          | '(' • '-' expresion expresion ')'
@@ -572,163 +556,164 @@ State 36
    55          | '(' • NEQ expresion expresion ')'
    58 operando: '(' • AREF variable expresion ')'
 
-    AREF  shift, and go to state 63
-    AND   shift, and go to state 64
-    OR    shift, and go to state 65
-    LEQ   shift, and go to state 66
-    GEQ   shift, and go to state 67
-    NEQ   shift, and go to state 68
-    '+'   shift, and go to state 69
-    '-'   shift, and go to state 70
-    '*'   shift, and go to state 71
-    '/'   shift, and go to state 72
-    '='   shift, and go to state 73
-    '<'   shift, and go to state 74
-    '>'   shift, and go to state 75
+    AREF  shift, and go to state 59
+    AND   shift, and go to state 60
+    OR    shift, and go to state 61
+    LEQ   shift, and go to state 62
+    GEQ   shift, and go to state 63
+    NEQ   shift, and go to state 64
+    '+'   shift, and go to state 65
+    '-'   shift, and go to state 66
+    '*'   shift, and go to state 67
+    '/'   shift, and go to state 68
+    '='   shift, and go to state 69
+    '<'   shift, and go to state 70
+    '>'   shift, and go to state 71
 
 
-State 37
+State 35
 
    35 llamada: IDENTIF argumentos •
 
     $default  reduce using rule 35 (llamada)
 
 
-State 38
+State 36
 
    37 argumentos: expresion • argumentos
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
     $default  reduce using rule 36 (argumentos)
 
-    argumentos  go to state 76
-    expresion   go to state 38
-    operando    go to state 39
-    variable    go to state 40
+    argumentos  go to state 72
+    expresion   go to state 36
+    operando    go to state 37
+    variable    go to state 38
 
 
-State 39
+State 37
 
    43 expresion: operando •
 
     $default  reduce using rule 43 (expresion)
 
 
-State 40
+State 38
 
    57 operando: variable •
 
     $default  reduce using rule 57 (operando)
 
 
-State 41
+State 39
 
-   20 definicion: DEFVAR variable • restodef
+   19 definicion: DEFVAR variable • restodef
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 77
+    '('      shift, and go to state 73
 
-    restodef   go to state 78
-    expresion  go to state 79
-    operando   go to state 39
-    variable   go to state 40
+    restodef   go to state 74
+    expresion  go to state 75
+    operando   go to state 37
+    variable   go to state 38
+
+
+State 40
+
+   24 asignacion: SETQ variable • expresion
+   25           | SETQ variable • '(' invertir ')'
+   26           | SETQ variable • '(' condicion
+   28           | SETQ variable • '(' REDUCE '#' '\'' '+' '(' MAP '\'' LIST '#' '\'' '*' variable variable ')' ')'
+
+    NUMBER   shift, and go to state 33
+    IDENTIF  shift, and go to state 1
+    '*'      shift, and go to state 2
+    '('      shift, and go to state 76
+
+    expresion  go to state 77
+    operando   go to state 37
+    variable   go to state 38
+
+
+State 41
+
+   27 asignacion: SETF '(' • AREF variable expresion ')' expresion
+
+    AREF  shift, and go to state 78
 
 
 State 42
 
-   25 asignacion: SETQ variable • expresion
-   26           | SETQ variable • '(' condicion
-   28           | SETQ variable • '(' REDUCE '#' '\'' '+' '(' MAP '\'' LIST '#' '\'' '*' variable variable ')' ')'
+   21 definicion: LET '(' • '(' variable restodef ')' ')' $@2 instrucciones
 
-    NUMBER   shift, and go to state 35
-    IDENTIF  shift, and go to state 1
-    '*'      shift, and go to state 2
-    '('      shift, and go to state 80
-
-    expresion  go to state 81
-    operando   go to state 39
-    variable   go to state 40
+    '('  shift, and go to state 79
 
 
 State 43
 
-   27 asignacion: SETF '(' • AREF variable expresion ')' expresion
+   32 bucle: LOOP WHILE • expresion DO instrucciones
 
-    AREF  shift, and go to state 82
+    NUMBER   shift, and go to state 33
+    IDENTIF  shift, and go to state 1
+    '*'      shift, and go to state 2
+    '('      shift, and go to state 34
+
+    expresion  go to state 80
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 44
 
-   22 definicion: LET '(' • '(' variable restodef ')' ')' $@2 instrucciones
+   29 condicion: IF expresion • '(' PROGN instrucciones ')' restoif
 
-    '('  shift, and go to state 83
+    '('  shift, and go to state 81
 
 
 State 45
-
-   32 bucle: LOOP WHILE • expresion DO instrucciones
-
-    NUMBER   shift, and go to state 35
-    IDENTIF  shift, and go to state 1
-    '*'      shift, and go to state 2
-    '('      shift, and go to state 36
-
-    expresion  go to state 84
-    operando   go to state 39
-    variable   go to state 40
-
-
-State 46
-
-   29 condicion: IF expresion • '(' PROGN instrucciones ')' restoif
-
-    '('  shift, and go to state 85
-
-
-State 47
 
    39 restoprint: STRING •
 
     $default  reduce using rule 39 (restoprint)
 
 
-State 48
+State 46
 
    38 print: PRINT restoprint •
 
     $default  reduce using rule 38 (print)
 
 
-State 49
+State 47
 
    40 restoprint: expresion •
 
     $default  reduce using rule 40 (restoprint)
 
 
+State 48
+
+   15 deffuncion: DEFUN IDENTIF • $@1 '(' argumentosfun ')' instrucciones ')'
+
+    $default  reduce using rule 14 ($@1)
+
+    $@1  go to state 82
+
+
+State 49
+
+   18 returnfrom: RETURN '-' • FROM IDENTIF expresion
+
+    FROM  shift, and go to state 83
+
+
 State 50
-
-   16 deffuncion: DEFUN IDENTIF • $@1 '(' argumentosfun ')' instrucciones ')'
-
-    $default  reduce using rule 15 ($@1)
-
-    $@1  go to state 86
-
-
-State 51
-
-   19 returnfrom: RETURN '-' • FROM IDENTIF expresion
-
-    FROM  shift, and go to state 87
-
-
-State 52
 
    33 bucle: DOTIMES '(' • variable '(' LENGTH variable ')' variable ')' instrucciones
    34      | DOTIMES '(' • variable '(' LENGTH variable ')' ')' instrucciones
@@ -736,267 +721,253 @@ State 52
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
 
-    variable  go to state 88
+    variable  go to state 84
 
 
-State 53
+State 51
 
    41 incf: INCF variable • '(' AREF variable expresion ')'
 
-    '('  shift, and go to state 89
+    '('  shift, and go to state 85
 
 
-State 54
-
-   42 invertir: COERCE '(' • REVERSE '(' COERCE variable '\'' LIST ')' ')' '\'' variable
-
-    REVERSE  shift, and go to state 90
-
-
-State 55
+State 52
 
    11 sentencia: '(' returnfrom ')' •
 
     $default  reduce using rule 11 (sentencia)
 
 
-State 56
+State 53
 
     4 sentencia: '(' definicion ')' •
 
     $default  reduce using rule 4 (sentencia)
 
 
-State 57
+State 54
 
     5 sentencia: '(' asignacion ')' •
 
     $default  reduce using rule 5 (sentencia)
 
 
-State 58
+State 55
 
     7 sentencia: '(' bucle ')' •
 
     $default  reduce using rule 7 (sentencia)
 
 
-State 59
+State 56
 
     8 sentencia: '(' llamada ')' •
 
     $default  reduce using rule 8 (sentencia)
 
 
-State 60
+State 57
 
    10 sentencia: '(' print ')' •
 
     $default  reduce using rule 10 (sentencia)
 
 
-State 61
+State 58
 
    12 sentencia: '(' incf ')' •
 
     $default  reduce using rule 12 (sentencia)
 
 
-State 62
-
-   13 sentencia: '(' invertir ')' •
-
-    $default  reduce using rule 13 (sentencia)
-
-
-State 63
+State 59
 
    58 operando: '(' AREF • variable expresion ')'
 
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
 
-    variable  go to state 91
+    variable  go to state 86
+
+
+State 60
+
+   48 expresion: '(' AND • expresion expresion ')'
+
+    NUMBER   shift, and go to state 33
+    IDENTIF  shift, and go to state 1
+    '*'      shift, and go to state 2
+    '('      shift, and go to state 34
+
+    expresion  go to state 87
+    operando   go to state 37
+    variable   go to state 38
+
+
+State 61
+
+   49 expresion: '(' OR • expresion expresion ')'
+
+    NUMBER   shift, and go to state 33
+    IDENTIF  shift, and go to state 1
+    '*'      shift, and go to state 2
+    '('      shift, and go to state 34
+
+    expresion  go to state 88
+    operando   go to state 37
+    variable   go to state 38
+
+
+State 62
+
+   53 expresion: '(' LEQ • expresion expresion ')'
+
+    NUMBER   shift, and go to state 33
+    IDENTIF  shift, and go to state 1
+    '*'      shift, and go to state 2
+    '('      shift, and go to state 34
+
+    expresion  go to state 89
+    operando   go to state 37
+    variable   go to state 38
+
+
+State 63
+
+   54 expresion: '(' GEQ • expresion expresion ')'
+
+    NUMBER   shift, and go to state 33
+    IDENTIF  shift, and go to state 1
+    '*'      shift, and go to state 2
+    '('      shift, and go to state 34
+
+    expresion  go to state 90
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 64
 
-   48 expresion: '(' AND • expresion expresion ')'
+   55 expresion: '(' NEQ • expresion expresion ')'
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
-    expresion  go to state 92
-    operando   go to state 39
-    variable   go to state 40
+    expresion  go to state 91
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 65
 
-   49 expresion: '(' OR • expresion expresion ')'
+   44 expresion: '(' '+' • expresion expresion ')'
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
-    expresion  go to state 93
-    operando   go to state 39
-    variable   go to state 40
+    expresion  go to state 92
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 66
 
-   53 expresion: '(' LEQ • expresion expresion ')'
+   45 expresion: '(' '-' • expresion expresion ')'
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
-    expresion  go to state 94
-    operando   go to state 39
-    variable   go to state 40
+    expresion  go to state 93
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 67
 
-   54 expresion: '(' GEQ • expresion expresion ')'
+   46 expresion: '(' '*' • expresion expresion ')'
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
-    expresion  go to state 95
-    operando   go to state 39
-    variable   go to state 40
+    expresion  go to state 94
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 68
 
-   55 expresion: '(' NEQ • expresion expresion ')'
+   47 expresion: '(' '/' • expresion expresion ')'
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
-    expresion  go to state 96
-    operando   go to state 39
-    variable   go to state 40
+    expresion  go to state 95
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 69
 
-   44 expresion: '(' '+' • expresion expresion ')'
+   50 expresion: '(' '=' • expresion expresion ')'
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
-    expresion  go to state 97
-    operando   go to state 39
-    variable   go to state 40
+    expresion  go to state 96
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 70
 
-   45 expresion: '(' '-' • expresion expresion ')'
+   51 expresion: '(' '<' • expresion expresion ')'
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
-    expresion  go to state 98
-    operando   go to state 39
-    variable   go to state 40
+    expresion  go to state 97
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 71
 
-   46 expresion: '(' '*' • expresion expresion ')'
+   52 expresion: '(' '>' • expresion expresion ')'
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
-    expresion  go to state 99
-    operando   go to state 39
-    variable   go to state 40
+    expresion  go to state 98
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 72
-
-   47 expresion: '(' '/' • expresion expresion ')'
-
-    NUMBER   shift, and go to state 35
-    IDENTIF  shift, and go to state 1
-    '*'      shift, and go to state 2
-    '('      shift, and go to state 36
-
-    expresion  go to state 100
-    operando   go to state 39
-    variable   go to state 40
-
-
-State 73
-
-   50 expresion: '(' '=' • expresion expresion ')'
-
-    NUMBER   shift, and go to state 35
-    IDENTIF  shift, and go to state 1
-    '*'      shift, and go to state 2
-    '('      shift, and go to state 36
-
-    expresion  go to state 101
-    operando   go to state 39
-    variable   go to state 40
-
-
-State 74
-
-   51 expresion: '(' '<' • expresion expresion ')'
-
-    NUMBER   shift, and go to state 35
-    IDENTIF  shift, and go to state 1
-    '*'      shift, and go to state 2
-    '('      shift, and go to state 36
-
-    expresion  go to state 102
-    operando   go to state 39
-    variable   go to state 40
-
-
-State 75
-
-   52 expresion: '(' '>' • expresion expresion ')'
-
-    NUMBER   shift, and go to state 35
-    IDENTIF  shift, and go to state 1
-    '*'      shift, and go to state 2
-    '('      shift, and go to state 36
-
-    expresion  go to state 103
-    operando   go to state 39
-    variable   go to state 40
-
-
-State 76
 
    37 argumentos: expresion argumentos •
 
     $default  reduce using rule 37 (argumentos)
 
 
-State 77
+State 73
 
-   24 restodef: '(' • MAKE '-' ARRAY expresion ')'
+   23 restodef: '(' • MAKE '-' ARRAY expresion ')'
    44 expresion: '(' • '+' expresion expresion ')'
    45          | '(' • '-' expresion expresion ')'
    46          | '(' • '*' expresion expresion ')'
@@ -1011,39 +982,40 @@ State 77
    55          | '(' • NEQ expresion expresion ')'
    58 operando: '(' • AREF variable expresion ')'
 
-    AREF  shift, and go to state 63
-    MAKE  shift, and go to state 104
-    AND   shift, and go to state 64
-    OR    shift, and go to state 65
-    LEQ   shift, and go to state 66
-    GEQ   shift, and go to state 67
-    NEQ   shift, and go to state 68
-    '+'   shift, and go to state 69
-    '-'   shift, and go to state 70
-    '*'   shift, and go to state 71
-    '/'   shift, and go to state 72
-    '='   shift, and go to state 73
-    '<'   shift, and go to state 74
-    '>'   shift, and go to state 75
+    AREF  shift, and go to state 59
+    MAKE  shift, and go to state 99
+    AND   shift, and go to state 60
+    OR    shift, and go to state 61
+    LEQ   shift, and go to state 62
+    GEQ   shift, and go to state 63
+    NEQ   shift, and go to state 64
+    '+'   shift, and go to state 65
+    '-'   shift, and go to state 66
+    '*'   shift, and go to state 67
+    '/'   shift, and go to state 68
+    '='   shift, and go to state 69
+    '<'   shift, and go to state 70
+    '>'   shift, and go to state 71
 
 
-State 78
+State 74
 
-   20 definicion: DEFVAR variable restodef •
+   19 definicion: DEFVAR variable restodef •
 
-    $default  reduce using rule 20 (definicion)
-
-
-State 79
-
-   23 restodef: expresion •
-
-    $default  reduce using rule 23 (restodef)
+    $default  reduce using rule 19 (definicion)
 
 
-State 80
+State 75
 
-   26 asignacion: SETQ variable '(' • condicion
+   22 restodef: expresion •
+
+    $default  reduce using rule 22 (restodef)
+
+
+State 76
+
+   25 asignacion: SETQ variable '(' • invertir ')'
+   26           | SETQ variable '(' • condicion
    28           | SETQ variable '(' • REDUCE '#' '\'' '+' '(' MAP '\'' LIST '#' '\'' '*' variable variable ')' ')'
    44 expresion: '(' • '+' expresion expresion ')'
    45          | '(' • '-' expresion expresion ')'
@@ -1059,335 +1031,344 @@ State 80
    55          | '(' • NEQ expresion expresion ')'
    58 operando: '(' • AREF variable expresion ')'
 
-    AREF    shift, and go to state 63
+    AREF    shift, and go to state 59
     IF      shift, and go to state 15
-    AND     shift, and go to state 64
-    OR      shift, and go to state 65
-    LEQ     shift, and go to state 66
-    GEQ     shift, and go to state 67
-    NEQ     shift, and go to state 68
-    REDUCE  shift, and go to state 105
-    '+'     shift, and go to state 69
-    '-'     shift, and go to state 70
-    '*'     shift, and go to state 71
-    '/'     shift, and go to state 72
-    '='     shift, and go to state 73
-    '<'     shift, and go to state 74
-    '>'     shift, and go to state 75
+    AND     shift, and go to state 60
+    OR      shift, and go to state 61
+    LEQ     shift, and go to state 62
+    GEQ     shift, and go to state 63
+    NEQ     shift, and go to state 64
+    REDUCE  shift, and go to state 100
+    COERCE  shift, and go to state 101
+    '+'     shift, and go to state 65
+    '-'     shift, and go to state 66
+    '*'     shift, and go to state 67
+    '/'     shift, and go to state 68
+    '='     shift, and go to state 69
+    '<'     shift, and go to state 70
+    '>'     shift, and go to state 71
 
-    condicion  go to state 106
-
-
-State 81
-
-   25 asignacion: SETQ variable expresion •
-
-    $default  reduce using rule 25 (asignacion)
+    condicion  go to state 102
+    invertir   go to state 103
 
 
-State 82
+State 77
+
+   24 asignacion: SETQ variable expresion •
+
+    $default  reduce using rule 24 (asignacion)
+
+
+State 78
 
    27 asignacion: SETF '(' AREF • variable expresion ')' expresion
 
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
 
-    variable  go to state 107
+    variable  go to state 104
+
+
+State 79
+
+   21 definicion: LET '(' '(' • variable restodef ')' ')' $@2 instrucciones
+
+    IDENTIF  shift, and go to state 1
+    '*'      shift, and go to state 2
+
+    variable  go to state 105
+
+
+State 80
+
+   32 bucle: LOOP WHILE expresion • DO instrucciones
+
+    DO  shift, and go to state 106
+
+
+State 81
+
+   29 condicion: IF expresion '(' • PROGN instrucciones ')' restoif
+
+    PROGN  shift, and go to state 107
+
+
+State 82
+
+   15 deffuncion: DEFUN IDENTIF $@1 • '(' argumentosfun ')' instrucciones ')'
+
+    '('  shift, and go to state 108
 
 
 State 83
 
-   22 definicion: LET '(' '(' • variable restodef ')' ')' $@2 instrucciones
+   18 returnfrom: RETURN '-' FROM • IDENTIF expresion
 
-    IDENTIF  shift, and go to state 1
-    '*'      shift, and go to state 2
-
-    variable  go to state 108
+    IDENTIF  shift, and go to state 109
 
 
 State 84
 
-   32 bucle: LOOP WHILE expresion • DO instrucciones
+   33 bucle: DOTIMES '(' variable • '(' LENGTH variable ')' variable ')' instrucciones
+   34      | DOTIMES '(' variable • '(' LENGTH variable ')' ')' instrucciones
 
-    DO  shift, and go to state 109
+    '('  shift, and go to state 110
 
 
 State 85
 
-   29 condicion: IF expresion '(' • PROGN instrucciones ')' restoif
+   41 incf: INCF variable '(' • AREF variable expresion ')'
 
-    PROGN  shift, and go to state 110
+    AREF  shift, and go to state 111
 
 
 State 86
 
-   16 deffuncion: DEFUN IDENTIF $@1 • '(' argumentosfun ')' instrucciones ')'
+   58 operando: '(' AREF variable • expresion ')'
 
-    '('  shift, and go to state 111
+    NUMBER   shift, and go to state 33
+    IDENTIF  shift, and go to state 1
+    '*'      shift, and go to state 2
+    '('      shift, and go to state 34
+
+    expresion  go to state 112
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 87
 
-   19 returnfrom: RETURN '-' FROM • IDENTIF expresion
+   48 expresion: '(' AND expresion • expresion ')'
 
-    IDENTIF  shift, and go to state 112
+    NUMBER   shift, and go to state 33
+    IDENTIF  shift, and go to state 1
+    '*'      shift, and go to state 2
+    '('      shift, and go to state 34
+
+    expresion  go to state 113
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 88
 
-   33 bucle: DOTIMES '(' variable • '(' LENGTH variable ')' variable ')' instrucciones
-   34      | DOTIMES '(' variable • '(' LENGTH variable ')' ')' instrucciones
+   49 expresion: '(' OR expresion • expresion ')'
 
-    '('  shift, and go to state 113
+    NUMBER   shift, and go to state 33
+    IDENTIF  shift, and go to state 1
+    '*'      shift, and go to state 2
+    '('      shift, and go to state 34
+
+    expresion  go to state 114
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 89
 
-   41 incf: INCF variable '(' • AREF variable expresion ')'
+   53 expresion: '(' LEQ expresion • expresion ')'
 
-    AREF  shift, and go to state 114
+    NUMBER   shift, and go to state 33
+    IDENTIF  shift, and go to state 1
+    '*'      shift, and go to state 2
+    '('      shift, and go to state 34
+
+    expresion  go to state 115
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 90
 
-   42 invertir: COERCE '(' REVERSE • '(' COERCE variable '\'' LIST ')' ')' '\'' variable
+   54 expresion: '(' GEQ expresion • expresion ')'
 
-    '('  shift, and go to state 115
+    NUMBER   shift, and go to state 33
+    IDENTIF  shift, and go to state 1
+    '*'      shift, and go to state 2
+    '('      shift, and go to state 34
+
+    expresion  go to state 116
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 91
 
-   58 operando: '(' AREF variable • expresion ')'
+   55 expresion: '(' NEQ expresion • expresion ')'
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
-    expresion  go to state 116
-    operando   go to state 39
-    variable   go to state 40
+    expresion  go to state 117
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 92
 
-   48 expresion: '(' AND expresion • expresion ')'
+   44 expresion: '(' '+' expresion • expresion ')'
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
-    expresion  go to state 117
-    operando   go to state 39
-    variable   go to state 40
+    expresion  go to state 118
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 93
 
-   49 expresion: '(' OR expresion • expresion ')'
+   45 expresion: '(' '-' expresion • expresion ')'
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
-    expresion  go to state 118
-    operando   go to state 39
-    variable   go to state 40
+    expresion  go to state 119
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 94
 
-   53 expresion: '(' LEQ expresion • expresion ')'
+   46 expresion: '(' '*' expresion • expresion ')'
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
-    expresion  go to state 119
-    operando   go to state 39
-    variable   go to state 40
+    expresion  go to state 120
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 95
 
-   54 expresion: '(' GEQ expresion • expresion ')'
+   47 expresion: '(' '/' expresion • expresion ')'
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
-    expresion  go to state 120
-    operando   go to state 39
-    variable   go to state 40
+    expresion  go to state 121
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 96
 
-   55 expresion: '(' NEQ expresion • expresion ')'
+   50 expresion: '(' '=' expresion • expresion ')'
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
-    expresion  go to state 121
-    operando   go to state 39
-    variable   go to state 40
+    expresion  go to state 122
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 97
 
-   44 expresion: '(' '+' expresion • expresion ')'
+   51 expresion: '(' '<' expresion • expresion ')'
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
-    expresion  go to state 122
-    operando   go to state 39
-    variable   go to state 40
+    expresion  go to state 123
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 98
 
-   45 expresion: '(' '-' expresion • expresion ')'
+   52 expresion: '(' '>' expresion • expresion ')'
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
-    expresion  go to state 123
-    operando   go to state 39
-    variable   go to state 40
+    expresion  go to state 124
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 99
 
-   46 expresion: '(' '*' expresion • expresion ')'
+   23 restodef: '(' MAKE • '-' ARRAY expresion ')'
 
-    NUMBER   shift, and go to state 35
-    IDENTIF  shift, and go to state 1
-    '*'      shift, and go to state 2
-    '('      shift, and go to state 36
-
-    expresion  go to state 124
-    operando   go to state 39
-    variable   go to state 40
+    '-'  shift, and go to state 125
 
 
 State 100
 
-   47 expresion: '(' '/' expresion • expresion ')'
+   28 asignacion: SETQ variable '(' REDUCE • '#' '\'' '+' '(' MAP '\'' LIST '#' '\'' '*' variable variable ')' ')'
 
-    NUMBER   shift, and go to state 35
-    IDENTIF  shift, and go to state 1
-    '*'      shift, and go to state 2
-    '('      shift, and go to state 36
-
-    expresion  go to state 125
-    operando   go to state 39
-    variable   go to state 40
+    '#'  shift, and go to state 126
 
 
 State 101
 
-   50 expresion: '(' '=' expresion • expresion ')'
+   42 invertir: COERCE • '(' REVERSE '(' COERCE variable '\'' LIST ')' ')' '\'' variable
 
-    NUMBER   shift, and go to state 35
-    IDENTIF  shift, and go to state 1
-    '*'      shift, and go to state 2
-    '('      shift, and go to state 36
-
-    expresion  go to state 126
-    operando   go to state 39
-    variable   go to state 40
+    '('  shift, and go to state 127
 
 
 State 102
-
-   51 expresion: '(' '<' expresion • expresion ')'
-
-    NUMBER   shift, and go to state 35
-    IDENTIF  shift, and go to state 1
-    '*'      shift, and go to state 2
-    '('      shift, and go to state 36
-
-    expresion  go to state 127
-    operando   go to state 39
-    variable   go to state 40
-
-
-State 103
-
-   52 expresion: '(' '>' expresion • expresion ')'
-
-    NUMBER   shift, and go to state 35
-    IDENTIF  shift, and go to state 1
-    '*'      shift, and go to state 2
-    '('      shift, and go to state 36
-
-    expresion  go to state 128
-    operando   go to state 39
-    variable   go to state 40
-
-
-State 104
-
-   24 restodef: '(' MAKE • '-' ARRAY expresion ')'
-
-    '-'  shift, and go to state 129
-
-
-State 105
-
-   28 asignacion: SETQ variable '(' REDUCE • '#' '\'' '+' '(' MAP '\'' LIST '#' '\'' '*' variable variable ')' ')'
-
-    '#'  shift, and go to state 130
-
-
-State 106
 
    26 asignacion: SETQ variable '(' condicion •
 
     $default  reduce using rule 26 (asignacion)
 
 
-State 107
+State 103
+
+   25 asignacion: SETQ variable '(' invertir • ')'
+
+    ')'  shift, and go to state 128
+
+
+State 104
 
    27 asignacion: SETF '(' AREF variable • expresion ')' expresion
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
-    expresion  go to state 131
-    operando   go to state 39
-    variable   go to state 40
+    expresion  go to state 129
+    operando   go to state 37
+    variable   go to state 38
 
 
-State 108
+State 105
 
-   22 definicion: LET '(' '(' variable • restodef ')' ')' $@2 instrucciones
+   21 definicion: LET '(' '(' variable • restodef ')' ')' $@2 instrucciones
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 77
+    '('      shift, and go to state 73
 
-    restodef   go to state 132
-    expresion  go to state 79
-    operando   go to state 39
-    variable   go to state 40
+    restodef   go to state 130
+    expresion  go to state 75
+    operando   go to state 37
+    variable   go to state 38
 
 
-State 109
+State 106
 
    32 bucle: LOOP WHILE expresion DO • instrucciones
 
@@ -1397,12 +1378,12 @@ State 109
 
     $default  reduce using rule 2 (instrucciones)
 
-    instrucciones  go to state 133
+    instrucciones  go to state 131
     sentencia      go to state 6
     variable       go to state 7
 
 
-State 110
+State 107
 
    29 condicion: IF expresion '(' PROGN • instrucciones ')' restoif
 
@@ -1412,224 +1393,231 @@ State 110
 
     $default  reduce using rule 2 (instrucciones)
 
-    instrucciones  go to state 134
+    instrucciones  go to state 132
     sentencia      go to state 6
     variable       go to state 7
 
 
-State 111
+State 108
 
-   16 deffuncion: DEFUN IDENTIF $@1 '(' • argumentosfun ')' instrucciones ')'
+   15 deffuncion: DEFUN IDENTIF $@1 '(' • argumentosfun ')' instrucciones ')'
 
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
 
-    $default  reduce using rule 17 (argumentosfun)
+    $default  reduce using rule 16 (argumentosfun)
 
-    argumentosfun  go to state 135
-    variable       go to state 136
+    argumentosfun  go to state 133
+    variable       go to state 134
 
 
-State 112
+State 109
 
-   19 returnfrom: RETURN '-' FROM IDENTIF • expresion
+   18 returnfrom: RETURN '-' FROM IDENTIF • expresion
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
-    expresion  go to state 137
-    operando   go to state 39
-    variable   go to state 40
+    expresion  go to state 135
+    operando   go to state 37
+    variable   go to state 38
 
 
-State 113
+State 110
 
    33 bucle: DOTIMES '(' variable '(' • LENGTH variable ')' variable ')' instrucciones
    34      | DOTIMES '(' variable '(' • LENGTH variable ')' ')' instrucciones
 
-    LENGTH  shift, and go to state 138
+    LENGTH  shift, and go to state 136
 
 
-State 114
+State 111
 
    41 incf: INCF variable '(' AREF • variable expresion ')'
 
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
 
-    variable  go to state 139
+    variable  go to state 137
+
+
+State 112
+
+   58 operando: '(' AREF variable expresion • ')'
+
+    ')'  shift, and go to state 138
+
+
+State 113
+
+   48 expresion: '(' AND expresion expresion • ')'
+
+    ')'  shift, and go to state 139
+
+
+State 114
+
+   49 expresion: '(' OR expresion expresion • ')'
+
+    ')'  shift, and go to state 140
 
 
 State 115
 
-   42 invertir: COERCE '(' REVERSE '(' • COERCE variable '\'' LIST ')' ')' '\'' variable
-
-    COERCE  shift, and go to state 140
-
-
-State 116
-
-   58 operando: '(' AREF variable expresion • ')'
+   53 expresion: '(' LEQ expresion expresion • ')'
 
     ')'  shift, and go to state 141
 
 
-State 117
+State 116
 
-   48 expresion: '(' AND expresion expresion • ')'
+   54 expresion: '(' GEQ expresion expresion • ')'
 
     ')'  shift, and go to state 142
 
 
-State 118
+State 117
 
-   49 expresion: '(' OR expresion expresion • ')'
+   55 expresion: '(' NEQ expresion expresion • ')'
 
     ')'  shift, and go to state 143
 
 
-State 119
+State 118
 
-   53 expresion: '(' LEQ expresion expresion • ')'
+   44 expresion: '(' '+' expresion expresion • ')'
 
     ')'  shift, and go to state 144
 
 
-State 120
+State 119
 
-   54 expresion: '(' GEQ expresion expresion • ')'
+   45 expresion: '(' '-' expresion expresion • ')'
 
     ')'  shift, and go to state 145
 
 
-State 121
+State 120
 
-   55 expresion: '(' NEQ expresion expresion • ')'
+   46 expresion: '(' '*' expresion expresion • ')'
 
     ')'  shift, and go to state 146
 
 
-State 122
+State 121
 
-   44 expresion: '(' '+' expresion expresion • ')'
+   47 expresion: '(' '/' expresion expresion • ')'
 
     ')'  shift, and go to state 147
 
 
-State 123
+State 122
 
-   45 expresion: '(' '-' expresion expresion • ')'
+   50 expresion: '(' '=' expresion expresion • ')'
 
     ')'  shift, and go to state 148
 
 
-State 124
+State 123
 
-   46 expresion: '(' '*' expresion expresion • ')'
+   51 expresion: '(' '<' expresion expresion • ')'
 
     ')'  shift, and go to state 149
 
 
-State 125
+State 124
 
-   47 expresion: '(' '/' expresion expresion • ')'
+   52 expresion: '(' '>' expresion expresion • ')'
 
     ')'  shift, and go to state 150
 
 
+State 125
+
+   23 restodef: '(' MAKE '-' • ARRAY expresion ')'
+
+    ARRAY  shift, and go to state 151
+
+
 State 126
 
-   50 expresion: '(' '=' expresion expresion • ')'
+   28 asignacion: SETQ variable '(' REDUCE '#' • '\'' '+' '(' MAP '\'' LIST '#' '\'' '*' variable variable ')' ')'
 
-    ')'  shift, and go to state 151
+    '\''  shift, and go to state 152
 
 
 State 127
 
-   51 expresion: '(' '<' expresion expresion • ')'
+   42 invertir: COERCE '(' • REVERSE '(' COERCE variable '\'' LIST ')' ')' '\'' variable
 
-    ')'  shift, and go to state 152
+    REVERSE  shift, and go to state 153
 
 
 State 128
 
-   52 expresion: '(' '>' expresion expresion • ')'
+   25 asignacion: SETQ variable '(' invertir ')' •
 
-    ')'  shift, and go to state 153
+    $default  reduce using rule 25 (asignacion)
 
 
 State 129
 
-   24 restodef: '(' MAKE '-' • ARRAY expresion ')'
+   27 asignacion: SETF '(' AREF variable expresion • ')' expresion
 
-    ARRAY  shift, and go to state 154
+    ')'  shift, and go to state 154
 
 
 State 130
 
-   28 asignacion: SETQ variable '(' REDUCE '#' • '\'' '+' '(' MAP '\'' LIST '#' '\'' '*' variable variable ')' ')'
+   21 definicion: LET '(' '(' variable restodef • ')' ')' $@2 instrucciones
 
-    '\''  shift, and go to state 155
+    ')'  shift, and go to state 155
 
 
 State 131
-
-   27 asignacion: SETF '(' AREF variable expresion • ')' expresion
-
-    ')'  shift, and go to state 156
-
-
-State 132
-
-   22 definicion: LET '(' '(' variable restodef • ')' ')' $@2 instrucciones
-
-    ')'  shift, and go to state 157
-
-
-State 133
 
    32 bucle: LOOP WHILE expresion DO instrucciones •
 
     $default  reduce using rule 32 (bucle)
 
 
-State 134
+State 132
 
    29 condicion: IF expresion '(' PROGN instrucciones • ')' restoif
 
-    ')'  shift, and go to state 158
+    ')'  shift, and go to state 156
 
 
-State 135
+State 133
 
-   16 deffuncion: DEFUN IDENTIF $@1 '(' argumentosfun • ')' instrucciones ')'
+   15 deffuncion: DEFUN IDENTIF $@1 '(' argumentosfun • ')' instrucciones ')'
 
-    ')'  shift, and go to state 159
+    ')'  shift, and go to state 157
 
 
-State 136
+State 134
 
-   18 argumentosfun: variable • argumentosfun
+   17 argumentosfun: variable • argumentosfun
 
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
 
-    $default  reduce using rule 17 (argumentosfun)
+    $default  reduce using rule 16 (argumentosfun)
 
-    argumentosfun  go to state 160
-    variable       go to state 136
-
-
-State 137
-
-   19 returnfrom: RETURN '-' FROM IDENTIF expresion •
-
-    $default  reduce using rule 19 (returnfrom)
+    argumentosfun  go to state 158
+    variable       go to state 134
 
 
-State 138
+State 135
+
+   18 returnfrom: RETURN '-' FROM IDENTIF expresion •
+
+    $default  reduce using rule 18 (returnfrom)
+
+
+State 136
 
    33 bucle: DOTIMES '(' variable '(' LENGTH • variable ')' variable ')' instrucciones
    34      | DOTIMES '(' variable '(' LENGTH • variable ')' ')' instrucciones
@@ -1637,179 +1625,176 @@ State 138
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
 
-    variable  go to state 161
+    variable  go to state 159
 
 
-State 139
+State 137
 
    41 incf: INCF variable '(' AREF variable • expresion ')'
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
 
-    expresion  go to state 162
-    operando   go to state 39
-    variable   go to state 40
-
-
-State 140
-
-   42 invertir: COERCE '(' REVERSE '(' COERCE • variable '\'' LIST ')' ')' '\'' variable
-
-    IDENTIF  shift, and go to state 1
-    '*'      shift, and go to state 2
-
-    variable  go to state 163
+    expresion  go to state 160
+    operando   go to state 37
+    variable   go to state 38
 
 
-State 141
+State 138
 
    58 operando: '(' AREF variable expresion ')' •
 
     $default  reduce using rule 58 (operando)
 
 
-State 142
+State 139
 
    48 expresion: '(' AND expresion expresion ')' •
 
     $default  reduce using rule 48 (expresion)
 
 
-State 143
+State 140
 
    49 expresion: '(' OR expresion expresion ')' •
 
     $default  reduce using rule 49 (expresion)
 
 
-State 144
+State 141
 
    53 expresion: '(' LEQ expresion expresion ')' •
 
     $default  reduce using rule 53 (expresion)
 
 
-State 145
+State 142
 
    54 expresion: '(' GEQ expresion expresion ')' •
 
     $default  reduce using rule 54 (expresion)
 
 
-State 146
+State 143
 
    55 expresion: '(' NEQ expresion expresion ')' •
 
     $default  reduce using rule 55 (expresion)
 
 
-State 147
+State 144
 
    44 expresion: '(' '+' expresion expresion ')' •
 
     $default  reduce using rule 44 (expresion)
 
 
-State 148
+State 145
 
    45 expresion: '(' '-' expresion expresion ')' •
 
     $default  reduce using rule 45 (expresion)
 
 
-State 149
+State 146
 
    46 expresion: '(' '*' expresion expresion ')' •
 
     $default  reduce using rule 46 (expresion)
 
 
-State 150
+State 147
 
    47 expresion: '(' '/' expresion expresion ')' •
 
     $default  reduce using rule 47 (expresion)
 
 
-State 151
+State 148
 
    50 expresion: '(' '=' expresion expresion ')' •
 
     $default  reduce using rule 50 (expresion)
 
 
-State 152
+State 149
 
    51 expresion: '(' '<' expresion expresion ')' •
 
     $default  reduce using rule 51 (expresion)
 
 
-State 153
+State 150
 
    52 expresion: '(' '>' expresion expresion ')' •
 
     $default  reduce using rule 52 (expresion)
 
 
-State 154
+State 151
 
-   24 restodef: '(' MAKE '-' ARRAY • expresion ')'
+   23 restodef: '(' MAKE '-' ARRAY • expresion ')'
 
-    NUMBER   shift, and go to state 35
+    NUMBER   shift, and go to state 33
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('      shift, and go to state 34
+
+    expresion  go to state 161
+    operando   go to state 37
+    variable   go to state 38
+
+
+State 152
+
+   28 asignacion: SETQ variable '(' REDUCE '#' '\'' • '+' '(' MAP '\'' LIST '#' '\'' '*' variable variable ')' ')'
+
+    '+'  shift, and go to state 162
+
+
+State 153
+
+   42 invertir: COERCE '(' REVERSE • '(' COERCE variable '\'' LIST ')' ')' '\'' variable
+
+    '('  shift, and go to state 163
+
+
+State 154
+
+   27 asignacion: SETF '(' AREF variable expresion ')' • expresion
+
+    NUMBER   shift, and go to state 33
+    IDENTIF  shift, and go to state 1
+    '*'      shift, and go to state 2
+    '('      shift, and go to state 34
 
     expresion  go to state 164
-    operando   go to state 39
-    variable   go to state 40
+    operando   go to state 37
+    variable   go to state 38
 
 
 State 155
 
-   28 asignacion: SETQ variable '(' REDUCE '#' '\'' • '+' '(' MAP '\'' LIST '#' '\'' '*' variable variable ')' ')'
+   21 definicion: LET '(' '(' variable restodef ')' • ')' $@2 instrucciones
 
-    '+'  shift, and go to state 165
+    ')'  shift, and go to state 165
 
 
 State 156
 
-   27 asignacion: SETF '(' AREF variable expresion ')' • expresion
+   29 condicion: IF expresion '(' PROGN instrucciones ')' • restoif
 
-    NUMBER   shift, and go to state 35
-    IDENTIF  shift, and go to state 1
-    '*'      shift, and go to state 2
-    '('      shift, and go to state 36
+    '('  shift, and go to state 166
+    ')'  shift, and go to state 167
 
-    expresion  go to state 166
-    operando   go to state 39
-    variable   go to state 40
+    restoif  go to state 168
 
 
 State 157
 
-   22 definicion: LET '(' '(' variable restodef ')' • ')' $@2 instrucciones
-
-    ')'  shift, and go to state 167
-
-
-State 158
-
-   29 condicion: IF expresion '(' PROGN instrucciones ')' • restoif
-
-    '('  shift, and go to state 168
-    ')'  shift, and go to state 169
-
-    restoif  go to state 170
-
-
-State 159
-
-   16 deffuncion: DEFUN IDENTIF $@1 '(' argumentosfun ')' • instrucciones ')'
+   15 deffuncion: DEFUN IDENTIF $@1 '(' argumentosfun ')' • instrucciones ')'
 
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
@@ -1817,141 +1802,181 @@ State 159
 
     $default  reduce using rule 2 (instrucciones)
 
-    instrucciones  go to state 171
+    instrucciones  go to state 169
     sentencia      go to state 6
     variable       go to state 7
 
 
+State 158
+
+   17 argumentosfun: variable argumentosfun •
+
+    $default  reduce using rule 17 (argumentosfun)
+
+
+State 159
+
+   33 bucle: DOTIMES '(' variable '(' LENGTH variable • ')' variable ')' instrucciones
+   34      | DOTIMES '(' variable '(' LENGTH variable • ')' ')' instrucciones
+
+    ')'  shift, and go to state 170
+
+
 State 160
 
-   18 argumentosfun: variable argumentosfun •
+   41 incf: INCF variable '(' AREF variable expresion • ')'
 
-    $default  reduce using rule 18 (argumentosfun)
+    ')'  shift, and go to state 171
 
 
 State 161
 
-   33 bucle: DOTIMES '(' variable '(' LENGTH variable • ')' variable ')' instrucciones
-   34      | DOTIMES '(' variable '(' LENGTH variable • ')' ')' instrucciones
+   23 restodef: '(' MAKE '-' ARRAY expresion • ')'
 
     ')'  shift, and go to state 172
 
 
 State 162
 
-   41 incf: INCF variable '(' AREF variable expresion • ')'
+   28 asignacion: SETQ variable '(' REDUCE '#' '\'' '+' • '(' MAP '\'' LIST '#' '\'' '*' variable variable ')' ')'
 
-    ')'  shift, and go to state 173
+    '('  shift, and go to state 173
 
 
 State 163
 
-   42 invertir: COERCE '(' REVERSE '(' COERCE variable • '\'' LIST ')' ')' '\'' variable
+   42 invertir: COERCE '(' REVERSE '(' • COERCE variable '\'' LIST ')' ')' '\'' variable
 
-    '\''  shift, and go to state 174
+    COERCE  shift, and go to state 174
 
 
 State 164
-
-   24 restodef: '(' MAKE '-' ARRAY expresion • ')'
-
-    ')'  shift, and go to state 175
-
-
-State 165
-
-   28 asignacion: SETQ variable '(' REDUCE '#' '\'' '+' • '(' MAP '\'' LIST '#' '\'' '*' variable variable ')' ')'
-
-    '('  shift, and go to state 176
-
-
-State 166
 
    27 asignacion: SETF '(' AREF variable expresion ')' expresion •
 
     $default  reduce using rule 27 (asignacion)
 
 
-State 167
+State 165
 
-   22 definicion: LET '(' '(' variable restodef ')' ')' • $@2 instrucciones
+   21 definicion: LET '(' '(' variable restodef ')' ')' • $@2 instrucciones
 
-    $default  reduce using rule 21 ($@2)
+    $default  reduce using rule 20 ($@2)
 
-    $@2  go to state 177
+    $@2  go to state 175
 
 
-State 168
+State 166
 
    31 restoif: '(' • PROGN instrucciones ')' ')'
 
-    PROGN  shift, and go to state 178
+    PROGN  shift, and go to state 176
 
 
-State 169
+State 167
 
    30 restoif: ')' •
 
     $default  reduce using rule 30 (restoif)
 
 
-State 170
+State 168
 
    29 condicion: IF expresion '(' PROGN instrucciones ')' restoif •
 
     $default  reduce using rule 29 (condicion)
 
 
-State 171
+State 169
 
-   16 deffuncion: DEFUN IDENTIF $@1 '(' argumentosfun ')' instrucciones • ')'
+   15 deffuncion: DEFUN IDENTIF $@1 '(' argumentosfun ')' instrucciones • ')'
 
-    ')'  shift, and go to state 179
+    ')'  shift, and go to state 177
 
 
-State 172
+State 170
 
    33 bucle: DOTIMES '(' variable '(' LENGTH variable ')' • variable ')' instrucciones
    34      | DOTIMES '(' variable '(' LENGTH variable ')' • ')' instrucciones
 
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
-    ')'      shift, and go to state 180
+    ')'      shift, and go to state 178
 
-    variable  go to state 181
+    variable  go to state 179
 
 
-State 173
+State 171
 
    41 incf: INCF variable '(' AREF variable expresion ')' •
 
     $default  reduce using rule 41 (incf)
 
 
+State 172
+
+   23 restodef: '(' MAKE '-' ARRAY expresion ')' •
+
+    $default  reduce using rule 23 (restodef)
+
+
+State 173
+
+   28 asignacion: SETQ variable '(' REDUCE '#' '\'' '+' '(' • MAP '\'' LIST '#' '\'' '*' variable variable ')' ')'
+
+    MAP  shift, and go to state 180
+
+
 State 174
 
-   42 invertir: COERCE '(' REVERSE '(' COERCE variable '\'' • LIST ')' ')' '\'' variable
+   42 invertir: COERCE '(' REVERSE '(' COERCE • variable '\'' LIST ')' ')' '\'' variable
 
-    LIST  shift, and go to state 182
+    IDENTIF  shift, and go to state 1
+    '*'      shift, and go to state 2
+
+    variable  go to state 181
 
 
 State 175
 
-   24 restodef: '(' MAKE '-' ARRAY expresion ')' •
+   21 definicion: LET '(' '(' variable restodef ')' ')' $@2 • instrucciones
 
-    $default  reduce using rule 24 (restodef)
+    IDENTIF  shift, and go to state 1
+    '*'      shift, and go to state 2
+    '('      shift, and go to state 3
+
+    $default  reduce using rule 2 (instrucciones)
+
+    instrucciones  go to state 182
+    sentencia      go to state 6
+    variable       go to state 7
 
 
 State 176
 
-   28 asignacion: SETQ variable '(' REDUCE '#' '\'' '+' '(' • MAP '\'' LIST '#' '\'' '*' variable variable ')' ')'
+   31 restoif: '(' PROGN • instrucciones ')' ')'
 
-    MAP  shift, and go to state 183
+    IDENTIF  shift, and go to state 1
+    '*'      shift, and go to state 2
+    '('      shift, and go to state 3
+
+    $default  reduce using rule 2 (instrucciones)
+
+    instrucciones  go to state 183
+    sentencia      go to state 6
+    variable       go to state 7
 
 
 State 177
 
-   22 definicion: LET '(' '(' variable restodef ')' ')' $@2 • instrucciones
+   15 deffuncion: DEFUN IDENTIF $@1 '(' argumentosfun ')' instrucciones ')' •
+
+    $default  reduce using rule 15 (deffuncion)
+
+
+State 178
+
+   34 bucle: DOTIMES '(' variable '(' LENGTH variable ')' ')' • instrucciones
 
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
@@ -1964,86 +1989,49 @@ State 177
     variable       go to state 7
 
 
-State 178
-
-   31 restoif: '(' PROGN • instrucciones ')' ')'
-
-    IDENTIF  shift, and go to state 1
-    '*'      shift, and go to state 2
-    '('      shift, and go to state 3
-
-    $default  reduce using rule 2 (instrucciones)
-
-    instrucciones  go to state 185
-    sentencia      go to state 6
-    variable       go to state 7
-
-
 State 179
 
-   16 deffuncion: DEFUN IDENTIF $@1 '(' argumentosfun ')' instrucciones ')' •
+   33 bucle: DOTIMES '(' variable '(' LENGTH variable ')' variable • ')' instrucciones
 
-    $default  reduce using rule 16 (deffuncion)
+    ')'  shift, and go to state 185
 
 
 State 180
 
-   34 bucle: DOTIMES '(' variable '(' LENGTH variable ')' ')' • instrucciones
+   28 asignacion: SETQ variable '(' REDUCE '#' '\'' '+' '(' MAP • '\'' LIST '#' '\'' '*' variable variable ')' ')'
 
-    IDENTIF  shift, and go to state 1
-    '*'      shift, and go to state 2
-    '('      shift, and go to state 3
-
-    $default  reduce using rule 2 (instrucciones)
-
-    instrucciones  go to state 186
-    sentencia      go to state 6
-    variable       go to state 7
+    '\''  shift, and go to state 186
 
 
 State 181
 
-   33 bucle: DOTIMES '(' variable '(' LENGTH variable ')' variable • ')' instrucciones
+   42 invertir: COERCE '(' REVERSE '(' COERCE variable • '\'' LIST ')' ')' '\'' variable
 
-    ')'  shift, and go to state 187
+    '\''  shift, and go to state 187
 
 
 State 182
 
-   42 invertir: COERCE '(' REVERSE '(' COERCE variable '\'' LIST • ')' ')' '\'' variable
+   21 definicion: LET '(' '(' variable restodef ')' ')' $@2 instrucciones •
 
-    ')'  shift, and go to state 188
+    $default  reduce using rule 21 (definicion)
 
 
 State 183
 
-   28 asignacion: SETQ variable '(' REDUCE '#' '\'' '+' '(' MAP • '\'' LIST '#' '\'' '*' variable variable ')' ')'
+   31 restoif: '(' PROGN instrucciones • ')' ')'
 
-    '\''  shift, and go to state 189
+    ')'  shift, and go to state 188
 
 
 State 184
-
-   22 definicion: LET '(' '(' variable restodef ')' ')' $@2 instrucciones •
-
-    $default  reduce using rule 22 (definicion)
-
-
-State 185
-
-   31 restoif: '(' PROGN instrucciones • ')' ')'
-
-    ')'  shift, and go to state 190
-
-
-State 186
 
    34 bucle: DOTIMES '(' variable '(' LENGTH variable ')' ')' instrucciones •
 
     $default  reduce using rule 34 (bucle)
 
 
-State 187
+State 185
 
    33 bucle: DOTIMES '(' variable '(' LENGTH variable ')' variable ')' • instrucciones
 
@@ -2053,94 +2041,101 @@ State 187
 
     $default  reduce using rule 2 (instrucciones)
 
-    instrucciones  go to state 191
+    instrucciones  go to state 189
     sentencia      go to state 6
     variable       go to state 7
 
 
+State 186
+
+   28 asignacion: SETQ variable '(' REDUCE '#' '\'' '+' '(' MAP '\'' • LIST '#' '\'' '*' variable variable ')' ')'
+
+    LIST  shift, and go to state 190
+
+
+State 187
+
+   42 invertir: COERCE '(' REVERSE '(' COERCE variable '\'' • LIST ')' ')' '\'' variable
+
+    LIST  shift, and go to state 191
+
+
 State 188
 
-   42 invertir: COERCE '(' REVERSE '(' COERCE variable '\'' LIST ')' • ')' '\'' variable
+   31 restoif: '(' PROGN instrucciones ')' • ')'
 
     ')'  shift, and go to state 192
 
 
 State 189
 
-   28 asignacion: SETQ variable '(' REDUCE '#' '\'' '+' '(' MAP '\'' • LIST '#' '\'' '*' variable variable ')' ')'
-
-    LIST  shift, and go to state 193
-
-
-State 190
-
-   31 restoif: '(' PROGN instrucciones ')' • ')'
-
-    ')'  shift, and go to state 194
-
-
-State 191
-
    33 bucle: DOTIMES '(' variable '(' LENGTH variable ')' variable ')' instrucciones •
 
     $default  reduce using rule 33 (bucle)
 
 
-State 192
-
-   42 invertir: COERCE '(' REVERSE '(' COERCE variable '\'' LIST ')' ')' • '\'' variable
-
-    '\''  shift, and go to state 195
-
-
-State 193
+State 190
 
    28 asignacion: SETQ variable '(' REDUCE '#' '\'' '+' '(' MAP '\'' LIST • '#' '\'' '*' variable variable ')' ')'
 
-    '#'  shift, and go to state 196
+    '#'  shift, and go to state 193
 
 
-State 194
+State 191
+
+   42 invertir: COERCE '(' REVERSE '(' COERCE variable '\'' LIST • ')' ')' '\'' variable
+
+    ')'  shift, and go to state 194
+
+
+State 192
 
    31 restoif: '(' PROGN instrucciones ')' ')' •
 
     $default  reduce using rule 31 (restoif)
 
 
+State 193
+
+   28 asignacion: SETQ variable '(' REDUCE '#' '\'' '+' '(' MAP '\'' LIST '#' • '\'' '*' variable variable ')' ')'
+
+    '\''  shift, and go to state 195
+
+
+State 194
+
+   42 invertir: COERCE '(' REVERSE '(' COERCE variable '\'' LIST ')' • ')' '\'' variable
+
+    ')'  shift, and go to state 196
+
+
 State 195
 
-   42 invertir: COERCE '(' REVERSE '(' COERCE variable '\'' LIST ')' ')' '\'' • variable
+   28 asignacion: SETQ variable '(' REDUCE '#' '\'' '+' '(' MAP '\'' LIST '#' '\'' • '*' variable variable ')' ')'
 
-    IDENTIF  shift, and go to state 1
-    '*'      shift, and go to state 2
-
-    variable  go to state 197
+    '*'  shift, and go to state 197
 
 
 State 196
 
-   28 asignacion: SETQ variable '(' REDUCE '#' '\'' '+' '(' MAP '\'' LIST '#' • '\'' '*' variable variable ')' ')'
+   42 invertir: COERCE '(' REVERSE '(' COERCE variable '\'' LIST ')' ')' • '\'' variable
 
     '\''  shift, and go to state 198
 
 
 State 197
 
-   42 invertir: COERCE '(' REVERSE '(' COERCE variable '\'' LIST ')' ')' '\'' variable •
+   28 asignacion: SETQ variable '(' REDUCE '#' '\'' '+' '(' MAP '\'' LIST '#' '\'' '*' • variable variable ')' ')'
 
-    $default  reduce using rule 42 (invertir)
+    IDENTIF  shift, and go to state 1
+    '*'      shift, and go to state 2
+
+    variable  go to state 199
 
 
 State 198
 
-   28 asignacion: SETQ variable '(' REDUCE '#' '\'' '+' '(' MAP '\'' LIST '#' '\'' • '*' variable variable ')' ')'
-
-    '*'  shift, and go to state 199
-
-
-State 199
-
-   28 asignacion: SETQ variable '(' REDUCE '#' '\'' '+' '(' MAP '\'' LIST '#' '\'' '*' • variable variable ')' ')'
+   42 invertir: COERCE '(' REVERSE '(' COERCE variable '\'' LIST ')' ')' '\'' • variable
 
     IDENTIF  shift, and go to state 1
     '*'      shift, and go to state 2
@@ -2148,7 +2143,7 @@ State 199
     variable  go to state 200
 
 
-State 200
+State 199
 
    28 asignacion: SETQ variable '(' REDUCE '#' '\'' '+' '(' MAP '\'' LIST '#' '\'' '*' variable • variable ')' ')'
 
@@ -2156,6 +2151,13 @@ State 200
     '*'      shift, and go to state 2
 
     variable  go to state 201
+
+
+State 200
+
+   42 invertir: COERCE '(' REVERSE '(' COERCE variable '\'' LIST ')' ')' '\'' variable •
+
+    $default  reduce using rule 42 (invertir)
 
 
 State 201

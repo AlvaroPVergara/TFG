@@ -10,7 +10,7 @@
 (defun main () 
 (fun1)
 (print *vector*)
-(coerce (reverse (coerce *vector* 'list)) 'vector)
+(setq *vector* (coerce (reverse (coerce *vector* 'list)) 'vector))
 (print *vector*)
 (dotimes (i (length *vector*))
 (setf (aref *vector* i) (+ (aref *vector* i) 5)))

@@ -302,10 +302,11 @@ void recursiveAstToLisp(struct nodoAST* node){
 
         } else if (strcmp(node->nombre, "invertir-vector") == 0) {
             // We traduce our created function to understandable lisp
-
-            writeFile("(coerce (reverse (coerce ");
+            writeFile("(setq ");
             recursiveAstToLisp(node->primer_nodo); // vector name
-            writeFile(" 'list)) 'vector)\n");
+            writeFile(" (coerce (reverse (coerce ");
+            recursiveAstToLisp(node->primer_nodo); // vector name
+            writeFile(" 'list)) 'vector))\n");
 
         } else if (strcmp(node->nombre, "suma-vector") == 0) {
             // We traduce our created function to understandable lisp

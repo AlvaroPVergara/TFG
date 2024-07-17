@@ -104,7 +104,6 @@ sentencia:   '(' definicion ')'                 { $$=$2; }
             | '(' print ')'                     { $$=$2; }
             | '(' returnfrom ')'                { $$=$2; }
             | '(' incf ')'                      { $$=$2; }
-            | '(' invertir ')'                  { $$=$2; }
             | variable                          { sprintf(temp, "%s\n", $1.code); 
                                                     $$.trad = gen_code(temp); 
                                                 }
@@ -199,6 +198,9 @@ asignacion:   SETQ variable expresion                           {
                                                                 }
 
                                                                 $$.trad = gen_code(temp);
+                                                                }
+            | SETQ variable '(' invertir ')'                    { 
+                                                                $$ = $4;                      
                                                                 }
             | SETQ variable '(' condicion                       { 
                                                                 sprintf(temp, "%s %s !\n", $4.trad, $2.code); 
