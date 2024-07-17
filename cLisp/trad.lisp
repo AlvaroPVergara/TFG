@@ -2,6 +2,7 @@
 (defvar b 0)
 (defvar *vector* (make-array 10))
 (defun fun1 () 
+(setf (aref *vector* 1) (+ 2 3))
 (setf (aref *vector* 4) 5)
 (setf (aref *vector* 7) 29)
 (setf (aref *vector* 0) 1)
@@ -12,7 +13,7 @@
 (coerce (reverse (coerce *vector* 'list)) 'vector)
 (print *vector*)
 (dotimes (i (length *vector*))
-(setf (aref *vector* i) (+ (aref *vector* i) 1)))
+(setf (aref *vector* i) (+ (aref *vector* i) 5)))
 (print *vector*)
 (print "Hola mundo")
 a

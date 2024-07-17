@@ -4,6 +4,7 @@ int vector[10];
 
 
 int fun1(){
+    vector[1] = 2 + 3;
     vector[4] = 5;
     vector[7] = 29;
     vector[0] = 1;
@@ -13,7 +14,7 @@ int main(){
     printf("%s", vector[0]);
     invertir(vector);
     printf("%s", vector[0]);
-    sumaravector(1, vector);
+    sumaravector(5, vector);
     printf("%s", vector[0]);
     puts("Hola mundo");
     return a;

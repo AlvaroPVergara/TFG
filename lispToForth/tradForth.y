@@ -540,8 +540,8 @@ operando:       NUMBER                          { sprintf(temp, "%d", $1.value);
                                                 $$.trad = gen_code(temp);
                                                 $$.code = "variable";
                                                 }
-                | AREF variable expresion    { 
-                                                sprintf(temp, "%s %s CELLS + @", $3.trad, $2.code);
+                | '(' AREF variable expresion ')' { 
+                                                sprintf(temp, "%s CELLS %s +", $4.trad, $3.code);
                                                 $$.trad = gen_code(temp);
                                                 $$.code = "variable";
                                                 }
