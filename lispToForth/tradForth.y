@@ -302,7 +302,7 @@ print: PRINT restoprint                        { $$ = $2; }
         ;
 
 restoprint: STRING                             {
-                                                sprintf(temp, "S\" %s\" TYPE\n", $1.code);
+                                                sprintf(temp, "S\" %s\" TYPE CR\n", $1.code);
                                                 $$.trad = gen_code(temp);
                                                 }
             | expresion                         { 
@@ -313,11 +313,8 @@ restoprint: STRING                             {
                                                         sprintf(temp, "%s @ .\n", $1.trad);
                                                     } else if (strcmp(sym->type, "global")== 0){
                                                         if (sym -> size_array == 0){
-                                                            printf("IMPRIMIENDO VARIABLE\n");
                                                             sprintf(temp, "%s @ .\n", $1.trad);
                                                         } else {
-                                                            printf("IMPRIMIENDO VECTOR\n");
-                                                            
                                                             sprintf(temp, "S\" (\" TYPE\n %d 0 DO\nI CELLS %s + @ .\nLOOP\nS\" )\" TYPE CR\n", sym -> size_array, $1.trad);
                                                         }
                                                     } else if (strcmp(sym->type, "local")== 0){
@@ -342,7 +339,7 @@ incf: INCF  variable '(' AREF variable expresion ')' {
                                                     } else if (strcmp(sym->type, "local")== 0){
                                                         sprintf(temp, "i CELLS %s + @\n%s + to %s\n", $5.code, $2.code, $2.code );
                                                     }
-                                                    $$.trad = gen_code(temp); // TODO: REVISAR
+                                                    $$.trad = gen_code(temp);
                                                     }
     ;
 

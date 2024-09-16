@@ -1888,7 +1888,7 @@ yyreduce:
   case 40:
 #line 304 "lispToForth/tradForth.y"
                                                {
-                                                sprintf(temp, "S\" %s\" TYPE\n", yyvsp[0].code);
+                                                sprintf(temp, "S\" %s\" TYPE CR\n", yyvsp[0].code);
                                                 yyval.trad = gen_code(temp);
                                                 }
 #line 1895 "y.tab.c"
@@ -1935,7 +1935,7 @@ yyreduce:
                                                     } else if (strcmp(sym->type, "local")== 0){
                                                         sprintf(temp, "i CELLS %s + @\n%s + to %s\n", yyvsp[-2].code, yyvsp[-5].code, yyvsp[-5].code );
                                                     }
-                                                    yyval.trad = gen_code(temp); // TODO: REVISAR
+                                                    yyval.trad = gen_code(temp);
                                                     }
 #line 1941 "y.tab.c"
     break;

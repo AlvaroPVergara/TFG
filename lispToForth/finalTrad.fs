@@ -53,7 +53,7 @@ S" (" TYPE
 I CELLS vector + @ .
 LOOP
 S" )" TYPE CR
-S" Hola mundo" TYPE
+S" Hola mundo" TYPE CR
 c
 ;
 main
