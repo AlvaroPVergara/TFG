@@ -11,11 +11,17 @@ int fun1(){
 }
 int main(){
     fun1();
-    printf("%s", vector[0]);
+    int c;
+    sumarelementos(c, vector);
+
+    printf("%s", vector);
     invertir(vector);
-    printf("%s", vector[0]);
+
+    printf("%s", vector);
     sumaravector(5, vector);
-    printf("%s", vector[0]);
+    productoescalar(b, vector, vector);
+
+    printf("%s", vector);
     puts("Hola mundo");
-    return a;
+    return c;
 }

@@ -66,14 +66,14 @@ typedef struct s_attr {
                         // SECCION 3: Gramatica - Semantico 
 
                         
-axioma:     INTEGER declaraciones mainDef 	{   printf("%s%s", $2.prefija, $3.prefija);
+axioma:     INTEGER declaraciones mainDef 	{   //printf("%s%s", $2.prefija, $3.prefija);
                                                 struct nodoAST* nodoAxioma;
                                                 if (lastNodeGlobal){
                                                     nodoAxioma = crearNodoIntermedioGenerico("axioma", 2, lastNodeGlobal, $3.nodo);
                                                 } else {
                                                     nodoAxioma = crearNodoIntermedioGenerico("axioma", 1, $3.nodo);
                                                 }
-                                                printf ("Tabla de símbolos:\n");
+                                                printf ("\nTabla de símbolos:\n");
                                                 Symbol **tabla = initSymbolTable();
                                                 semanticAnalysis(nodoAxioma, tabla);
                                                 destroySymbolTable(tabla);

@@ -312,7 +312,14 @@ restoprint: STRING                             {
                                                         yyerror("Variable no declarada");
                                                         sprintf(temp, "%s @ .\n", $1.trad);
                                                     } else if (strcmp(sym->type, "global")== 0){
-                                                        sprintf(temp, "%s @ .\n", $1.trad);
+                                                        if (sym -> size_array == 0){
+                                                            printf("IMPRIMIENDO VARIABLE\n");
+                                                            sprintf(temp, "%s @ .\n", $1.trad);
+                                                        } else {
+                                                            printf("IMPRIMIENDO VECTOR\n");
+                                                            
+                                                            sprintf(temp, "S\" (\" TYPE\n %d 0 DO\nI CELLS %s + @ .\nLOOP\nS\" )\" TYPE CR\n", sym -> size_array, $1.trad);
+                                                        }
                                                     } else if (strcmp(sym->type, "local")== 0){
                                                         sprintf(temp, "%s .\n", $1.trad);
                                                     }
