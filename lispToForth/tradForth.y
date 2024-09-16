@@ -112,17 +112,39 @@ sentencia:   '(' definicion ')'                 { $$=$2; }
 // FUNCIONES
 deffuncion: DEFUN IDENTIF                       { act_function = $2.code; }
             '(' argumentosfun ')' instrucciones ')' 
-                                                {                              
-                                                sprintf(temp, ": %s ( %s -- n )\n%s;\n", $2.code, $5.trad ,$7.trad);
+                                                {                
+                                                if ($5.code){
+                                                sprintf(temp, ": %s ( %s -- n )\nLOCALS| %s |\n%s;\n", $2.code, $5.trad, $5.code ,$7.trad);
                                                 $$.trad = gen_code(temp);
                                                 act_function = "";
+                                                }
+                                                else{
+                                                sprintf(temp, ": %s ( -- n )\n%s;\n", $2.code ,$7.trad);
+                                                $$.trad = gen_code(temp);
+                                                act_function = "";
+                                                }          
+                                                
                                                 }
 
             ;
 
-argumentosfun:                                  { $$.trad =" "; } // lambda
-                | variable argumentosfun        { sprintf(temp, "%s %s", $1.code, $2.trad); 
+argumentosfun:                                  { $$.trad =NULL; 
+                                                $$.code =NULL;} // lambda
+                | variable argumentosfun        { 
+                                                if ($2.trad){
+                                                    sprintf(temp, "%s_ %s_", $1.code, $2.trad); 
+                                                }
+                                                else{
+                                                    sprintf(temp, "%s", $1.code); 
+                                                }
                                                 $$.trad = gen_code(temp); 
+                                                if ($2.code){
+                                                    sprintf(temp, "%s %s", $2.code, $1.code); 
+                                                } else {
+                                                    sprintf(temp, "%s", $1.code); 
+                                                }
+                                                
+                                                $$.code = gen_code(temp); ;
                                                 }
                 ;
 
@@ -207,7 +229,18 @@ asignacion:   SETQ variable expresion                           {
                                                                 $$.trad = gen_code(temp);
                                                                 }         
             | SETF '(' AREF variable expresion ')' expresion    { 
-                                                                sprintf(temp, "%s %s CELLS %s + !\n", $7.trad, $5.trad, $4.code);
+                                                                if (strcmp($7.code, "variable") == 0){
+                                                                    sym = searchSymbol(tabla, $7.trad);
+                                                                    if (sym != NULL){
+                                                                        if (strcmp(sym->type, "global")== 0){
+                                                                           sprintf(temp, "%s @ %s CELLS %s + !\n", $7.trad, $5.trad, $4.code);
+                                                                        } else{
+                                                                            sprintf(temp, "%s %s CELLS %s + !\n", $7.trad, $5.trad, $4.code);
+                                                                        }
+                                                                    }
+                                                                } else {
+                                                                    sprintf(temp, "%s %s CELLS %s + !\n", $7.trad, $5.trad, $4.code);
+                                                                }
                                                                 $$.trad = gen_code(temp);
                                                                 }   
             // PRODUCTO ESCALAR
@@ -302,7 +335,7 @@ print: PRINT restoprint                        { $$ = $2; }
         ;
 
 restoprint: STRING                             {
-                                                sprintf(temp, "S\" %s\" TYPE CR\n", $1.code);
+                                                sprintf(temp, "S\" %s \" TYPE CR\n", $1.code);
                                                 $$.trad = gen_code(temp);
                                                 }
             | expresion                         { 
@@ -310,20 +343,20 @@ restoprint: STRING                             {
                                                     sym = searchSymbol(tabla, $1.trad);
                                                     if (sym == NULL) {
                                                         yyerror("Variable no declarada");
-                                                        sprintf(temp, "%s @ .\n", $1.trad);
+                                                        sprintf(temp, "%s @ . CR\n", $1.trad);
                                                     } else if (strcmp(sym->type, "global")== 0){
                                                         if (sym -> size_array == 0){
-                                                            sprintf(temp, "%s @ .\n", $1.trad);
+                                                            sprintf(temp, "%s @ . CR\n", $1.trad);
                                                         } else {
                                                             sprintf(temp, "S\" (\" TYPE\n %d 0 DO\nI CELLS %s + @ .\nLOOP\nS\" )\" TYPE CR\n", sym -> size_array, $1.trad);
                                                         }
                                                     } else if (strcmp(sym->type, "local")== 0){
-                                                        sprintf(temp, "%s .\n", $1.trad);
+                                                        sprintf(temp, "%s . CR\n", $1.trad);
                                                     }
 
                                                 }
                                                 else{
-                                                    sprintf(temp, "%s .\n", $1.trad);
+                                                    sprintf(temp, "%s . CR\n", $1.trad);
                                                 }
                                                 $$.trad = gen_code(temp);
                                                 }
@@ -366,11 +399,21 @@ expresion:          operando                     { $$=$1; }
                                                     concat_ptr = temp;
                                                     concat_ptr += sprintf(concat_ptr, "%s ", $3.trad);
                                                     if (strcmp($3.code, "variable") == 0){
-                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                        sym = searchSymbol(tabla, $3.trad);
+                                                        if (sym != NULL){
+                                                            if (strcmp(sym->type, "global")== 0){
+                                                                concat_ptr += sprintf(concat_ptr, "@ ");
+                                                            }
+                                                        }
                                                     }
                                                     concat_ptr += sprintf(concat_ptr, "%s ", $4.trad);
                                                     if (strcmp($4.code, "variable") == 0){
-                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                        sym = searchSymbol(tabla, $4.trad);
+                                                        if (sym != NULL){
+                                                            if (strcmp(sym->type, "global")== 0){
+                                                                concat_ptr += sprintf(concat_ptr, "@ ");
+                                                            }
+                                                        }
                                                     }
                                                     concat_ptr += sprintf(concat_ptr, "+");
                                                     $$.trad = gen_code(temp);
@@ -381,11 +424,21 @@ expresion:          operando                     { $$=$1; }
                                                     concat_ptr = temp;
                                                     concat_ptr += sprintf(concat_ptr, "%s ", $3.trad);
                                                     if (strcmp($3.code, "variable") == 0){
-                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                        sym = searchSymbol(tabla, $3.trad);
+                                                        if (sym != NULL){
+                                                            if (strcmp(sym->type, "global")== 0){
+                                                                concat_ptr += sprintf(concat_ptr, "@ ");
+                                                            }
+                                                        }
                                                     }
                                                     concat_ptr += sprintf(concat_ptr, "%s ", $4.trad);
                                                     if (strcmp($4.code, "variable") == 0){
-                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                        sym = searchSymbol(tabla, $4.trad);
+                                                        if (sym != NULL){
+                                                            if (strcmp(sym->type, "global")== 0){
+                                                                concat_ptr += sprintf(concat_ptr, "@ ");
+                                                            }
+                                                        }
                                                     }
                                                     concat_ptr += sprintf(concat_ptr, "-");
                                                     $$.trad = gen_code(temp);
@@ -395,11 +448,21 @@ expresion:          operando                     { $$=$1; }
                                                     concat_ptr = temp;
                                                     concat_ptr += sprintf(concat_ptr, "%s ", $3.trad);
                                                     if (strcmp($3.code, "variable") == 0){
-                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                        sym = searchSymbol(tabla, $3.trad);
+                                                        if (sym != NULL){
+                                                            if (strcmp(sym->type, "global")== 0){
+                                                                concat_ptr += sprintf(concat_ptr, "@ ");
+                                                            }
+                                                        }
                                                     }
                                                     concat_ptr += sprintf(concat_ptr, "%s ", $4.trad);
                                                     if (strcmp($4.code, "variable") == 0){
-                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                        sym = searchSymbol(tabla, $4.trad);
+                                                        if (sym != NULL){
+                                                            if (strcmp(sym->type, "global")== 0){
+                                                                concat_ptr += sprintf(concat_ptr, "@ ");
+                                                            }
+                                                        }
                                                     }
                                                     concat_ptr += sprintf(concat_ptr, "*");
                                                     $$.trad = gen_code(temp);
@@ -409,11 +472,21 @@ expresion:          operando                     { $$=$1; }
                                                     concat_ptr = temp;
                                                     concat_ptr += sprintf(concat_ptr, "%s ", $3.trad);
                                                     if (strcmp($3.code, "variable") == 0){
-                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                        sym = searchSymbol(tabla, $3.trad);
+                                                        if (sym != NULL){
+                                                            if (strcmp(sym->type, "global")== 0){
+                                                                concat_ptr += sprintf(concat_ptr, "@ ");
+                                                            }
+                                                        }
                                                     }
                                                     concat_ptr += sprintf(concat_ptr, "%s ", $4.trad);
                                                     if (strcmp($4.code, "variable") == 0){
-                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                        sym = searchSymbol(tabla, $4.trad);
+                                                        if (sym != NULL){
+                                                            if (strcmp(sym->type, "global")== 0){
+                                                                concat_ptr += sprintf(concat_ptr, "@ ");
+                                                            }
+                                                        }
                                                     }
                                                     concat_ptr += sprintf(concat_ptr, "/");
                                                     $$.trad = gen_code(temp);
@@ -481,11 +554,21 @@ expresion:          operando                     { $$=$1; }
                                                     concat_ptr = temp;
                                                     concat_ptr += sprintf(concat_ptr, "%s ", $3.trad);
                                                     if (strcmp($3.code, "variable") == 0){
-                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                        sym = searchSymbol(tabla, $3.trad);
+                                                        if (sym != NULL){
+                                                            if (strcmp(sym->type, "global")== 0){
+                                                                concat_ptr += sprintf(concat_ptr, "@ ");
+                                                            }
+                                                        }
                                                     }
                                                     concat_ptr += sprintf(concat_ptr, "%s ", $4.trad);
                                                     if (strcmp($4.code, "variable") == 0){
-                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                        sym = searchSymbol(tabla, $4.trad);
+                                                        if (sym != NULL){
+                                                            if (strcmp(sym->type, "global")== 0){
+                                                                concat_ptr += sprintf(concat_ptr, "@ ");
+                                                            }
+                                                        }
                                                     }
                                                     concat_ptr += sprintf(concat_ptr, ">");
                                                     $$.trad = gen_code(temp);
@@ -547,7 +630,7 @@ operando:       NUMBER                          { sprintf(temp, "%d", $1.value);
                                                 $$.code = "variable";
                                                 }
                 | '(' AREF variable expresion ')' { 
-                                                sprintf(temp, "%s CELLS %s +", $4.trad, $3.code);
+                                                sprintf(temp, "%s CELLS %s + @", $4.trad, $3.code);
                                                 $$.trad = gen_code(temp);
                                                 $$.code = "variable";
                                                 }

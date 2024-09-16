@@ -6,22 +6,55 @@ int vector[10];
 int fun1(){
     vector[1] = 2 + 3;
     vector[4] = 5;
-    vector[7] = 29;
+    vector[7] = 10;
     vector[0] = 1;
+    vector[9] = a;
 }
+
+int operacionesYEstructuras(int val1, int val2){
+    if (val1 > val2){
+        puts("El primer valor es mayor");
+    } else{
+        puts("El segundo valor es mayor");
+    }
+
+    a = val1 - (val1 * val2 / (4 - 2));
+    printf("%d", a);
+
+    while(a <= 0){
+        a = a + 3;
+        printf("%d", a);
+    }
+    return a;
+}
+
 int main(){
+    operacionesYEstructuras(2, 4);
+
+    operacionesYEstructuras(10, 5);
+    
+    
     fun1();
+    puts("VALORES DEL VECTOR");
+    printf("%d", vector);
+
+    puts("SUMAR ELEMENTOS");
     int c;
     sumarelementos(c, vector);
+    printf("%d", c);
 
-    printf("%s", vector);
-    invertir(vector);
-
-    printf("%s", vector);
-    sumaravector(5, vector);
+    puts("PRODUCTO ESCALAR");
     productoescalar(b, vector, vector);
+    printf("%d", b);
 
-    printf("%s", vector);
+    puts("INVERTIR VECTOR");
+    invertir(vector);
+    printf("%d", vector);
+
+    puts("INCREMENTO");
+    sumaravector(5, vector);
+    printf("%d", vector);
+
     puts("Hola mundo");
     return c;
 }

@@ -598,12 +598,12 @@ static const yytype_int8 yytranslate[] =
 static const yytype_int16 yyrline[] =
 {
        0,    85,    85,    91,    92,    98,    99,   100,   101,   102,
-     103,   104,   105,   106,   107,   113,   113,   123,   124,   131,
-     139,   157,   156,   179,   182,   188,   202,   205,   209,   214,
-     242,   249,   250,   257,   261,   269,   281,   288,   289,   301,
-     304,   308,   336,   351,   367,   368,   383,   397,   411,   425,
-     439,   454,   468,   483,   497,   511,   525,   541,   546,   552,
-     559,   560
+     103,   104,   105,   106,   107,   113,   113,   131,   133,   153,
+     161,   179,   178,   201,   204,   210,   224,   227,   231,   247,
+     275,   282,   283,   290,   294,   302,   314,   321,   322,   334,
+     337,   341,   366,   381,   397,   398,   423,   447,   471,   495,
+     509,   524,   538,   553,   577,   591,   605,   621,   626,   632,
+     639,   640
 };
 #endif
 
@@ -1620,39 +1620,61 @@ yyreduce:
 
   case 16:
 #line 115 "lispToForth/tradForth.y"
-                                                {                              
-                                                sprintf(temp, ": %s ( %s -- n )\n%s;\n", yyvsp[-6].code, yyvsp[-3].trad ,yyvsp[-1].trad);
+                                                {                
+                                                if (yyvsp[-3].code){
+                                                sprintf(temp, ": %s ( %s -- n )\nLOCALS| %s |\n%s;\n", yyvsp[-6].code, yyvsp[-3].trad, yyvsp[-3].code ,yyvsp[-1].trad);
                                                 yyval.trad = gen_code(temp);
                                                 act_function = "";
                                                 }
-#line 1629 "y.tab.c"
+                                                else{
+                                                sprintf(temp, ": %s ( -- n )\n%s;\n", yyvsp[-6].code ,yyvsp[-1].trad);
+                                                yyval.trad = gen_code(temp);
+                                                act_function = "";
+                                                }          
+                                                
+                                                }
+#line 1637 "y.tab.c"
     break;
 
   case 17:
-#line 123 "lispToForth/tradForth.y"
-                                                { yyval.trad =" "; }
-#line 1635 "y.tab.c"
+#line 131 "lispToForth/tradForth.y"
+                                                { yyval.trad =NULL; 
+                                                yyval.code =NULL;}
+#line 1644 "y.tab.c"
     break;
 
   case 18:
-#line 124 "lispToForth/tradForth.y"
-                                                { sprintf(temp, "%s %s", yyvsp[-1].code, yyvsp[0].trad); 
-                                                yyval.trad = gen_code(temp); 
+#line 133 "lispToForth/tradForth.y"
+                                                { 
+                                                if (yyvsp[0].trad){
+                                                    sprintf(temp, "%s_ %s_", yyvsp[-1].code, yyvsp[0].trad); 
                                                 }
-#line 1643 "y.tab.c"
+                                                else{
+                                                    sprintf(temp, "%s", yyvsp[-1].code); 
+                                                }
+                                                yyval.trad = gen_code(temp); 
+                                                if (yyvsp[0].code){
+                                                    sprintf(temp, "%s %s", yyvsp[0].code, yyvsp[-1].code); 
+                                                } else {
+                                                    sprintf(temp, "%s", yyvsp[-1].code); 
+                                                }
+                                                
+                                                yyval.code = gen_code(temp); ;
+                                                }
+#line 1665 "y.tab.c"
     break;
 
   case 19:
-#line 131 "lispToForth/tradForth.y"
+#line 153 "lispToForth/tradForth.y"
                                                { 
                                                 sprintf(temp, "%s\nEXIT\n", yyvsp[0].trad);
                                                 yyval.trad = gen_code(temp);
                                                 }
-#line 1652 "y.tab.c"
+#line 1674 "y.tab.c"
     break;
 
   case 20:
-#line 139 "lispToForth/tradForth.y"
+#line 161 "lispToForth/tradForth.y"
                                                         { 
                                                         if (tabla == NULL){
                                                             tabla = initSymbolTable();
@@ -1670,11 +1692,11 @@ yyreduce:
                                                         }
                                                         
                                                     }
-#line 1674 "y.tab.c"
+#line 1696 "y.tab.c"
     break;
 
   case 21:
-#line 157 "lispToForth/tradForth.y"
+#line 179 "lispToForth/tradForth.y"
                                                     { if (yyvsp[-2].type == 0) { // INT CASE
                                                             insertSymbol(tabla, yyvsp[-3].code, "local", 0, 0);
                                                         }
@@ -1682,11 +1704,11 @@ yyreduce:
                                                             insertSymbol(tabla, yyvsp[-3].code, "local", yyvsp[-2].value, 0);
                                                         }
                                                     }
-#line 1686 "y.tab.c"
+#line 1708 "y.tab.c"
     break;
 
   case 22:
-#line 164 "lispToForth/tradForth.y"
+#line 186 "lispToForth/tradForth.y"
                                                     {   
                                                         if (yyvsp[-4].type == 0) { // INT CASE
                                                         sprintf(temp, "%d LOCALS| %s |\n%s", yyvsp[-4].value, yyvsp[-5].code,  yyvsp[0].trad);
@@ -1700,27 +1722,27 @@ yyreduce:
                                                         }
 
                                                     }
-#line 1704 "y.tab.c"
+#line 1726 "y.tab.c"
     break;
 
   case 23:
-#line 179 "lispToForth/tradForth.y"
+#line 201 "lispToForth/tradForth.y"
                                                      { yyval.type = 0; 
                                                        yyval.value = yyvsp[0].value; 
                                                      }
-#line 1712 "y.tab.c"
+#line 1734 "y.tab.c"
     break;
 
   case 24:
-#line 182 "lispToForth/tradForth.y"
+#line 204 "lispToForth/tradForth.y"
                                                      { yyval.type = 1; 
                                                       yyval.value = yyvsp[-1].value; 
                                                      }
-#line 1720 "y.tab.c"
+#line 1742 "y.tab.c"
     break;
 
   case 25:
-#line 188 "lispToForth/tradForth.y"
+#line 210 "lispToForth/tradForth.y"
                                                                 { 
                                                                 sym = searchSymbol(tabla, yyvsp[-1].code);
                                                                 if (sym == NULL) {
@@ -1735,37 +1757,48 @@ yyreduce:
 
                                                                 yyval.trad = gen_code(temp);
                                                                 }
-#line 1739 "y.tab.c"
+#line 1761 "y.tab.c"
     break;
 
   case 26:
-#line 202 "lispToForth/tradForth.y"
+#line 224 "lispToForth/tradForth.y"
                                                                 { 
                                                                 yyval = yyvsp[-1];                      
                                                                 }
-#line 1747 "y.tab.c"
+#line 1769 "y.tab.c"
     break;
 
   case 27:
-#line 205 "lispToForth/tradForth.y"
+#line 227 "lispToForth/tradForth.y"
                                                                 { 
                                                                 sprintf(temp, "%s %s !\n", yyvsp[0].trad, yyvsp[-2].code); 
                                                                 yyval.trad = gen_code(temp);
                                                                 }
-#line 1756 "y.tab.c"
+#line 1778 "y.tab.c"
     break;
 
   case 28:
-#line 209 "lispToForth/tradForth.y"
+#line 231 "lispToForth/tradForth.y"
                                                                 { 
-                                                                sprintf(temp, "%s %s CELLS %s + !\n", yyvsp[0].trad, yyvsp[-2].trad, yyvsp[-3].code);
+                                                                if (strcmp(yyvsp[0].code, "variable") == 0){
+                                                                    sym = searchSymbol(tabla, yyvsp[0].trad);
+                                                                    if (sym != NULL){
+                                                                        if (strcmp(sym->type, "global")== 0){
+                                                                           sprintf(temp, "%s @ %s CELLS %s + !\n", yyvsp[0].trad, yyvsp[-2].trad, yyvsp[-3].code);
+                                                                        } else{
+                                                                            sprintf(temp, "%s %s CELLS %s + !\n", yyvsp[0].trad, yyvsp[-2].trad, yyvsp[-3].code);
+                                                                        }
+                                                                    }
+                                                                } else {
+                                                                    sprintf(temp, "%s %s CELLS %s + !\n", yyvsp[0].trad, yyvsp[-2].trad, yyvsp[-3].code);
+                                                                }
                                                                 yyval.trad = gen_code(temp);
                                                                 }
-#line 1765 "y.tab.c"
+#line 1798 "y.tab.c"
     break;
 
   case 29:
-#line 215 "lispToForth/tradForth.y"
+#line 248 "lispToForth/tradForth.y"
                                                                  { 
                                                                 sym = searchSymbol(tabla, yyvsp[-16].code);
                                                                 if (sym == NULL) {
@@ -1790,44 +1823,44 @@ yyreduce:
                                                                 }
                                                                 yyval.trad = gen_code(temp);
                                                                 }
-#line 1794 "y.tab.c"
+#line 1827 "y.tab.c"
     break;
 
   case 30:
-#line 243 "lispToForth/tradForth.y"
+#line 276 "lispToForth/tradForth.y"
                                                       { 
                                                         sprintf(temp, "%s IF\n%s%sTHEN\n", yyvsp[-5].trad, yyvsp[-2].trad, yyvsp[0].trad);
                                                         yyval.trad = gen_code(temp);
                                                     }
-#line 1803 "y.tab.c"
+#line 1836 "y.tab.c"
     break;
 
   case 31:
-#line 249 "lispToForth/tradForth.y"
+#line 282 "lispToForth/tradForth.y"
                                                     { yyval.trad=""; }
-#line 1809 "y.tab.c"
+#line 1842 "y.tab.c"
     break;
 
   case 32:
-#line 250 "lispToForth/tradForth.y"
+#line 283 "lispToForth/tradForth.y"
                                                     {  
                                                     sprintf(temp, "ELSE\n%s", yyvsp[-2].trad);
                                                     yyval.trad = gen_code(temp);
                                                     }
-#line 1818 "y.tab.c"
+#line 1851 "y.tab.c"
     break;
 
   case 33:
-#line 257 "lispToForth/tradForth.y"
+#line 290 "lispToForth/tradForth.y"
                                                   { 
                                                         sprintf(temp, "BEGIN\n%s WHILE\n%sREPEAT\n", yyvsp[-2].trad, yyvsp[0].trad);   
                                                         yyval.trad = gen_code(temp); 
                                                         }
-#line 1827 "y.tab.c"
+#line 1860 "y.tab.c"
     break;
 
   case 34:
-#line 262 "lispToForth/tradForth.y"
+#line 295 "lispToForth/tradForth.y"
                                                   { 
                                                     sym = searchSymbol(tabla, yyvsp[-4].code);
                                                     long_variable = sym -> size_array;
@@ -1835,11 +1868,11 @@ yyreduce:
                                                     yyval.trad = gen_code(temp); 
 
                                                   }
-#line 1839 "y.tab.c"
+#line 1872 "y.tab.c"
     break;
 
   case 35:
-#line 270 "lispToForth/tradForth.y"
+#line 303 "lispToForth/tradForth.y"
                                                   { 
                                                     sym = searchSymbol(tabla, yyvsp[-3].code);
                                                     long_variable = sym -> size_array;
@@ -1847,26 +1880,26 @@ yyreduce:
                                                     yyval.trad = gen_code(temp); 
 
                                                   }
-#line 1851 "y.tab.c"
+#line 1884 "y.tab.c"
     break;
 
   case 36:
-#line 281 "lispToForth/tradForth.y"
+#line 314 "lispToForth/tradForth.y"
                                              { 
                                                  sprintf(temp, "%s%s\n", yyvsp[0].trad, yyvsp[-1].code);
                                                  yyval.trad = gen_code(temp);
                                                  }
-#line 1860 "y.tab.c"
+#line 1893 "y.tab.c"
     break;
 
   case 37:
-#line 288 "lispToForth/tradForth.y"
+#line 321 "lispToForth/tradForth.y"
                                                  { yyval.trad = ""; }
-#line 1866 "y.tab.c"
+#line 1899 "y.tab.c"
     break;
 
   case 38:
-#line 289 "lispToForth/tradForth.y"
+#line 322 "lispToForth/tradForth.y"
                                                  { 
                                                     if (strcmp(yyvsp[-1].code, "variable") == 0){
                                                         sprintf(temp, "%s @\n%s", yyvsp[-1].trad, yyvsp[0].trad); 
@@ -1876,56 +1909,53 @@ yyreduce:
                                                     }
                                                     yyval.trad = gen_code(temp); 
                                                 }
-#line 1880 "y.tab.c"
+#line 1913 "y.tab.c"
     break;
 
   case 39:
-#line 301 "lispToForth/tradForth.y"
+#line 334 "lispToForth/tradForth.y"
                                                { yyval = yyvsp[0]; }
-#line 1886 "y.tab.c"
+#line 1919 "y.tab.c"
     break;
 
   case 40:
-#line 304 "lispToForth/tradForth.y"
+#line 337 "lispToForth/tradForth.y"
                                                {
-                                                sprintf(temp, "S\" %s\" TYPE CR\n", yyvsp[0].code);
+                                                sprintf(temp, "S\" %s \" TYPE CR\n", yyvsp[0].code);
                                                 yyval.trad = gen_code(temp);
                                                 }
-#line 1895 "y.tab.c"
+#line 1928 "y.tab.c"
     break;
 
   case 41:
-#line 308 "lispToForth/tradForth.y"
+#line 341 "lispToForth/tradForth.y"
                                                 { 
                                                 if (strcmp(yyvsp[0].code, "variable") == 0){
                                                     sym = searchSymbol(tabla, yyvsp[0].trad);
                                                     if (sym == NULL) {
                                                         yyerror("Variable no declarada");
-                                                        sprintf(temp, "%s @ .\n", yyvsp[0].trad);
+                                                        sprintf(temp, "%s @ . CR\n", yyvsp[0].trad);
                                                     } else if (strcmp(sym->type, "global")== 0){
                                                         if (sym -> size_array == 0){
-                                                            printf("IMPRIMIENDO VARIABLE\n");
-                                                            sprintf(temp, "%s @ .\n", yyvsp[0].trad);
+                                                            sprintf(temp, "%s @ . CR\n", yyvsp[0].trad);
                                                         } else {
-                                                            printf("IMPRIMIENDO VECTOR\n");
-                                                            
                                                             sprintf(temp, "S\" (\" TYPE\n %d 0 DO\nI CELLS %s + @ .\nLOOP\nS\" )\" TYPE CR\n", sym -> size_array, yyvsp[0].trad);
                                                         }
                                                     } else if (strcmp(sym->type, "local")== 0){
-                                                        sprintf(temp, "%s .\n", yyvsp[0].trad);
+                                                        sprintf(temp, "%s . CR\n", yyvsp[0].trad);
                                                     }
 
                                                 }
                                                 else{
-                                                    sprintf(temp, "%s .\n", yyvsp[0].trad);
+                                                    sprintf(temp, "%s . CR\n", yyvsp[0].trad);
                                                 }
                                                 yyval.trad = gen_code(temp);
                                                 }
-#line 1925 "y.tab.c"
+#line 1955 "y.tab.c"
     break;
 
   case 42:
-#line 336 "lispToForth/tradForth.y"
+#line 366 "lispToForth/tradForth.y"
                                                      { 
                                                     sym = searchSymbol(tabla, yyvsp[-5].code);
                                                     if (sym == NULL) {
@@ -1937,11 +1967,11 @@ yyreduce:
                                                     }
                                                     yyval.trad = gen_code(temp);
                                                     }
-#line 1941 "y.tab.c"
+#line 1971 "y.tab.c"
     break;
 
   case 43:
-#line 351 "lispToForth/tradForth.y"
+#line 381 "lispToForth/tradForth.y"
                                                                                  { 
                                                     sym = searchSymbol(tabla, yyvsp[-6].code);
                                                     if (sym == NULL) {
@@ -1953,94 +1983,134 @@ yyreduce:
                                                     }
                                                     yyval.trad = gen_code(temp);
                                                     }
-#line 1957 "y.tab.c"
+#line 1987 "y.tab.c"
     break;
 
   case 44:
-#line 367 "lispToForth/tradForth.y"
+#line 397 "lispToForth/tradForth.y"
                                                  { yyval=yyvsp[0]; }
-#line 1963 "y.tab.c"
+#line 1993 "y.tab.c"
     break;
 
   case 45:
-#line 368 "lispToForth/tradForth.y"
+#line 398 "lispToForth/tradForth.y"
                                                     { 
                                                     concat_ptr = temp;
                                                     concat_ptr += sprintf(concat_ptr, "%s ", yyvsp[-2].trad);
                                                     if (strcmp(yyvsp[-2].code, "variable") == 0){
-                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                        sym = searchSymbol(tabla, yyvsp[-2].trad);
+                                                        if (sym != NULL){
+                                                            if (strcmp(sym->type, "global")== 0){
+                                                                concat_ptr += sprintf(concat_ptr, "@ ");
+                                                            }
+                                                        }
                                                     }
                                                     concat_ptr += sprintf(concat_ptr, "%s ", yyvsp[-1].trad);
                                                     if (strcmp(yyvsp[-1].code, "variable") == 0){
-                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                        sym = searchSymbol(tabla, yyvsp[-1].trad);
+                                                        if (sym != NULL){
+                                                            if (strcmp(sym->type, "global")== 0){
+                                                                concat_ptr += sprintf(concat_ptr, "@ ");
+                                                            }
+                                                        }
                                                     }
                                                     concat_ptr += sprintf(concat_ptr, "+");
                                                     yyval.trad = gen_code(temp);
                                                     yyval.code = "oper";
 
                                                  }
-#line 1983 "y.tab.c"
+#line 2023 "y.tab.c"
     break;
 
   case 46:
-#line 383 "lispToForth/tradForth.y"
+#line 423 "lispToForth/tradForth.y"
                                                     { 
                                                     concat_ptr = temp;
                                                     concat_ptr += sprintf(concat_ptr, "%s ", yyvsp[-2].trad);
                                                     if (strcmp(yyvsp[-2].code, "variable") == 0){
-                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                        sym = searchSymbol(tabla, yyvsp[-2].trad);
+                                                        if (sym != NULL){
+                                                            if (strcmp(sym->type, "global")== 0){
+                                                                concat_ptr += sprintf(concat_ptr, "@ ");
+                                                            }
+                                                        }
                                                     }
                                                     concat_ptr += sprintf(concat_ptr, "%s ", yyvsp[-1].trad);
                                                     if (strcmp(yyvsp[-1].code, "variable") == 0){
-                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                        sym = searchSymbol(tabla, yyvsp[-1].trad);
+                                                        if (sym != NULL){
+                                                            if (strcmp(sym->type, "global")== 0){
+                                                                concat_ptr += sprintf(concat_ptr, "@ ");
+                                                            }
+                                                        }
                                                     }
                                                     concat_ptr += sprintf(concat_ptr, "-");
                                                     yyval.trad = gen_code(temp);
                                                     yyval.code = "oper";
                                                  }
-#line 2002 "y.tab.c"
+#line 2052 "y.tab.c"
     break;
 
   case 47:
-#line 397 "lispToForth/tradForth.y"
+#line 447 "lispToForth/tradForth.y"
                                                      {  
                                                     concat_ptr = temp;
                                                     concat_ptr += sprintf(concat_ptr, "%s ", yyvsp[-2].trad);
                                                     if (strcmp(yyvsp[-2].code, "variable") == 0){
-                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                        sym = searchSymbol(tabla, yyvsp[-2].trad);
+                                                        if (sym != NULL){
+                                                            if (strcmp(sym->type, "global")== 0){
+                                                                concat_ptr += sprintf(concat_ptr, "@ ");
+                                                            }
+                                                        }
                                                     }
                                                     concat_ptr += sprintf(concat_ptr, "%s ", yyvsp[-1].trad);
                                                     if (strcmp(yyvsp[-1].code, "variable") == 0){
-                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                        sym = searchSymbol(tabla, yyvsp[-1].trad);
+                                                        if (sym != NULL){
+                                                            if (strcmp(sym->type, "global")== 0){
+                                                                concat_ptr += sprintf(concat_ptr, "@ ");
+                                                            }
+                                                        }
                                                     }
                                                     concat_ptr += sprintf(concat_ptr, "*");
                                                     yyval.trad = gen_code(temp);
                                                     yyval.code = "oper";
                                                  }
-#line 2021 "y.tab.c"
+#line 2081 "y.tab.c"
     break;
 
   case 48:
-#line 411 "lispToForth/tradForth.y"
+#line 471 "lispToForth/tradForth.y"
                                                    {  
                                                     concat_ptr = temp;
                                                     concat_ptr += sprintf(concat_ptr, "%s ", yyvsp[-2].trad);
                                                     if (strcmp(yyvsp[-2].code, "variable") == 0){
-                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                        sym = searchSymbol(tabla, yyvsp[-2].trad);
+                                                        if (sym != NULL){
+                                                            if (strcmp(sym->type, "global")== 0){
+                                                                concat_ptr += sprintf(concat_ptr, "@ ");
+                                                            }
+                                                        }
                                                     }
                                                     concat_ptr += sprintf(concat_ptr, "%s ", yyvsp[-1].trad);
                                                     if (strcmp(yyvsp[-1].code, "variable") == 0){
-                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                        sym = searchSymbol(tabla, yyvsp[-1].trad);
+                                                        if (sym != NULL){
+                                                            if (strcmp(sym->type, "global")== 0){
+                                                                concat_ptr += sprintf(concat_ptr, "@ ");
+                                                            }
+                                                        }
                                                     }
                                                     concat_ptr += sprintf(concat_ptr, "/");
                                                     yyval.trad = gen_code(temp);
                                                     yyval.code = "oper";
                                                  }
-#line 2040 "y.tab.c"
+#line 2110 "y.tab.c"
     break;
 
   case 49:
-#line 425 "lispToForth/tradForth.y"
+#line 495 "lispToForth/tradForth.y"
                                                    {
                                                     concat_ptr = temp;
                                                     concat_ptr += sprintf(concat_ptr, "%s ", yyvsp[-2].trad);
@@ -2055,11 +2125,11 @@ yyreduce:
                                                     yyval.trad = gen_code(temp);
                                                     yyval.code = "oper";
                                                 }
-#line 2059 "y.tab.c"
+#line 2129 "y.tab.c"
     break;
 
   case 50:
-#line 439 "lispToForth/tradForth.y"
+#line 509 "lispToForth/tradForth.y"
                                                   {
                                                     concat_ptr = temp;
                                                     concat_ptr += sprintf(concat_ptr, "%s ", yyvsp[-2].trad);
@@ -2075,11 +2145,11 @@ yyreduce:
                                                     yyval.code = "oper";
                                                
                                                 }
-#line 2079 "y.tab.c"
+#line 2149 "y.tab.c"
     break;
 
   case 51:
-#line 454 "lispToForth/tradForth.y"
+#line 524 "lispToForth/tradForth.y"
                                                   {
                                                     concat_ptr = temp;
                                                     concat_ptr += sprintf(concat_ptr, "%s ", yyvsp[-2].trad);
@@ -2094,11 +2164,11 @@ yyreduce:
                                                     yyval.trad = gen_code(temp);
                                                     yyval.code = "oper";
                                                 }
-#line 2098 "y.tab.c"
+#line 2168 "y.tab.c"
     break;
 
   case 52:
-#line 468 "lispToForth/tradForth.y"
+#line 538 "lispToForth/tradForth.y"
                                                   {
                                                     concat_ptr = temp;
                                                     concat_ptr += sprintf(concat_ptr, "%s ", yyvsp[-2].trad);
@@ -2114,30 +2184,40 @@ yyreduce:
                                                     yyval.code = "oper";
 
                                                 }
-#line 2118 "y.tab.c"
+#line 2188 "y.tab.c"
     break;
 
   case 53:
-#line 483 "lispToForth/tradForth.y"
+#line 553 "lispToForth/tradForth.y"
                                                   {
                                                     concat_ptr = temp;
                                                     concat_ptr += sprintf(concat_ptr, "%s ", yyvsp[-2].trad);
                                                     if (strcmp(yyvsp[-2].code, "variable") == 0){
-                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                        sym = searchSymbol(tabla, yyvsp[-2].trad);
+                                                        if (sym != NULL){
+                                                            if (strcmp(sym->type, "global")== 0){
+                                                                concat_ptr += sprintf(concat_ptr, "@ ");
+                                                            }
+                                                        }
                                                     }
                                                     concat_ptr += sprintf(concat_ptr, "%s ", yyvsp[-1].trad);
                                                     if (strcmp(yyvsp[-1].code, "variable") == 0){
-                                                        concat_ptr += sprintf(concat_ptr, "@ ");
+                                                        sym = searchSymbol(tabla, yyvsp[-1].trad);
+                                                        if (sym != NULL){
+                                                            if (strcmp(sym->type, "global")== 0){
+                                                                concat_ptr += sprintf(concat_ptr, "@ ");
+                                                            }
+                                                        }
                                                     }
                                                     concat_ptr += sprintf(concat_ptr, ">");
                                                     yyval.trad = gen_code(temp);
                                                     yyval.code = "oper";
                                                 }
-#line 2137 "y.tab.c"
+#line 2217 "y.tab.c"
     break;
 
   case 54:
-#line 497 "lispToForth/tradForth.y"
+#line 577 "lispToForth/tradForth.y"
                                                   {
                                                     concat_ptr = temp;
                                                     concat_ptr += sprintf(concat_ptr, "%s ", yyvsp[-2].trad);
@@ -2152,11 +2232,11 @@ yyreduce:
                                                     yyval.trad = gen_code(temp);
                                                     yyval.code = "oper";
                                                 }
-#line 2156 "y.tab.c"
+#line 2236 "y.tab.c"
     break;
 
   case 55:
-#line 511 "lispToForth/tradForth.y"
+#line 591 "lispToForth/tradForth.y"
                                                   { 
                                                     concat_ptr = temp;
                                                     concat_ptr += sprintf(concat_ptr, "%s ", yyvsp[-2].trad);
@@ -2171,11 +2251,11 @@ yyreduce:
                                                     yyval.trad = gen_code(temp);
                                                     yyval.code = "oper";
                                                 }
-#line 2175 "y.tab.c"
+#line 2255 "y.tab.c"
     break;
 
   case 56:
-#line 525 "lispToForth/tradForth.y"
+#line 605 "lispToForth/tradForth.y"
                                                   {
                                                     concat_ptr = temp;
                                                     concat_ptr += sprintf(concat_ptr, "%s ", yyvsp[-2].trad);
@@ -2190,54 +2270,54 @@ yyreduce:
                                                     yyval.trad = gen_code(temp);
                                                     yyval.code = "oper";
                                                 }
-#line 2194 "y.tab.c"
+#line 2274 "y.tab.c"
     break;
 
   case 57:
-#line 541 "lispToForth/tradForth.y"
+#line 621 "lispToForth/tradForth.y"
                                                 { sprintf(temp, "%d", yyvsp[0].value);
                                                 yyval.trad = gen_code(temp);
                                                 yyval.value = yyvsp[0].value; 
                                                 yyval.code = "number";
                                                 }
-#line 2204 "y.tab.c"
+#line 2284 "y.tab.c"
     break;
 
   case 58:
-#line 546 "lispToForth/tradForth.y"
+#line 626 "lispToForth/tradForth.y"
                                                 { 
 
                                                 sprintf(temp, "%s", yyvsp[0].code);
                                                 yyval.trad = gen_code(temp);
                                                 yyval.code = "variable";
                                                 }
-#line 2215 "y.tab.c"
+#line 2295 "y.tab.c"
     break;
 
   case 59:
-#line 552 "lispToForth/tradForth.y"
+#line 632 "lispToForth/tradForth.y"
                                                   { 
-                                                sprintf(temp, "%s CELLS %s +", yyvsp[-1].trad, yyvsp[-2].code);
+                                                sprintf(temp, "%s CELLS %s + @", yyvsp[-1].trad, yyvsp[-2].code);
                                                 yyval.trad = gen_code(temp);
                                                 yyval.code = "variable";
                                                 }
-#line 2225 "y.tab.c"
+#line 2305 "y.tab.c"
     break;
 
   case 60:
-#line 559 "lispToForth/tradForth.y"
+#line 639 "lispToForth/tradForth.y"
                                                 { yyval.code = yyvsp[0].code; }
-#line 2231 "y.tab.c"
+#line 2311 "y.tab.c"
     break;
 
   case 61:
-#line 560 "lispToForth/tradForth.y"
+#line 640 "lispToForth/tradForth.y"
                                                 { yyval.code = yyvsp[-1].code; }
-#line 2237 "y.tab.c"
+#line 2317 "y.tab.c"
     break;
 
 
-#line 2241 "y.tab.c"
+#line 2321 "y.tab.c"
 
       default: break;
     }
@@ -2469,7 +2549,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 563 "lispToForth/tradForth.y"
+#line 643 "lispToForth/tradForth.y"
 
 
                         /* SECCION 4  Codigo en C */

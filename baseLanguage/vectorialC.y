@@ -211,7 +211,6 @@ restoVar:                       {  $$.code = NULL;
 funcionesDef:   funcionArgs ')' '{'                 { lastNode = NULL; }
                 recSentenciaFin    
                 INTEGER funcionesDefRec             { //Nodo de la funcion
-                                                        // TODO: MANAGE ARGS
                                                         struct nodoAST* nodoFunc = crearNodoFuncion("NombreFuncTemp");
                                                         struct nodoAST* nodoArgs = crearNodoIntermedioGenerico("argumentos", 0);
                                                         if ($1.nodo){
@@ -252,6 +251,7 @@ funcionArgs:                                       { $$.prefija = "";
                                                     }
             |  INTEGER IDENTIF isVector recArgFunct {       // Nodo AST
                                                             struct nodoAST* nodoVar = NULL;         
+                                                            
                                                             if ($3.code){
                                                                 nodoVar = crearNodoVariableInit($2.code, $3.nodo -> valor, "vector");
                                                             } else{
@@ -962,7 +962,9 @@ operando:    IDENTIF isVector           {
             | '(' expresion ')'          { $$ = $2 ; }
             ;
 
-isVector:                               { $$.nodo = NULL; }
+isVector:                               { $$.nodo = NULL; 
+                                          $$.code = NULL;
+                                        }
             | '[' expresionAric ']'     { $$.nodo = $2.nodo; 
                                           $$.value = $2.value;
                                         }
